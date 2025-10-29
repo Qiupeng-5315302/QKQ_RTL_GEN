@@ -1,6 +1,6 @@
 # 视频汇聚与自动黑像素填充：设计方案
 
-本文档提供了一个数字电路设计方案，用于实现一个4通道视频汇聚器。当任何一路视频流丢失时，该模块能自动用黑像素数据填充该通道，同时不影响其他正常视频流的传输。
+本文档提供了一个数字电路设计方案，用于实现一个4通道视频汇聚器。当任何一路视频流丢失时，该模块能自动用黑像素数据填充(按照Wx4h模式)该通道，同时不影响其他正常视频流的传输。
 
 ---
 
@@ -8,9 +8,9 @@
 
 1. frame_sync_lock信号拉起后，开始正常输出图像，以及对齐检测；
 2. 若用户置高 auto_mask_en[3:0]，对应的pipe[3:0] 检测到超时未进入数据，则对pipe[3:0]补黑像素；
-3. 若用户触发 video_mask_restart[3:0],则撤离 pipe[3:0] 补黑像素；
-4. ⚠️ 若用户拉低 auto_mask_en[3:0]，检测到pipe[3:0] 超时未进入数据，则**暂停所有数据输出**，本地所有pipe_mask_bitmap置1，停止发起同步汇聚；
-5. 若用户触发 video_mask_latch_reset,则将汇聚器中的pipe_mask_bitmap清至初始态；
+3. 若用户置高 video_mask_restart[3:0],则撤离 pipe[3:0] 填充黑像素；
+4. ⚠️ 若用户拉低 auto_mask_en[3:0]，检测到pipe[3:0] 超时未进入数据，则**暂停所有数据输出**，本地所有pipe_mask_bitmap 置1，停止发起同步汇聚；
+5. 若用户触发 video_mask_latch_reset,则将汇聚器中的pipe_mask_bitmap 清至初始态；
 6. 若用户置高 force_video_mask,则强制pipe[3:0]补黑像素；
 7. 若用户拉低 force_video_mask,则撤离pipe[3:0]补黑像素；
 
@@ -110,7 +110,7 @@ pipe清空由pipe_mask_bitmap对应位置1触发；执行video_pipe FIFO清空�
 - pkt_datatype 字段说明加串器 MIPI RX 的包类型
 - pkt_id 字段说明FS/FE携带的帧号，LONG_PKT携带的行号，由于加串器 MIPI RX的协议 LONG_PKT无行号字段，按照以下方案实现：
   - [ ] 检查LONG_PKT行号16bit，行号由MIPI TX生成，要求加串器传输LS/LE，行号由解串器接收LS-LE后开窗生成；
-  - [ ] 检查LONG_PKT行号3bit，不要求加串器传输LS/LE，行号由加串器生成，将3bit自增（循环计数）行号打到像素包中（即每行递增，溢出后回到0）；
+  - [x] 检查LONG_PKT行号3bit，不要求加串器传输LS/LE，行号由加串器生成，将3bit自增（循环计数）行号打到像素包中（即每行递增，溢出后回到0）；
   - [ ] 不检查LONG_PKT行号，仅检查FS/FE帧号；
 
 #### 2.1.1 管道屏蔽管理-pipe_mask_ctrl
@@ -128,7 +128,9 @@ pipe清空由pipe_mask_bitmap对应位置1触发；执行video_pipe FIFO清空�
 
 ##### 工作流程-pipe_mask_ctrl
 
-- local_pkt_datatype 控制汇聚器按固定pkt序列输出图像FS->LONG_PKT->FE
+- local_pkt_datatype 控制汇聚器按固定pkt序列输出图像
+  - [ ] FS->LONG_PKT->FE
+  - [ ] FS-> LS -> LONG_PKT -> LE ->FE
 - local_short_pkt_id 记录本地帧号，复位后无效，锁存收到的第一帧帧号
 - local_long_pkt_id 记录本地行号，调度FE后，重置到0(启用时要求加串器传输LS/LE，或者加串器将3bit行号打到像素包中)
 
@@ -192,6 +194,6 @@ pipe清空由pipe_mask_bitmap对应位置1触发；执行video_pipe FIFO清空�
 | `black_pixel_data`| O | 140 | 黑像素数据输出 |
 
 #### 原理-BPG
-该模块内部包含`reg_BPG_*`配置寄存器。该系列寄存器控制填充包的类型和字节长度（对应IDI接口）。
-
+  - [ ] 该模块内部包含`reg_BPG_*`配置寄存器。该系列寄存器控制填充包的类型和字节长度（对应IDI接口）。
+  - [ ] 由最老时戳包的 datatype 和 wordcount
 ---
