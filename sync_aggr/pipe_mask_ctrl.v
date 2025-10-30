@@ -1,10 +1,11 @@
-﻿// =============================================================================
-// File Name    : pipe_mask_ctrl.v
-// Author       : Auto-generated from pipe_mask_ctrl_design.md
+// =============================================================================
+// File Name    : pipe_mask_ctrl_new.v
+// Author       : Generated based on pipe_mask_ctrl_design.md v2.0
 // Description  : Video pipeline mask control state machine
-//                Three-stage state machine implementation
-//                Maintains pipe_mask_bitmap and generates pipe_normal_bitmap
-// License      : MIT License
+//                Eight-state FSM with complete functionality
+//                Supports Force/Auto/Restart mask modes
+// Date         : 2025-10-30
+// License      : MIT
 // =============================================================================
 
 module pipe_mask_ctrl (
@@ -17,62 +18,90 @@ module pipe_mask_ctrl (
     input  wire [3:0]  Force_Video_Mask,
     input  wire [3:0]  Auto_Mask_En,
     input  wire [3:0]  Video_Mask_Restart_En,
+    input  wire [3:0]  pipe_frame_active,
     input  wire        frame_sync_lock,
     input  wire [1:0]  aggre_mode,
     input  wire        video_mask_latch_reset,
     
-    // Status Signals from Timestamp Alignment Determination Module
-    input  wire        timestamp_align_succeed,
-    input  wire        timestamp_align_fail,
+    // FIFO Interface (for sub-modules)
+    input  wire [3:0]  data_vld,
+    input  wire [101:0] data_0,
+    input  wire [101:0] data_1,
+    input  wire [101:0] data_2,
+    input  wire [101:0] data_3,
+    input  wire [79:0] local_timestamp,
+    input  wire [19:0] reg_sync_aggr_video_timeout_threshold,
     
-    // Status Signals from Video Status Determination Module
-    input  wire [3:0]  video_status_pass_bitmap,
-    input  wire [3:0]  video_status_fail_bitmap,
-    
-    // SCH Concat Interface
-    input  wire        end_sch_pulse,
+    // Schedule Concat Interface
     output reg         start_sch_pulse,
+    input  wire        end_sch_pulse,
+    
+    // Video Pipe Control
+    output reg  [3:0]  pipe_clear_pulse,
+    output reg  [7:0]  pipe_wr_mode,
     
     // Bitmap Outputs
     output reg  [3:0]  pipe_mask_bitmap,
-    output wire [3:0]  pipe_normal_bitmap
+    output wire [3:0]  pipe_normal_bitmap,
+    output wire [3:0]  pipe_restart_bitmap
 );
 
+    //==========================================================================
     // State Encoding
-    localparam [3:0] INIT                             = 4'd0;
-    localparam [3:0] IDLE                             = 4'd1;
-    localparam [3:0] DURING_TIMESTAMP_ALIGN_DETERMING = 4'd2;
-    localparam [3:0] DURING_VIDEO_STATUS_DETERMING    = 4'd3;
-    localparam [3:0] DURING_SCHEDULING_PIPE           = 4'd4;
-    localparam [3:0] MASK_BITMAP_ADD_TIME_OUT         = 4'd5;
-    localparam [3:0] MASK_BITMAP_ADD_FORCE            = 4'd6;
-    localparam [3:0] MASK_BITMAP_SUB                  = 4'd7;
-
-    // Internal Registers
-    reg [3:0] current_state;
-    reg [3:0] next_state;
-    reg [3:0] delay_cnt;
-    reg [3:0] video_status_pass_bitmap_latch;
+    //==========================================================================
+    localparam [2:0] INIT                             = 3'd0;
+    localparam [2:0] IDLE                             = 3'd1;
+    localparam [2:0] DURING_TIMESTAMP_ALIGN_DETERMING = 3'd2;
+    localparam [2:0] DURING_VIDEO_STATUS_DETERMING    = 3'd3;
+    localparam [2:0] MASK_BITMAP_SUB_RECOVER          = 3'd4;
+    localparam [2:0] MASK_BITMAP_ADD_TIME_OUT         = 3'd5;
+    localparam [2:0] CLEAR_MASK_PIPE                  = 3'd6;
+    localparam [2:0] DURING_SCHEDULING_PIPE           = 3'd7;
     
-    // pipe_normal_bitmap = ~pipe_mask_bitmap & pipe_concat_en
-    assign pipe_normal_bitmap = ~pipe_mask_bitmap & pipe_concat_en;
-
-    // Stage 1: State Register
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            current_state <= INIT;
-        end else begin
-            current_state <= next_state;
-        end
-    end
-
-    // Stage 2: Next State Logic
+    //==========================================================================
+    // Internal Registers and Wires
+    //==========================================================================
+    reg [2:0]  current_state;
+    reg [2:0]  next_state;
+    reg [3:0]  delay_cnt;
+    
+    // Latched configuration (set in INIT, fixed in IDLE)
+    reg [3:0]  local_force_video_mask;
+    reg [3:0]  local_auto_mask_en;
+    
+    // Debug fault flag (internal only)
+    reg        fault_clear_mask_pipe_error;
+    
+    // Signals from/to timestamp_align_determination sub-module
+    wire       start_timestamp_align;
+    wire       timestamp_align_pass;
+    wire       timestamp_align_fail;
+    wire [3:0] timestamp_align_pass_bitmap;
+    
+    // Signals from/to video_status_determination sub-module
+    wire       start_video_status_determing;
+    wire [3:0] video_status_pass_bitmap;
+    wire [3:0] video_status_fail_bitmap;
+    
+    // Derived signals
+    assign pipe_normal_bitmap  = ~pipe_mask_bitmap & pipe_concat_en;
+    assign pipe_restart_bitmap = pipe_mask_bitmap & Video_Mask_Restart_En & pipe_frame_active;
+    
+    // Control pulse generation
+    assign start_timestamp_align = (current_state == IDLE) && 
+                                         (next_state == DURING_TIMESTAMP_ALIGN_DETERMING);
+    assign start_video_status_determing = (current_state == DURING_TIMESTAMP_ALIGN_DETERMING) && 
+                                          (next_state == DURING_VIDEO_STATUS_DETERMING);
+    
+    //==========================================================================
+    // Stage 1: Next State Logic (Combinational)
+    //==========================================================================
     always @(*) begin
         next_state = current_state;
         
         case (current_state)
             INIT: begin
-                if (frame_sync_lock && (aggre_mode == 2'b01)) begin
+                if (aggre_mode == 2'b01 && frame_sync_lock) begin
                     next_state = IDLE;
                 end
             end
@@ -80,32 +109,46 @@ module pipe_mask_ctrl (
             IDLE: begin
                 if (video_mask_latch_reset) begin
                     next_state = INIT;
-                end else if (|Force_Video_Mask) begin
-                    next_state = MASK_BITMAP_ADD_FORCE;
-                end else if (|Video_Mask_Restart_En) begin
-                    next_state = MASK_BITMAP_SUB;
-                end else begin
+                end
+                else if (|((pipe_normal_bitmap | pipe_restart_bitmap) & data_vld)) begin
                     next_state = DURING_TIMESTAMP_ALIGN_DETERMING;
                 end
             end
             
             DURING_TIMESTAMP_ALIGN_DETERMING: begin
-                if (delay_cnt == 4'd2) begin
-                    if (timestamp_align_succeed) begin
-                        next_state = DURING_VIDEO_STATUS_DETERMING;
-                    end else if (timestamp_align_fail) begin
+                if (delay_cnt == 4'd3) begin
+                    if (timestamp_align_fail) begin
                         next_state = IDLE;
+                    end
+                    else if (timestamp_align_pass) begin
+                        next_state = DURING_VIDEO_STATUS_DETERMING;
                     end
                 end
             end
             
             DURING_VIDEO_STATUS_DETERMING: begin
                 if (delay_cnt == 4'd3) begin
-                    if (|video_status_fail_bitmap) begin
-                        next_state = MASK_BITMAP_ADD_TIME_OUT;
-                    end else begin
-                        next_state = DURING_SCHEDULING_PIPE;
-                    end
+                    next_state = MASK_BITMAP_SUB_RECOVER;
+                end
+            end
+            
+            MASK_BITMAP_SUB_RECOVER: begin
+                next_state = MASK_BITMAP_ADD_TIME_OUT;
+            end
+            
+            MASK_BITMAP_ADD_TIME_OUT: begin
+                next_state = CLEAR_MASK_PIPE;
+            end
+            
+            CLEAR_MASK_PIPE: begin
+                if (&pipe_mask_bitmap) begin
+                    next_state = INIT;
+                end
+                else if (|video_status_pass_bitmap) begin
+                    next_state = DURING_SCHEDULING_PIPE;
+                end
+                else begin
+                    next_state = IDLE;
                 end
             end
             
@@ -115,125 +158,184 @@ module pipe_mask_ctrl (
                 end
             end
             
-            MASK_BITMAP_ADD_TIME_OUT: begin
-                if (delay_cnt == 4'd10) begin
-                    if (|video_status_pass_bitmap_latch) begin
-                        next_state = DURING_SCHEDULING_PIPE;
-                    end else begin
-                        next_state = IDLE;
-                    end
-                end
-            end
-            
-            MASK_BITMAP_ADD_FORCE: begin
-                next_state = IDLE;
-            end
-            
-            MASK_BITMAP_SUB: begin
-                next_state = IDLE;
-            end
-            
             default: begin
                 next_state = INIT;
             end
         endcase
     end
-
-    // Stage 3: Output Logic - Delay Counter
+    
+    //==========================================================================
+    // Stage 2: State Register (Sequential)
+    //==========================================================================
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            current_state <= INIT;
+        end
+        else begin
+            current_state <= next_state;
+        end
+    end
+    
+    // Delay Counter (Sequential)
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             delay_cnt <= 4'd0;
-        end else begin
-            case (current_state)
-                DURING_TIMESTAMP_ALIGN_DETERMING: begin
-                    if (delay_cnt < 4'd2) begin
-                        delay_cnt <= delay_cnt + 1'b1;
-                    end else begin
-                        delay_cnt <= 4'd0;
-                    end
-                end
-                
-                DURING_VIDEO_STATUS_DETERMING: begin
-                    if (delay_cnt < 4'd3) begin
-                        delay_cnt <= delay_cnt + 1'b1;
-                    end else begin
-                        delay_cnt <= 4'd0;
-                    end
-                end
-                
-                MASK_BITMAP_ADD_TIME_OUT: begin
-                    if (delay_cnt < 4'd10) begin
-                        delay_cnt <= delay_cnt + 1'b1;
-                    end else begin
-                        delay_cnt <= 4'd0;
-                    end
-                end
-                
-                default: begin
-                    delay_cnt <= 4'd0;
-                end
-            endcase
         end
-    end
-
-    // Latch video_status_pass_bitmap
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            video_status_pass_bitmap_latch <= 4'd0;
-        end else begin
-            if (current_state == DURING_TIMESTAMP_ALIGN_DETERMING && 
-                delay_cnt == 4'd2 && timestamp_align_succeed) begin
-                video_status_pass_bitmap_latch <= video_status_pass_bitmap;
+        else begin
+            // delay_cnt only resets when entering specific states that need counting
+            if (next_state == DURING_TIMESTAMP_ALIGN_DETERMING && current_state == IDLE) begin
+                delay_cnt <= 4'd1;
+            end
+            else if (next_state == DURING_VIDEO_STATUS_DETERMING && current_state == DURING_TIMESTAMP_ALIGN_DETERMING) begin
+                delay_cnt <= 4'd1;
+            end
+            else if (current_state == DURING_TIMESTAMP_ALIGN_DETERMING && delay_cnt < 4'd3) begin
+                delay_cnt <= delay_cnt + 1'b1;
+            end
+            else if (current_state == DURING_VIDEO_STATUS_DETERMING && delay_cnt < 4'd3) begin
+                delay_cnt <= delay_cnt + 1'b1;
             end
         end
     end
-
-    // pipe_mask_bitmap Control
+    
+    //==========================================================================
+    // Stage 3: Output Logic
+    //==========================================================================
+    
+    // Configuration latching
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            pipe_mask_bitmap <= 4'b0000;
-        end else begin
+            local_force_video_mask <= 4'b0;
+            local_auto_mask_en     <= 4'b0;
+        end
+        else if (current_state == INIT) begin
+            local_force_video_mask <= Force_Video_Mask;
+            local_auto_mask_en     <= Auto_Mask_En;
+        end
+    end
+    
+    // pipe_mask_bitmap management
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            pipe_mask_bitmap <= 4'b1111;
+        end
+        else begin
             case (current_state)
                 INIT: begin
                     if (next_state == IDLE) begin
-                        pipe_mask_bitmap <= 4'b0000;
+                        pipe_mask_bitmap <= pipe_concat_en & local_force_video_mask;
                     end
                 end
                 
-                IDLE: begin
-                    pipe_mask_bitmap <= pipe_mask_bitmap;
+                MASK_BITMAP_SUB_RECOVER: begin
+                    pipe_mask_bitmap <= pipe_mask_bitmap & ~(pipe_restart_bitmap & video_status_pass_bitmap);
                 end
                 
                 MASK_BITMAP_ADD_TIME_OUT: begin
-                    pipe_mask_bitmap <= pipe_mask_bitmap | (video_status_fail_bitmap & Auto_Mask_En);
-                end
-                
-                MASK_BITMAP_ADD_FORCE: begin
-                    pipe_mask_bitmap <= pipe_mask_bitmap | Force_Video_Mask;
-                end
-                
-                MASK_BITMAP_SUB: begin
-                    pipe_mask_bitmap <= pipe_mask_bitmap & ~Video_Mask_Restart_En;
-                end
-                
-                default: begin
-                    pipe_mask_bitmap <= pipe_mask_bitmap;
+                    pipe_mask_bitmap <= pipe_mask_bitmap | (pipe_normal_bitmap & video_status_fail_bitmap);
                 end
             endcase
         end
     end
-
-    // start_sch_pulse Generation
+    
+    // pipe_clear_pulse generation
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            pipe_clear_pulse <= 4'b0;
+        end
+        else if (current_state != CLEAR_MASK_PIPE && next_state == CLEAR_MASK_PIPE) begin
+            pipe_clear_pulse <= pipe_mask_bitmap;
+        end
+        else begin
+            pipe_clear_pulse <= 4'b0;
+        end
+    end
+    
+    // start_sch_pulse generation
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             start_sch_pulse <= 1'b0;
-        end else begin
-            if (current_state != DURING_SCHEDULING_PIPE && next_state == DURING_SCHEDULING_PIPE) begin
-                start_sch_pulse <= 1'b1;
-            end else begin
-                start_sch_pulse <= 1'b0;
+        end
+        else if (current_state != DURING_SCHEDULING_PIPE && next_state == DURING_SCHEDULING_PIPE) begin
+            start_sch_pulse <= 1'b1;
+        end
+        else begin
+            start_sch_pulse <= 1'b0;
+        end
+    end
+    
+    // pipe_wr_mode generation
+    always @(*) begin
+        integer i;
+        for (i = 0; i < 4; i = i + 1) begin
+            if (pipe_mask_bitmap[i] && !Video_Mask_Restart_En[i]) begin
+                pipe_wr_mode[2*i+1 : 2*i] = 2'b00;
+            end
+            else begin
+                pipe_wr_mode[2*i+1 : 2*i] = 2'b10;
             end
         end
     end
+    
+    // Fault detection for debug
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            fault_clear_mask_pipe_error <= 1'b0;
+        end
+        else if (current_state == CLEAR_MASK_PIPE) begin
+            if (!(&pipe_mask_bitmap) && !(|video_status_pass_bitmap)) begin
+                fault_clear_mask_pipe_error <= 1'b1;
+            end
+        end
+        else if (current_state == INIT) begin
+            fault_clear_mask_pipe_error <= 1'b0;
+        end
+    end
+    
+    //==========================================================================
+    // Sub-Module Instantiation
+    //==========================================================================
+    
+    // Timestamp Alignment Determination Module
+    timstamp_align_determination u_timstamp_align_determination (
+        .clk                                    (clk),
+        .rst_n                                  (rst_n),
+        .reg_sync_aggr_video_timeout_threshold  (reg_sync_aggr_video_timeout_threshold),
+        .pipe_normal_bitmap                     (pipe_normal_bitmap),
+        .pipe_restart_bitmap                    (pipe_restart_bitmap),
+        .data_vld_0                             (data_vld[0]),
+        .data_vld_1                             (data_vld[1]),
+        .data_vld_2                             (data_vld[2]),
+        .data_vld_3                             (data_vld[3]),
+        .data_0                                 (data_0),
+        .data_1                                 (data_1),
+        .data_2                                 (data_2),
+        .data_3                                 (data_3),
+        .local_timestamp                        (local_timestamp),
+        .start_timestamp_align                  (start_timestamp_align),
+        .timestamp_align_pass                   (timestamp_align_pass),
+        .timestamp_align_fail                   (timestamp_align_fail),
+        .timestamp_align_pass_bitmap            (timestamp_align_pass_bitmap)
+    );
+    
+    // Video Status Determination Module (to be implemented)
+    video_status_determination u_video_status_determination (
+        .clk                                    (clk),
+        .rst_n                                  (rst_n),
+        .start_video_status_determing           (start_video_status_determing),
+        .timestamp_align_pass_bitmap            (timestamp_align_pass_bitmap),
+        .data_vld_0                             (data_vld[0]),
+        .data_vld_1                             (data_vld[1]),
+        .data_vld_2                             (data_vld[2]),
+        .data_vld_3                             (data_vld[3]),
+        .data_0                                 (data_0),
+        .data_1                                 (data_1),
+        .data_2                                 (data_2),
+        .data_3                                 (data_3),
+        .Auto_Mask_En                           (local_auto_mask_en),
+        .video_status_pass_bitmap               (video_status_pass_bitmap),
+        .video_status_fail_bitmap               (video_status_fail_bitmap)
+    );
 
 endmodule
+

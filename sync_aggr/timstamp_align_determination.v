@@ -1,11 +1,12 @@
 // =============================================================================
 // Module: timstamp_align_determination
 // Description: 时戳对齐判定模块
-//              通过比较4个FWFT FIFO的空满状态和本地时戳，判断当前normal_pipe_bitmap
-//              中哪些pipe可以不再等待。采用3拍流水线处理。
+//              通过比较4个FWFT FIFO的空满状态和本地时戳，判断当前需要检测的pipe
+//              (pipe_normal_bitmap | pipe_restart_bitmap) 中哪些可以不再等待。
+//              采用3拍流水线处理。
 // 
 // Author: AI Generated based on pipe_mask_ctrl_design.md
-// Date: 2025-10-25
+// Date: 2025-10-30 (Updated)
 // =============================================================================
 
 module timstamp_align_determination (
@@ -37,7 +38,7 @@ module timstamp_align_determination (
     input  wire [79:0]  local_timestamp,
     
     // Control
-    input  wire         start_timestamp_align_determing,
+    input  wire         start_timestamp_align,
     
     // Output
     output reg          timestamp_align_pass,
@@ -64,9 +65,13 @@ assign pkt_timestamp_1 = data_1[79:0];
 assign pkt_timestamp_2 = data_2[79:0];
 assign pkt_timestamp_3 = data_3[79:0];
 
+// Check bitmap: combine normal and restart pipes
+wire [3:0] check_bitmap;
+assign check_bitmap = pipe_normal_bitmap | pipe_restart_bitmap;
+
 // Pipeline Stage 1 registers
 reg         stage1_valid;
-reg [3:0]   stage1_normal_bitmap;
+reg [3:0]   stage1_check_bitmap;
 reg [3:0]   stage1_data_vld;
 reg         stage1_all_data_ready;
 reg [79:0]  stage1_result0;  // min(timestamp_0, timestamp_1)
@@ -75,7 +80,7 @@ reg [79:0]  stage1_local_timestamp;
 
 // Pipeline Stage 2 registers
 reg         stage2_valid;
-reg [3:0]   stage2_normal_bitmap;
+reg [3:0]   stage2_check_bitmap;
 reg [3:0]   stage2_data_vld;
 reg         stage2_all_data_ready;
 reg [79:0]  stage2_oldest_timestamp;
@@ -83,7 +88,7 @@ reg [79:0]  stage2_local_timestamp;
 
 // Pipeline Stage 3 registers
 reg         stage3_valid;
-reg [3:0]   stage3_normal_bitmap;
+reg [3:0]   stage3_check_bitmap;
 reg [3:0]   stage3_data_vld;
 reg         stage3_all_data_ready;
 reg [79:0]  stage3_time_offset;
@@ -98,18 +103,18 @@ always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         stage1_valid <= 1'b0;
     end else begin
-        stage1_valid <= start_timestamp_align_determing;
+        stage1_valid <= start_timestamp_align;
     end
 end
 
 // Stage 1: Control signals sampling
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-        stage1_normal_bitmap   <= 4'b0000;
+        stage1_check_bitmap    <= 4'b0000;
         stage1_data_vld        <= 4'b0000;
         stage1_local_timestamp <= 80'h0;
-    end else if (start_timestamp_align_determing) begin
-        stage1_normal_bitmap   <= pipe_normal_bitmap;
+    end else if (start_timestamp_align) begin
+        stage1_check_bitmap    <= check_bitmap;
         stage1_data_vld        <= data_vld;
         stage1_local_timestamp <= local_timestamp;
     end
@@ -119,8 +124,8 @@ end
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         stage1_all_data_ready <= 1'b0;
-    end else if (start_timestamp_align_determing) begin
-        stage1_all_data_ready <= ((pipe_normal_bitmap & data_vld) == pipe_normal_bitmap);
+    end else if (start_timestamp_align) begin
+        stage1_all_data_ready <= ((check_bitmap & data_vld) == check_bitmap);
     end
 end
 
@@ -128,12 +133,12 @@ end
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         stage1_result0 <= 80'h0;
-    end else if (start_timestamp_align_determing) begin
-        if ((pipe_normal_bitmap[0] & data_vld[0]) && (pipe_normal_bitmap[1] & data_vld[1])) begin
+    end else if (start_timestamp_align) begin
+        if ((check_bitmap[0] & data_vld[0]) && (check_bitmap[1] & data_vld[1])) begin
             stage1_result0 <= (pkt_timestamp_0 < pkt_timestamp_1) ? pkt_timestamp_0 : pkt_timestamp_1;
-        end else if (pipe_normal_bitmap[0] & data_vld[0]) begin
+        end else if (check_bitmap[0] & data_vld[0]) begin
             stage1_result0 <= pkt_timestamp_0;
-        end else if (pipe_normal_bitmap[1] & data_vld[1]) begin
+        end else if (check_bitmap[1] & data_vld[1]) begin
             stage1_result0 <= pkt_timestamp_1;
         end else begin
             stage1_result0 <= 80'hFFFFFFFFFFFFFFFFFFFF; // Max value if both empty
@@ -145,12 +150,12 @@ end
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         stage1_result1 <= 80'h0;
-    end else if (start_timestamp_align_determing) begin
-        if ((pipe_normal_bitmap[2] & data_vld[2]) && (pipe_normal_bitmap[3] & data_vld[3])) begin
+    end else if (start_timestamp_align) begin
+        if ((check_bitmap[2] & data_vld[2]) && (check_bitmap[3] & data_vld[3])) begin
             stage1_result1 <= (pkt_timestamp_2 < pkt_timestamp_3) ? pkt_timestamp_2 : pkt_timestamp_3;
-        end else if (pipe_normal_bitmap[2] & data_vld[2]) begin
+        end else if (check_bitmap[2] & data_vld[2]) begin
             stage1_result1 <= pkt_timestamp_2;
-        end else if (pipe_normal_bitmap[3] & data_vld[3]) begin
+        end else if (check_bitmap[3] & data_vld[3]) begin
             stage1_result1 <= pkt_timestamp_3;
         end else begin
             stage1_result1 <= 80'hFFFFFFFFFFFFFFFFFFFF; // Max value if both empty
@@ -174,12 +179,12 @@ end
 // Stage 2: Control signals propagation
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-        stage2_normal_bitmap   <= 4'b0000;
+        stage2_check_bitmap    <= 4'b0000;
         stage2_data_vld        <= 4'b0000;
         stage2_all_data_ready  <= 1'b0;
         stage2_local_timestamp <= 80'h0;
     end else if (stage1_valid) begin
-        stage2_normal_bitmap   <= stage1_normal_bitmap;
+        stage2_check_bitmap    <= stage1_check_bitmap;
         stage2_data_vld        <= stage1_data_vld;
         stage2_all_data_ready  <= stage1_all_data_ready;
         stage2_local_timestamp <= stage1_local_timestamp;
@@ -211,11 +216,11 @@ end
 // Stage 3: Control signals propagation
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-        stage3_normal_bitmap  <= 4'b0000;
+        stage3_check_bitmap   <= 4'b0000;
         stage3_data_vld       <= 4'b0000;
         stage3_all_data_ready <= 1'b0;
     end else if (stage2_valid) begin
-        stage3_normal_bitmap  <= stage2_normal_bitmap;
+        stage3_check_bitmap   <= stage2_check_bitmap;
         stage3_data_vld       <= stage2_data_vld;
         stage3_all_data_ready <= stage2_all_data_ready;
     end
@@ -285,11 +290,11 @@ always @(posedge clk or negedge rst_n) begin
         if (stage3_valid) begin
             // Case 1: All data is ready
             if (stage3_all_data_ready) begin
-                timestamp_align_pass_bitmap <= stage3_normal_bitmap;
+                timestamp_align_pass_bitmap <= stage3_check_bitmap;
             end
             // Case 2: Partial data ready and timeout
             else if (stage3_timeout) begin
-                timestamp_align_pass_bitmap <= stage3_normal_bitmap & stage3_data_vld;
+                timestamp_align_pass_bitmap <= stage3_check_bitmap & stage3_data_vld;
             end
             // Case 3: Partial data ready but not timeout - continue waiting
             else begin
