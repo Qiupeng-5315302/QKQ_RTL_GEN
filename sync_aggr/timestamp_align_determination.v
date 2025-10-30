@@ -1,5 +1,5 @@
 // =============================================================================
-// Module: timstamp_align_determination
+// Module: timestamp_align_determination
 // Description: 时戳对齐判定模块
 //              通过比较4个FWFT FIFO的空满状态和本地时戳，判断当前需要检测的pipe
 //              (pipe_normal_bitmap | pipe_restart_bitmap) 中哪些可以不再等待。
@@ -9,7 +9,7 @@
 // Date: 2025-10-30 (Updated)
 // =============================================================================
 
-module timstamp_align_determination (
+module timestamp_align_determination (
     // Clock and Reset
     input  wire         clk,
     input  wire         rst_n,
@@ -17,6 +17,7 @@ module timstamp_align_determination (
     // Configuration
     input  wire [19:0]  reg_sync_aggr_video_timeout_threshold,
     input  wire [3:0]   pipe_normal_bitmap,
+    input  wire [3:0]   pipe_restart_bitmap,
     
     // FIFO Interface - Pipe 0
     input  wire         data_vld_0,

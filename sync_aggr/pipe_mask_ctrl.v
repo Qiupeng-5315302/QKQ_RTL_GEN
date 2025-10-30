@@ -297,7 +297,7 @@ module pipe_mask_ctrl (
     //==========================================================================
     
     // Timestamp Alignment Determination Module
-    timstamp_align_determination u_timstamp_align_determination (
+    timestamp_align_determination u_timestamp_align_determination (
         .clk                                    (clk),
         .rst_n                                  (rst_n),
         .reg_sync_aggr_video_timeout_threshold  (reg_sync_aggr_video_timeout_threshold),
