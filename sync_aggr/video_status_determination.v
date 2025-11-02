@@ -4,8 +4,6 @@
 //              通过检查4个FWFT FIFO出口数据的datatype序列和pkt_count正确性，
 //              判断timestamp_align_pass_bitmap对应的pipe中哪些视频包格式正确。
 //              采用3拍流水线处理。
-// 
-// Author: AI Generated based on pipe_mask_ctrl_design.md v3.0
 // Date: 2025-11-02
 // =============================================================================
 
@@ -99,22 +97,27 @@ reg [15:0]  stage1_pkt_count_3;
 // Latch local_pkt_count for Stage 2
 reg [15:0]  stage1_local_pkt_count;
 
+// Stage 1 valid signal
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-        stage1_valid            <= 1'b0;
-        stage1_check_bitmap     <= 4'b0000;
-        stage1_datatype_match   <= 4'b0000;
-        stage1_check_count      <= 1'b0;
-        stage1_pkt_count_0      <= 16'h0;
-        stage1_pkt_count_1      <= 16'h0;
-        stage1_pkt_count_2      <= 16'h0;
-        stage1_pkt_count_3      <= 16'h0;
-        stage1_local_pkt_count  <= 16'h0;
+        stage1_valid <= 1'b0;
     end
     else if (start_video_status_determing) begin
-        // Start pipeline
-        stage1_valid            <= 1'b1;
-        stage1_check_bitmap     <= timestamp_align_pass_bitmap;
+        stage1_valid <= 1'b1;
+    end
+    else begin
+        stage1_valid <= 1'b0;
+    end
+end
+
+// Stage 1 datatype comparison
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        stage1_check_bitmap   <= 4'b0000;
+        stage1_datatype_match <= 4'b0000;
+    end
+    else if (start_video_status_determing) begin
+        stage1_check_bitmap <= timestamp_align_pass_bitmap;
         
         // Datatype comparison for each pipe
         // If check_bitmap[i]==1 and check_video_pkt_datatype==1, compare datatype
@@ -126,21 +129,31 @@ always @(posedge clk or negedge rst_n) begin
                                     (pkt_datatype_2 == local_pkt_datatype) : 1'b1;
         stage1_datatype_match[3] <= (timestamp_align_pass_bitmap[3] && check_video_pkt_datatype) ? 
                                     (pkt_datatype_3 == local_pkt_datatype) : 1'b1;
-        
+    end
+end
+
+// Stage 1 data latching for Stage 2
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        stage1_check_count     <= 1'b0;
+        stage1_pkt_count_0     <= 16'h0;
+        stage1_pkt_count_1     <= 16'h0;
+        stage1_pkt_count_2     <= 16'h0;
+        stage1_pkt_count_3     <= 16'h0;
+        stage1_local_pkt_count <= 16'h0;
+    end
+    else if (start_video_status_determing) begin
         // Latch check_video_pkt_count for Stage 2 (KEY: align with data)
-        stage1_check_count      <= check_video_pkt_count;
+        stage1_check_count <= check_video_pkt_count;
         
         // Latch pkt_count for Stage 2
-        stage1_pkt_count_0      <= pkt_count_0;
-        stage1_pkt_count_1      <= pkt_count_1;
-        stage1_pkt_count_2      <= pkt_count_2;
-        stage1_pkt_count_3      <= pkt_count_3;
+        stage1_pkt_count_0 <= pkt_count_0;
+        stage1_pkt_count_1 <= pkt_count_1;
+        stage1_pkt_count_2 <= pkt_count_2;
+        stage1_pkt_count_3 <= pkt_count_3;
         
         // Latch local_pkt_count for Stage 2
-        stage1_local_pkt_count  <= local_pkt_count;
-    end
-    else begin
-        stage1_valid            <= 1'b0;
+        stage1_local_pkt_count <= local_pkt_count;
     end
 end
 
@@ -156,15 +169,26 @@ reg         stage2_valid;
 reg [3:0]   stage2_pass_bitmap_raw;
 reg [3:0]   stage2_count_match;
 
+// Stage 2 valid signal
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-        stage2_valid            <= 1'b0;
-        stage2_pass_bitmap_raw  <= 4'b0000;
-        stage2_count_match      <= 4'b0000;
+        stage2_valid <= 1'b0;
     end
     else if (stage1_valid) begin
-        stage2_valid            <= 1'b1;
-        
+        stage2_valid <= 1'b1;
+    end
+    else begin
+        stage2_valid <= 1'b0;
+    end
+end
+
+// Stage 2 count comparison
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        stage2_count_match     <= 4'b0000;
+        stage2_pass_bitmap_raw <= 4'b0000;
+    end
+    else if (stage1_valid) begin
         // Count comparison for each pipe
         // Only check pipes that passed Stage 1
         // Use latched check_count (stage1_check_count) aligned with data
@@ -178,10 +202,7 @@ always @(posedge clk or negedge rst_n) begin
                                  (stage1_pkt_count_3 == stage1_local_pkt_count) : 1'b1;
         
         // Calculate pass bitmap (datatype + count both match)
-        stage2_pass_bitmap_raw  <= stage1_pass_bitmap & stage2_count_match;
-    end
-    else begin
-        stage2_valid            <= 1'b0;
+        stage2_pass_bitmap_raw <= stage1_pass_bitmap & stage2_count_match;
     end
 end
 
@@ -191,17 +212,26 @@ end
 
 // Latch pipe_normal_bitmap for Stage 3
 reg [3:0] stage3_pipe_normal_bitmap;
-reg [3:0] stage3_auto_mask_en;
 
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         stage3_pipe_normal_bitmap <= 4'b0000;
-        stage3_auto_mask_en       <= 4'b1111;
     end
     else if (stage1_valid) begin
         // Latch at Stage 1 for use in Stage 3
         stage3_pipe_normal_bitmap <= pipe_normal_bitmap;
-        stage3_auto_mask_en       <= Auto_Mask_En;
+    end
+end
+
+// Latch Auto_Mask_En for Stage 3
+reg [3:0] stage3_auto_mask_en;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        stage3_auto_mask_en <= 4'b1111;
+    end
+    else if (stage1_valid) begin
+        stage3_auto_mask_en <= Auto_Mask_En;
     end
 end
 

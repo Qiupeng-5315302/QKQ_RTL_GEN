@@ -1,11 +1,9 @@
 // =============================================================================
-// File Name    : pipe_mask_ctrl_new.v
-// Author       : Generated based on pipe_mask_ctrl_design.md v2.0
+// Module       : pipe_mask_ctrl.v
 // Description  : Video pipeline mask control state machine
 //                Eight-state FSM with complete functionality
 //                Supports Force/Auto/Restart mask modes
 // Date         : 2025-10-30
-// License      : MIT
 // =============================================================================
 
 module pipe_mask_ctrl (
@@ -313,16 +311,19 @@ module pipe_mask_ctrl (
     localparam  DATATYPE_IDLE       = 2'd0;
     localparam  DATATYPE_FS         = 2'd1;
     localparam  DATATYPE_LONGPKT    = 2'd2;
-    localparam  DATATYPE_FS         = 2'd3;
+    localparam  DATATYPE_FE         = 2'd3;
 
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            local_linecount = 16'd0;
-        else if(start_sch_pulse && (local_datatype_cs == DATATYPE_LONGPKT))
-            local_linecount = local_linecount + 16'd1;
-        else if(start_sch_pulse && (local_datatype_cs == DATATYPE_FS))
-            local_linecount = 16'd0;
+            local_linecount <= 16'd0;
+        end
+        else if(start_sch_pulse && (local_datatype_cs == DATATYPE_LONGPKT)) begin
+            local_linecount <= local_linecount + 16'd1;
+        end
+        else if(start_sch_pulse && (local_datatype_cs == DATATYPE_FS)) begin
+            local_linecount <= 16'd0;
+        end
     end
 
     always @(posedge clk or negedge rst_n) begin
@@ -365,11 +366,11 @@ module pipe_mask_ctrl (
     assign check_datatype_fs = (local_datatype_cs == DATATYPE_FS);
     assign check_datatype_fe = (local_datatype_cs == DATATYPE_FE);
     assign check_datatype_shortpkt = check_datatype_fs || check_datatype_fe;
-    assign check_datatype_longpkt = (local_datatype_cs == DATATYPE_LONKPKT);
+    assign check_datatype_longpkt = (local_datatype_cs == DATATYPE_LONGPKT);
     assign check_pkt_datatype = check_datatype_shortpkt || check_datatype_longpkt;
     assign check_shortpkt_framecount = check_datatype_shortpkt && reg_sync_aggr_check_framecount;
     assign check_longpkt_linecount = check_datatype_longpkt && reg_sync_aggr_check_linecount;
-    assign check_pkt_count = check_shortpkt_framecount | check_shortpkt_framecount;
+    assign check_pkt_count = check_shortpkt_framecount | check_longpkt_linecount;
 
     assign local_pkt_datatype = (check_datatype_fs) ? 6'h0 :
                                 (check_datatype_fe) ? 6'h1 :
