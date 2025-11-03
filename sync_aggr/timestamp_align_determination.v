@@ -4,8 +4,6 @@
 //              通过比较4个FWFT FIFO的空满状态和本地时戳，判断当前需要检测的pipe
 //              (pipe_normal_bitmap | pipe_restart_bitmap) 中哪些可以不再等待。
 //              采用3拍流水线处理。
-// 
-// Author: AI Generated based on pipe_mask_ctrl_design.md
 // Date: 2025-10-30 (Updated)
 // =============================================================================
 

@@ -22,13 +22,15 @@ module pipe_mask_ctrl (
     input  wire        video_mask_latch_reset,
     
     // FIFO Interface (for sub-modules)
-    input  wire [3:0]  data_vld,
+    input  wire         data_vld_0,
+    input  wire         data_vld_1,
+    input  wire         data_vld_2,
+    input  wire         data_vld_3,
     input  wire [101:0] data_0,
     input  wire [101:0] data_1,
     input  wire [101:0] data_2,
     input  wire [101:0] data_3,
-    input  wire [79:0] local_timestamp,
-    input  wire [19:0] reg_sync_aggr_video_timeout_threshold,
+    input  wire [ 19:0] reg_sync_aggr_video_timeout_threshold,
     
     // Schedule Concat Interface
     output reg         start_sch_pulse,
@@ -41,7 +43,17 @@ module pipe_mask_ctrl (
     // Bitmap Outputs
     output reg  [3:0]  pipe_mask_bitmap,
     output wire [3:0]  pipe_normal_bitmap,
-    output wire [3:0]  pipe_restart_bitmap
+    output wire [3:0]  pipe_restart_bitmap,
+
+    //clk_1M
+    input  wire        clk_1M,
+    input  wire        clk_1M_rst_n,
+    output reg  [79:0] local_us_cnt,
+    
+    // Local Packet Info Outputs (for BPG)
+    output wire [15:0] local_framecount_out,
+    output wire [15:0] local_linecount_out,
+    output wire [ 5:0] local_pkt_datatype_out
 );
 
     //==========================================================================
@@ -294,6 +306,37 @@ module pipe_mask_ctrl (
     // local us_cnt
     //==========================================================================
 
+    wire    [79:0]  local_timestamp;
+
+    always @(posedge clk_1M or negedge clk_1M_rst_n)begin
+        if(!clk_1M_rst_n)
+            clk_1M_edge <= 1'd0;
+        else
+            clk_1M_edge <= ~clk_1M_edge;
+    end
+
+    sync2_cell u_sync2_cell_clk_1M_edge(   
+        .clk(treed_intp_clk),
+        .reset(treed_intp_clk_reset),
+        .data(clk1m_edge),
+        .qout(clk1m_edge_dly)
+    ); //1us
+
+    edge_det#(.PULSE_MODE (2)
+    )clk10k_edge_det(
+        .clk(clk),
+        .reset(rst_n),
+        .din(clk10k_edge_dly),
+        .d_edge(pulse_1m_sync));
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            local_us_cnt <= 80'd0;
+        else if (pulse_1m_sync)
+            local_us_cnt <= local_us_cnt + 1'd1;
+    end
+
+    assign local_timestamp = local_us_cnt;
 
     //==========================================================================
     // local packet info maintain
@@ -304,6 +347,9 @@ module pipe_mask_ctrl (
     wire    [ 2:0]  video_status_info_vc;    
    
     reg     [15:0]  local_linecount;
+    reg     [15:0]  local_framecount;
+
+
 
     reg [1:0] local_datatype_cs;
     reg [1:0] local_datatype_ns;
@@ -312,6 +358,8 @@ module pipe_mask_ctrl (
     localparam  DATATYPE_FS         = 2'd1;
     localparam  DATATYPE_LONGPKT    = 2'd2;
     localparam  DATATYPE_FE         = 2'd3;
+
+
 
 
     always @(posedge clk or negedge rst_n) begin
@@ -326,6 +374,20 @@ module pipe_mask_ctrl (
         end
     end
 
+    // Local framecount management: increment on FE
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            local_framecount <= 16'd0;
+        end
+        else if (current_state == INIT) begin
+            // Reset to first received frame number or 0
+            local_framecount <= 16'd0;
+        end
+        else if(start_sch_pulse && (local_datatype_cs == DATATYPE_FE)) begin
+            local_framecount <= local_framecount + 16'd1;
+        end
+    end
+
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             local_datatype_cs <= DATATYPE_IDLE;
@@ -333,6 +395,7 @@ module pipe_mask_ctrl (
         else if (clear) begin
             local_datatype_cs <= DATATYPE_IDLE;
         end
+        
         else begin
             local_datatype_cs <= local_datatype_ns;
         end
@@ -379,6 +442,11 @@ module pipe_mask_ctrl (
     assign local_pkt_count = (check_datatype_fs) ? local_framecount :
                              (check_datatype_fe) ? local_framecount :
                              (check_datatype_longpkt) ? local_linecount : 16'h0;
+
+    // Outputs for BPG module
+    assign local_framecount_out  = local_framecount;
+    assign local_linecount_out   = local_linecount;
+    assign local_pkt_datatype_out = local_pkt_datatype;
 
 
     //==========================================================================
