@@ -393,6 +393,8 @@ input			reg_send_pkt_match_lp_dt_en_aggr0;// To u0_as6d_app_aggr_lane of as6d_ap
 input			reg_send_pkt_match_lp_dt_en_aggr1;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			reg_send_pkt_match_lp_dt_en_aggr2;// To u2_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			reg_send_pkt_match_lp_dt_en_aggr3;// To u3_as6d_app_aggr_lane of as6d_app_aggr_lane.v
+input [15:0]		reg_sync_aggr_check_framecount;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [15:0]		reg_sync_aggr_check_linecount;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [1:0]		sch0_aggre_mode;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			sch0_frame_sync_lock;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			sch0_fse_filter;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
@@ -874,7 +876,9 @@ u0_as6d_app_aggr_lane  (
 			.video_pipe_date_type_for_concat_align_vld1(video_pipe_date_type_for_concat_align_vld1),
 			.video_pipe_date_type_for_concat_align_vld2(video_pipe_date_type_for_concat_align_vld2),
 			.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
-			.video_pipe_vld_aggre_bypass(video_pipe0_vld_aggre_bypass)); // Templated
+			.video_pipe_vld_aggre_bypass(video_pipe0_vld_aggre_bypass), // Templated
+			.reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount[15:0]),
+			.reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount[15:0]));
 
 as6d_app_aggr_lane#(/*AUTOINSTPARAM*/
 		    // Parameters
@@ -1050,7 +1054,9 @@ u1_as6d_app_aggr_lane  (
 			.video_pipe_date_type_for_concat_align_vld1(video_pipe_date_type_for_concat_align_vld1),
 			.video_pipe_date_type_for_concat_align_vld2(video_pipe_date_type_for_concat_align_vld2),
 			.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
-			.video_pipe_vld_aggre_bypass(video_pipe1_vld_aggre_bypass)); // Templated
+			.video_pipe_vld_aggre_bypass(video_pipe1_vld_aggre_bypass), // Templated
+			.reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount[15:0]),
+			.reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount[15:0]));
 
 as6d_app_aggr_lane#(/*AUTOINSTPARAM*/
 		    // Parameters
@@ -1226,7 +1232,9 @@ u2_as6d_app_aggr_lane  (
 			.video_pipe_date_type_for_concat_align_vld1(video_pipe_date_type_for_concat_align_vld1),
 			.video_pipe_date_type_for_concat_align_vld2(video_pipe_date_type_for_concat_align_vld2),
 			.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
-			.video_pipe_vld_aggre_bypass(video_pipe2_vld_aggre_bypass)); // Templated
+			.video_pipe_vld_aggre_bypass(video_pipe2_vld_aggre_bypass), // Templated
+			.reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount[15:0]),
+			.reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount[15:0]));
 
 as6d_app_aggr_lane#(/*AUTOINSTPARAM*/
 		    // Parameters
@@ -1402,6 +1410,8 @@ u3_as6d_app_aggr_lane  (
 			.video_pipe_date_type_for_concat_align_vld1(video_pipe_date_type_for_concat_align_vld1),
 			.video_pipe_date_type_for_concat_align_vld2(video_pipe_date_type_for_concat_align_vld2),
 			.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
-			.video_pipe_vld_aggre_bypass(video_pipe3_vld_aggre_bypass)); // Templated
+			.video_pipe_vld_aggre_bypass(video_pipe3_vld_aggre_bypass), // Templated
+			.reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount[15:0]),
+			.reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount[15:0]));
 
 endmodule

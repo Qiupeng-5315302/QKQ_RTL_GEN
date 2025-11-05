@@ -170,6 +170,8 @@ input			reg_clear_send_pkt_cnt_sp_ls;// To u_as6d_app_idi_gen of as6d_app_idi_ge
 input			reg_delete_lp_depend_on_wc_mux;// To u_as6d_app_idi_gen of as6d_app_idi_gen.v
 input [5:0]		reg_send_pkt_match_lp_dt;// To u_as6d_app_idi_gen of as6d_app_idi_gen.v
 input			reg_send_pkt_match_lp_dt_en;// To u_as6d_app_idi_gen of as6d_app_idi_gen.v
+input [15:0]		reg_sync_aggr_check_framecount;// To u_as6d_app_pipe_sch of as6d_app_pipe_sch.v
+input [15:0]		reg_sync_aggr_check_linecount;// To u_as6d_app_pipe_sch of as6d_app_pipe_sch.v
 input			video_loss0;		// To u_as6d_app_pipe_sch of as6d_app_pipe_sch.v
 input			video_loss1;		// To u_as6d_app_pipe_sch of as6d_app_pipe_sch.v
 input			video_loss2;		// To u_as6d_app_pipe_sch of as6d_app_pipe_sch.v
@@ -390,7 +392,9 @@ u_as6d_app_pipe_sch  (/*AUTOINST*/
 		      .video_pipe_date_type_for_concat_align3(video_pipe_date_type_for_concat_align3[5:0]),
 		      .video_pipe_date_type_for_concat_align2(video_pipe_date_type_for_concat_align2[5:0]),
 		      .video_pipe_date_type_for_concat_align1(video_pipe_date_type_for_concat_align1[5:0]),
-		      .video_pipe_date_type_for_concat_align0(video_pipe_date_type_for_concat_align0[5:0]));
+		      .video_pipe_date_type_for_concat_align0(video_pipe_date_type_for_concat_align0[5:0]),
+		      .reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount[15:0]),
+		      .reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount[15:0]));
 
 /*  as6d_app_data_post  AUTO_TEMPLATE (
 		.in_video_data_vld		(sch2post_video_data_vld		),

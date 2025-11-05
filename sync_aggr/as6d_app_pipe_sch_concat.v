@@ -22,6 +22,7 @@ module as6d_app_pipe_sch_concat(
    frame_sync_lock, master_pipe, auto_mask_en,
    force_video_mask, video_mask_restart, video_mask_latch_reset,
    reg_sync_aggr_video_timeout_threshold, pipe_frame_active,
+   reg_sync_aggr_check_framecount, reg_sync_aggr_check_linecount,
    video_status_info_datatype, video_status_info_linecount,
    video_status_info_wordcount, video_status_info_vc,
    video_pipe_date_type_for_concat_align_vld3,
@@ -99,6 +100,8 @@ module as6d_app_pipe_sch_concat(
     input       [3:0]       video_mask_restart;
     input                   video_mask_latch_reset;       // Video mask latch reset
     input       [19:0]      reg_sync_aggr_video_timeout_threshold;  // Timeout threshold
+    input                   reg_sync_aggr_check_framecount;         // Enable framecount check
+    input                   reg_sync_aggr_check_linecount;          // Enable linecount check
     input       [3:0]       pipe_frame_active;            // Pipe frame active status
     
     // =========================================================================
@@ -218,6 +221,8 @@ as6d_app_video_status_management u_video_status_management (
     .aggre_mode             (aggre_mode),
     .video_mask_latch_reset (video_mask_latch_reset),
     .reg_sync_aggr_video_timeout_threshold (reg_sync_aggr_video_timeout_threshold),
+    .reg_sync_aggr_check_framecount (reg_sync_aggr_check_framecount),
+    .reg_sync_aggr_check_linecount  (reg_sync_aggr_check_linecount),
     
     // BPG Configuration Inputs
     .video_status_info_datatype  (video_status_info_datatype),

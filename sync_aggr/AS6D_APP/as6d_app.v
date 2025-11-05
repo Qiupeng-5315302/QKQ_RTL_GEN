@@ -1834,6 +1834,8 @@ input			reg_send_pkt_match_lp_dt_en_aggr0;// To u_as6d_app_aggregator of as6d_ap
 input			reg_send_pkt_match_lp_dt_en_aggr1;// To u_as6d_app_aggregator of as6d_app_aggr.v
 input			reg_send_pkt_match_lp_dt_en_aggr2;// To u_as6d_app_aggregator of as6d_app_aggr.v
 input			reg_send_pkt_match_lp_dt_en_aggr3;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [15:0]		reg_sync_aggr_check_framecount;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [15:0]		reg_sync_aggr_check_linecount;// To u_as6d_app_aggregator of as6d_app_aggr.v
 input [7:0]		reg_sram_lcrc_err_oen;	// To u_as6d_app_video_pipe of as6d_app_video_pipe.v
 input			reg_testbus_hi8bsel_8bmode;// To u_as6d_app_mon_top of as6d_app_mon_top.v
 input [5:0]		reg_testbus_sel_hi0;	// To u_as6d_app_mon_top of as6d_app_mon_top.v
@@ -6251,6 +6253,8 @@ as6d_app_aggr    u_as6d_app_aggregator(
 				       .reg_send_pkt_match_lp_dt_en_aggr1(reg_send_pkt_match_lp_dt_en_aggr1),
 				       .reg_send_pkt_match_lp_dt_en_aggr2(reg_send_pkt_match_lp_dt_en_aggr2),
 				       .reg_send_pkt_match_lp_dt_en_aggr3(reg_send_pkt_match_lp_dt_en_aggr3),
+					  .reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount),
+					  .reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount),
 				       .sch0_aggre_mode	(sch0_aggre_mode[1:0]),
 				       .sch0_frame_sync_lock(sch0_frame_sync_lock),
 				       .sch0_fse_filter	(reg_sch0_fse_filter), // Templated

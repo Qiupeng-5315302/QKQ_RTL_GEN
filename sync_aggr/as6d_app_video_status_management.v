@@ -61,6 +61,8 @@ module as6d_app_video_status_management(
     input   [1:0]           aggre_mode,                   // Aggregation mode
     input                   video_mask_latch_reset,       // Video mask latch reset
     input   [19:0]          reg_sync_aggr_video_timeout_threshold, // Video timeout threshold
+    input                   reg_sync_aggr_check_framecount,        // Enable framecount check
+    input                   reg_sync_aggr_check_linecount,         // Enable linecount check
     
     // =========================================================================
     // BPG Configuration Inputs
@@ -367,6 +369,8 @@ pipe_mask_ctrl u_pipe_mask_ctrl(
     .data_2                             (video_status_buffer_rd_data_2),
     .data_3                             (video_status_buffer_rd_data_3),
     .reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold),
+    .reg_sync_aggr_check_framecount     (reg_sync_aggr_check_framecount),
+    .reg_sync_aggr_check_linecount      (reg_sync_aggr_check_linecount),
     
     // Schedule Concat Interface
     .start_sch_pulse                    (start_sch_pulse),

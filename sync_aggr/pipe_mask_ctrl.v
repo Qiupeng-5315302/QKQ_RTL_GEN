@@ -21,10 +21,10 @@ module pipe_mask_ctrl (
     input  wire [1:0]  aggre_mode,
     input  wire        video_mask_latch_reset,
 
-    input  wire [ 5:0] video_status_info_datatype;
-    input  wire [15:0] video_status_info_linecount;    
-    input  wire [15:0] video_status_info_wordcount;
-    input  wire [ 2:0] video_status_info_vc;    
+    input  wire [ 5:0] video_status_info_datatype,
+    input  wire [15:0] video_status_info_linecount,    
+    input  wire [15:0] video_status_info_wordcount,
+    input  wire [ 2:0] video_status_info_vc,
     
     // FIFO Interface (for sub-modules)
     input  wire         data_vld_0,
@@ -36,6 +36,8 @@ module pipe_mask_ctrl (
     input  wire [101:0] data_2,
     input  wire [101:0] data_3,
     input  wire [ 19:0] reg_sync_aggr_video_timeout_threshold,
+    input  wire         reg_sync_aggr_check_framecount,
+    input  wire         reg_sync_aggr_check_linecount,
     
     // Schedule Concat Interface
     output reg         start_sch_pulse,
@@ -49,7 +51,7 @@ module pipe_mask_ctrl (
     output reg  [3:0]  pipe_mask_bitmap,
     output wire [3:0]  pipe_normal_bitmap,
     output wire [3:0]  pipe_restart_bitmap,
-    output wire [3:0]  video_status_pass_bitmap;
+    output wire [3:0]  video_status_pass_bitmap,
 
     //clk_1M
     input  wire        clk_1M,
@@ -64,7 +66,7 @@ module pipe_mask_ctrl (
     output wire        video_status_buffer_rd_en_0,
     output wire        video_status_buffer_rd_en_1,
     output wire        video_status_buffer_rd_en_2,
-    output wire        video_status_buffer_rd_en_3,
+    output wire        video_status_buffer_rd_en_3
 );
 
     //==========================================================================
@@ -110,7 +112,8 @@ module pipe_mask_ctrl (
     
     // Control pulse generation
     assign start_timestamp_align = (current_state == IDLE) && 
-                                         (next_state == DURING_TIMESTAMP_ALIGN_DETERMING);
+                                  (|((pipe_normal_bitmap | pipe_restart_bitmap) & {data_vld_3,data_vld_2,data_vld_1,data_vld_0}));
+
     assign start_video_status_determing = (current_state == DURING_TIMESTAMP_ALIGN_DETERMING) && 
                                           (next_state == DURING_VIDEO_STATUS_DETERMING);
     
@@ -131,7 +134,7 @@ module pipe_mask_ctrl (
                 if (video_mask_latch_reset) begin
                     next_state = INIT;
                 end
-                else if (|((pipe_normal_bitmap | pipe_restart_bitmap) & data_vld)) begin
+                else if (start_timestamp_align) begin
                     next_state = DURING_TIMESTAMP_ALIGN_DETERMING;
                 end
             end
@@ -318,6 +321,7 @@ module pipe_mask_ctrl (
     //==========================================================================
 
     wire    [79:0]  local_timestamp;
+    reg             clk_1M_edge;
 
     always @(posedge clk_1M or negedge clk_1M_rst_n)begin
         if(!clk_1M_rst_n)
@@ -341,7 +345,7 @@ module pipe_mask_ctrl (
         .d_edge(pulse_1m_sync));
 
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+        if (!rst_n)
             local_us_cnt <= 80'd0;
         else if (pulse_1m_sync)
             local_us_cnt <= local_us_cnt + 1'd1;
@@ -350,25 +354,24 @@ module pipe_mask_ctrl (
     assign local_timestamp = local_us_cnt;
 
     //==========================================================================
-    // local packet info maintain
+    // clear signal gen
     //==========================================================================
 
-   
+    assign clear = (current_state == INIT);
+
+    //==========================================================================
+    // local packet info maintain
+    //==========================================================================
+  
     reg     [15:0]  local_linecount;
     reg     [15:0]  local_framecount;
-
-
-
-    reg [1:0] local_datatype_cs;
-    reg [1:0] local_datatype_ns;
+    reg     [1:0] local_datatype_cs;
+    reg     [1:0] local_datatype_ns;
 
     localparam  DATATYPE_IDLE       = 2'd0;
     localparam  DATATYPE_FS         = 2'd1;
     localparam  DATATYPE_LONGPKT    = 2'd2;
     localparam  DATATYPE_FE         = 2'd3;
-
-
-
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

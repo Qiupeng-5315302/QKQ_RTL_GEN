@@ -22,9 +22,10 @@ module as6d_app_pipe_sch#(
    idi_wordcount_0, idi_wordcount_1, idi_wordcount_2, idi_wordcount_3,
    idi_linecount_0, idi_linecount_1, idi_linecount_2, idi_linecount_3,
    reg_video_mask_latch_reset, reg_sync_aggr_video_timeout_threshold, pipe_frame_active,
+   reg_sync_aggr_check_framecount, reg_sync_aggr_check_linecount,
    reg_video_status_info_datatype, reg_video_status_info_linecount,
    reg_video_status_info_wordcount, reg_video_status_info_vc,
-   reg_master_pipe, pipe0_concat_en, pipe0_aggre_en, empty_vld0, empty0,
+   master_pipe, pipe0_concat_en, pipe0_aggre_en, empty_vld0, empty0,
    in_video_data_vld0, in_video_data0, ack0, ack_vld0, ack_pre0,
    line_end0, line_end_vld0, pipe1_concat_en, pipe1_aggre_en,
    empty_vld1, empty1, in_video_data_vld1, in_video_data1, ack1,
@@ -84,12 +85,14 @@ module as6d_app_pipe_sch#(
     input   [2:0]           idi_linecount_3;
     input                   reg_video_mask_latch_reset;
     input   [19:0]          reg_sync_aggr_video_timeout_threshold;
+    input                   reg_sync_aggr_check_framecount;
+    input                   reg_sync_aggr_check_linecount;
     input   [3:0]           pipe_frame_active;
     input   [5:0]           reg_video_status_info_datatype;
     input   [15:0]          reg_video_status_info_linecount;
     input   [15:0]          reg_video_status_info_wordcount;
     input   [2:0]           reg_video_status_info_vc;
-    input [1:0]             reg_master_pipe;
+    input [1:0]             master_pipe;
     input                   pipe0_concat_en;
     input                   pipe0_aggre_en;
     input                   empty_vld0;
@@ -611,12 +614,14 @@ module as6d_app_pipe_sch#(
 											.line_end2	(line_end2),
 											.line_end3	(line_end3),
 											.frame_sync_lock(frame_sync_lock),
-											.master_pipe	(reg_master_pipe[1:0]),
+											.master_pipe	(master_pipe[1:0]),
 											.auto_mask_en	(reg_auto_mask_en[3:0]),
 											.force_video_mask(reg_force_video_mask[3:0]),
 											.video_mask_restart(reg_video_mask_restart[3:0]),
 											.video_mask_latch_reset(reg_video_mask_latch_reset),
 											.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
+											.reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount),
+											.reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount),
 											.pipe_frame_active(pipe_frame_active[3:0]),
 											.video_status_info_datatype(reg_video_status_info_datatype[5:0]),
 											.video_status_info_linecount(reg_video_status_info_linecount[15:0]),
