@@ -1,0 +1,868 @@
+
+`include "as6d_app_all_includes.vh"
+module as6d_app_pipe_route_lane    #(
+
+    )(/*AUTOARG*/
+   // Outputs
+   reg_rd_vprbs_rx_fail, reg_rd_vprbs_rx_err, reg_rd_vprbs_rx_check,
+   pipe_csi_data, pipe_bytes_en, pipe_header_en, pipe_data_en,
+   pipe_data_type, pipe_virtual_channel, pipe_virtual_channel_x,
+   pipe_word_count, pipe_aggr_id, pipe_pkt_crc_en, pipe_pkt_crc,
+   // Inputs
+   reg_vprbs_tx_pat_reset, reg_vprbs_tx_order, reg_vprbs_tx_mode,
+   reg_vprbs_tx_idi_driver_word_count,
+   reg_vprbs_tx_idi_driver_virtual_channel,
+   reg_vprbs_tx_idi_driver_total_interval,
+   reg_vprbs_tx_idi_driver_pkt_interval,
+   reg_vprbs_tx_idi_driver_data_type,
+   reg_vprbs_tx_err_inject_intv_time,
+   reg_vprbs_tx_err_inject_intv_num, reg_vprbs_tx_err_inject_en,
+   reg_vprbs_rx_uncheck_tolerance, reg_vprbs_rx_order,
+   reg_vprbs_rx_mode, reg_vprbs_rx_locked_match_cnt,
+   reg_vprbs_rx_lock_continue, reg_vprbs_rx_load,
+   reg_vprbs_rx_err_clear, reg_vprbs_loopback, fifo_wrclk,
+   fifo_wrclk_rst_n, pipe_wr_mode, reg_pipe_stream_sel,
+   reg_drop_short_pkt, reg_drop_mapping_fault_pkt, reg_pipe_map_en,
+   reg_pipe_map0_aggr_id, reg_pipe_map1_aggr_id,
+   reg_pipe_map2_aggr_id, reg_pipe_map3_aggr_id,
+   reg_pipe_map4_aggr_id, reg_pipe_map5_aggr_id,
+   reg_pipe_map6_aggr_id, reg_pipe_map7_aggr_id,
+   reg_pipe_map8_aggr_id, reg_pipe_map9_aggr_id,
+   reg_pipe_map10_aggr_id, reg_pipe_map11_aggr_id,
+   reg_pipe_map12_aggr_id, reg_pipe_map13_aggr_id,
+   reg_pipe_map14_aggr_id, reg_pipe_map15_aggr_id,
+   reg_pipe_map0_vc_source, reg_pipe_map1_vc_source,
+   reg_pipe_map2_vc_source, reg_pipe_map3_vc_source,
+   reg_pipe_map4_vc_source, reg_pipe_map5_vc_source,
+   reg_pipe_map6_vc_source, reg_pipe_map7_vc_source,
+   reg_pipe_map8_vc_source, reg_pipe_map9_vc_source,
+   reg_pipe_map10_vc_source, reg_pipe_map11_vc_source,
+   reg_pipe_map12_vc_source, reg_pipe_map13_vc_source,
+   reg_pipe_map14_vc_source, reg_pipe_map15_vc_source,
+   reg_pipe_map0_vc_dest, reg_pipe_map1_vc_dest,
+   reg_pipe_map2_vc_dest, reg_pipe_map3_vc_dest,
+   reg_pipe_map4_vc_dest, reg_pipe_map5_vc_dest,
+   reg_pipe_map6_vc_dest, reg_pipe_map7_vc_dest,
+   reg_pipe_map8_vc_dest, reg_pipe_map9_vc_dest,
+   reg_pipe_map10_vc_dest, reg_pipe_map11_vc_dest,
+   reg_pipe_map12_vc_dest, reg_pipe_map13_vc_dest,
+   reg_pipe_map14_vc_dest, reg_pipe_map15_vc_dest,
+   reg_pipe_map0_dt_source, reg_pipe_map1_dt_source,
+   reg_pipe_map2_dt_source, reg_pipe_map3_dt_source,
+   reg_pipe_map4_dt_source, reg_pipe_map5_dt_source,
+   reg_pipe_map6_dt_source, reg_pipe_map7_dt_source,
+   reg_pipe_map8_dt_source, reg_pipe_map9_dt_source,
+   reg_pipe_map10_dt_source, reg_pipe_map11_dt_source,
+   reg_pipe_map12_dt_source, reg_pipe_map13_dt_source,
+   reg_pipe_map14_dt_source, reg_pipe_map15_dt_source,
+   reg_pipe_map0_dt_dest, reg_pipe_map1_dt_dest,
+   reg_pipe_map2_dt_dest, reg_pipe_map3_dt_dest,
+   reg_pipe_map4_dt_dest, reg_pipe_map5_dt_dest,
+   reg_pipe_map6_dt_dest, reg_pipe_map7_dt_dest,
+   reg_pipe_map8_dt_dest, reg_pipe_map9_dt_dest,
+   reg_pipe_map10_dt_dest, reg_pipe_map11_dt_dest,
+   reg_pipe_map12_dt_dest, reg_pipe_map13_dt_dest,
+   reg_pipe_map14_dt_dest, reg_pipe_map15_dt_dest, mep0_csi_data,
+   mep0_bytes_en, mep0_header_en, mep0_data_en, mep0_data_type,
+   mep0_virtual_channel, mep0_virtual_channel_x, mep0_word_count,
+   mep0_tunnel_mode_en, mep0_pkt_crc_en, mep0_pkt_crc, mep1_csi_data,
+   mep1_bytes_en, mep1_header_en, mep1_data_en, mep1_data_type,
+   mep1_virtual_channel, mep1_virtual_channel_x, mep1_word_count,
+   mep1_tunnel_mode_en, mep1_pkt_crc_en, mep1_pkt_crc, mep2_csi_data,
+   mep2_bytes_en, mep2_header_en, mep2_data_en, mep2_data_type,
+   mep2_virtual_channel, mep2_virtual_channel_x, mep2_word_count,
+   mep2_tunnel_mode_en, mep2_pkt_crc_en, mep2_pkt_crc, mep3_csi_data,
+   mep3_bytes_en, mep3_header_en, mep3_data_en, mep3_data_type,
+   mep3_virtual_channel, mep3_virtual_channel_x, mep3_word_count,
+   mep3_tunnel_mode_en, mep3_pkt_crc_en, mep3_pkt_crc,
+   reg_vprbs_rx_chk_en, reg_vprbs_tx_gen_en
+   );
+
+/*AUTOINPUT*/
+// Beginning of automatic inputs (from unused autoinst inputs)
+input			reg_vprbs_loopback;	// To u_pattern_test of pattern_test.v
+input			reg_vprbs_rx_err_clear;	// To u_pattern_test of pattern_test.v
+input			reg_vprbs_rx_load;	// To u_pattern_test of pattern_test.v
+input			reg_vprbs_rx_lock_continue;// To u_pattern_test of pattern_test.v
+input [3:0]		reg_vprbs_rx_locked_match_cnt;// To u_pattern_test of pattern_test.v
+input [2:0]		reg_vprbs_rx_mode;	// To u_pattern_test of pattern_test.v
+input			reg_vprbs_rx_order;	// To u_pattern_test of pattern_test.v
+input [3:0]		reg_vprbs_rx_uncheck_tolerance;// To u_pattern_test of pattern_test.v
+input			reg_vprbs_tx_err_inject_en;// To u_pattern_test of pattern_test.v
+input [7:0]		reg_vprbs_tx_err_inject_intv_num;// To u_pattern_test of pattern_test.v
+input [7:0]		reg_vprbs_tx_err_inject_intv_time;// To u_pattern_test of pattern_test.v
+input [5:0]		reg_vprbs_tx_idi_driver_data_type;// To u_pattern_test of pattern_test.v
+input [15:0]		reg_vprbs_tx_idi_driver_pkt_interval;// To u_pattern_test of pattern_test.v
+input [15:0]		reg_vprbs_tx_idi_driver_total_interval;// To u_pattern_test of pattern_test.v
+input [3:0]		reg_vprbs_tx_idi_driver_virtual_channel;// To u_pattern_test of pattern_test.v
+input [15:0]		reg_vprbs_tx_idi_driver_word_count;// To u_pattern_test of pattern_test.v
+input [2:0]		reg_vprbs_tx_mode;	// To u_pattern_test of pattern_test.v
+input			reg_vprbs_tx_order;	// To u_pattern_test of pattern_test.v
+input			reg_vprbs_tx_pat_reset;	// To u_pattern_test of pattern_test.v
+// End of automatics
+/*AUTOOUTPUT*/
+// Beginning of automatic outputs (from unused autoinst outputs)
+output			reg_rd_vprbs_rx_check;	// From u_pattern_test of pattern_test.v
+output [31:0]		reg_rd_vprbs_rx_err;	// From u_pattern_test of pattern_test.v
+output			reg_rd_vprbs_rx_fail;	// From u_pattern_test of pattern_test.v
+// End of automatics
+
+/*AUTOWIRE*/
+input                                                       fifo_wrclk;
+input                                                       fifo_wrclk_rst_n;
+input  [1:0]                                                pipe_wr_mode;
+input  [1:0]                                                reg_pipe_stream_sel;            
+input                                                       reg_drop_short_pkt;
+input                                                       reg_drop_mapping_fault_pkt;
+/*******************************************pipe_mapping*******************************************/
+input  [15:0]                                               reg_pipe_map_en;            
+input  [3:0]                                                reg_pipe_map0_aggr_id;            
+input  [3:0]                                                reg_pipe_map1_aggr_id;            
+input  [3:0]                                                reg_pipe_map2_aggr_id;            
+input  [3:0]                                                reg_pipe_map3_aggr_id;            
+input  [3:0]                                                reg_pipe_map4_aggr_id;            
+input  [3:0]                                                reg_pipe_map5_aggr_id;            
+input  [3:0]                                                reg_pipe_map6_aggr_id;            
+input  [3:0]                                                reg_pipe_map7_aggr_id;            
+input  [3:0]                                                reg_pipe_map8_aggr_id;            
+input  [3:0]                                                reg_pipe_map9_aggr_id;            
+input  [3:0]                                                reg_pipe_map10_aggr_id;            
+input  [3:0]                                                reg_pipe_map11_aggr_id;            
+input  [3:0]                                                reg_pipe_map12_aggr_id;            
+input  [3:0]                                                reg_pipe_map13_aggr_id;            
+input  [3:0]                                                reg_pipe_map14_aggr_id;            
+input  [3:0]                                                reg_pipe_map15_aggr_id;            
+input  [1:0]                                                reg_pipe_map0_vc_source;            
+input  [1:0]                                                reg_pipe_map1_vc_source;            
+input  [1:0]                                                reg_pipe_map2_vc_source;            
+input  [1:0]                                                reg_pipe_map3_vc_source;            
+input  [1:0]                                                reg_pipe_map4_vc_source;            
+input  [1:0]                                                reg_pipe_map5_vc_source;            
+input  [1:0]                                                reg_pipe_map6_vc_source;            
+input  [1:0]                                                reg_pipe_map7_vc_source;            
+input  [1:0]                                                reg_pipe_map8_vc_source;            
+input  [1:0]                                                reg_pipe_map9_vc_source;            
+input  [1:0]                                                reg_pipe_map10_vc_source;            
+input  [1:0]                                                reg_pipe_map11_vc_source;            
+input  [1:0]                                                reg_pipe_map12_vc_source;            
+input  [1:0]                                                reg_pipe_map13_vc_source;            
+input  [1:0]                                                reg_pipe_map14_vc_source;            
+input  [1:0]                                                reg_pipe_map15_vc_source;            
+input  [1:0]                                                reg_pipe_map0_vc_dest;            
+input  [1:0]                                                reg_pipe_map1_vc_dest;            
+input  [1:0]                                                reg_pipe_map2_vc_dest;            
+input  [1:0]                                                reg_pipe_map3_vc_dest;            
+input  [1:0]                                                reg_pipe_map4_vc_dest;            
+input  [1:0]                                                reg_pipe_map5_vc_dest;            
+input  [1:0]                                                reg_pipe_map6_vc_dest;            
+input  [1:0]                                                reg_pipe_map7_vc_dest;            
+input  [1:0]                                                reg_pipe_map8_vc_dest;            
+input  [1:0]                                                reg_pipe_map9_vc_dest;            
+input  [1:0]                                                reg_pipe_map10_vc_dest;            
+input  [1:0]                                                reg_pipe_map11_vc_dest;            
+input  [1:0]                                                reg_pipe_map12_vc_dest;            
+input  [1:0]                                                reg_pipe_map13_vc_dest;            
+input  [1:0]                                                reg_pipe_map14_vc_dest;            
+input  [1:0]                                                reg_pipe_map15_vc_dest;            
+input  [5:0]                                                reg_pipe_map0_dt_source;            
+input  [5:0]                                                reg_pipe_map1_dt_source;            
+input  [5:0]                                                reg_pipe_map2_dt_source;            
+input  [5:0]                                                reg_pipe_map3_dt_source;            
+input  [5:0]                                                reg_pipe_map4_dt_source;            
+input  [5:0]                                                reg_pipe_map5_dt_source;            
+input  [5:0]                                                reg_pipe_map6_dt_source;            
+input  [5:0]                                                reg_pipe_map7_dt_source;            
+input  [5:0]                                                reg_pipe_map8_dt_source;            
+input  [5:0]                                                reg_pipe_map9_dt_source;            
+input  [5:0]                                                reg_pipe_map10_dt_source;            
+input  [5:0]                                                reg_pipe_map11_dt_source;            
+input  [5:0]                                                reg_pipe_map12_dt_source;            
+input  [5:0]                                                reg_pipe_map13_dt_source;            
+input  [5:0]                                                reg_pipe_map14_dt_source;            
+input  [5:0]                                                reg_pipe_map15_dt_source;            
+input  [5:0]                                                reg_pipe_map0_dt_dest;            
+input  [5:0]                                                reg_pipe_map1_dt_dest;            
+input  [5:0]                                                reg_pipe_map2_dt_dest;            
+input  [5:0]                                                reg_pipe_map3_dt_dest;            
+input  [5:0]                                                reg_pipe_map4_dt_dest;            
+input  [5:0]                                                reg_pipe_map5_dt_dest;            
+input  [5:0]                                                reg_pipe_map6_dt_dest;            
+input  [5:0]                                                reg_pipe_map7_dt_dest;            
+input  [5:0]                                                reg_pipe_map8_dt_dest;            
+input  [5:0]                                                reg_pipe_map9_dt_dest;            
+input  [5:0]                                                reg_pipe_map10_dt_dest;            
+input  [5:0]                                                reg_pipe_map11_dt_dest;            
+input  [5:0]                                                reg_pipe_map12_dt_dest;            
+input  [5:0]                                                reg_pipe_map13_dt_dest;            
+input  [5:0]                                                reg_pipe_map14_dt_dest;            
+input  [5:0]                                                reg_pipe_map15_dt_dest;            
+input  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]            mep0_csi_data;
+input  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]       mep0_bytes_en;
+input                                                       mep0_header_en;
+input                                                       mep0_data_en;
+input  [5:0]                                                mep0_data_type;
+input  [1:0]                                                mep0_virtual_channel;
+input  [(`MEP_CSI2_DEVICE_VCX_DWIDTH-1):0]                  mep0_virtual_channel_x;
+input  [15:0]                                               mep0_word_count;            
+input                                                       mep0_tunnel_mode_en;
+input                                                       mep0_pkt_crc_en;
+input  [31:0]                                               mep0_pkt_crc;
+
+input  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]            mep1_csi_data;
+input  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]       mep1_bytes_en;
+input                                                       mep1_header_en;
+input                                                       mep1_data_en;
+input  [5:0]                                                mep1_data_type;
+input  [1:0]                                                mep1_virtual_channel;
+input  [(`MEP_CSI2_DEVICE_VCX_DWIDTH-1):0]                  mep1_virtual_channel_x;
+input  [15:0]                                               mep1_word_count;            
+input                                                       mep1_tunnel_mode_en;
+input                                                       mep1_pkt_crc_en;
+input  [31:0]                                               mep1_pkt_crc;
+
+input  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]            mep2_csi_data;
+input  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]       mep2_bytes_en;
+input                                                       mep2_header_en;
+input                                                       mep2_data_en;
+input  [5:0]                                                mep2_data_type;
+input  [1:0]                                                mep2_virtual_channel;
+input  [(`MEP_CSI2_DEVICE_VCX_DWIDTH-1):0]                  mep2_virtual_channel_x;
+input  [15:0]                                               mep2_word_count;            
+input                                                       mep2_tunnel_mode_en;
+input                                                       mep2_pkt_crc_en;
+input  [31:0]                                               mep2_pkt_crc;
+
+input  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]            mep3_csi_data;
+input  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]       mep3_bytes_en;
+input                                                       mep3_header_en;
+input                                                       mep3_data_en;
+input  [5:0]                                                mep3_data_type;
+input  [1:0]                                                mep3_virtual_channel;
+input  [(`MEP_CSI2_DEVICE_VCX_DWIDTH-1):0]                  mep3_virtual_channel_x;
+input  [15:0]                                               mep3_word_count;            
+input                                                       mep3_tunnel_mode_en;
+input                                                       mep3_pkt_crc_en;
+input  [31:0]                                               mep3_pkt_crc;
+
+input                                                       reg_vprbs_rx_chk_en;
+input                                                       reg_vprbs_tx_gen_en;
+
+output  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]           pipe_csi_data;
+output  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]      pipe_bytes_en;
+output                                                      pipe_header_en;
+output                                                      pipe_data_en;
+output  [5:0]                                               pipe_data_type;
+output  [1:0]                                               pipe_virtual_channel;
+output  [(`MEP_CSI2_DEVICE_VCX_DWIDTH-1):0]                 pipe_virtual_channel_x;
+output  [15:0]                                              pipe_word_count;            
+output  [3:0]                                               pipe_aggr_id;
+output                                                      pipe_pkt_crc_en;
+output  [31:0]                                              pipe_pkt_crc;
+
+wire  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]             pipe_csi_data                           ;
+wire  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]        pipe_bytes_en                           ;
+wire                                                        pipe_header_en                          ;
+wire                                                        pipe_data_en                            ;
+wire  [5:0]                                                 pipe_data_type                          ;
+wire  [1:0]                                                 pipe_virtual_channel                    ;
+wire  [(`MEP_CSI2_DEVICE_VCX_DWIDTH-1):0]                   pipe_virtual_channel_x                  ;
+wire  [15:0]                                                pipe_word_count                         ;
+
+wire  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]             drop_sp_csi_data                        ;
+wire  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]        drop_sp_bytes_en                        ;
+wire                                                        drop_sp_header_en                       ;
+wire                                                        drop_sp_data_en                         ;
+wire  [5:0]                                                 drop_sp_data_type                       ;
+wire  [1:0]                                                 drop_sp_virtual_channel                 ;
+wire  [(`MEP_CSI2_DEVICE_VCX_DWIDTH-1):0]                   drop_sp_virtual_channel_x               ;
+wire  [15:0]                                                drop_sp_word_count                      ;
+wire  [3:0]                                                 drop_sp_aggr_id                         ;
+wire                                                        drop_sp_pkt_crc_en                      ;
+wire  [31:0]                                                drop_sp_pkt_crc                         ;
+
+reg  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]              pipe_sel_csi_data                       ;
+reg  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]         pipe_sel_bytes_en                       ;
+reg                                                         pipe_sel_header_en                      ;
+reg                                                         pipe_sel_data_en                        ;
+reg  [5:0]                                                  pipe_sel_data_type                      ;
+reg  [1:0]                                                  pipe_sel_virtual_channel                ;
+reg  [(`MEP_CSI2_DEVICE_VCX_DWIDTH-1):0]                    pipe_sel_virtual_channel_x              ;
+reg  [15:0]                                                 pipe_sel_word_count                     ;
+reg                                                         pipe_sel_pkt_crc_en                     ;
+reg  [31:0]                                                 pipe_sel_pkt_crc                        ;
+
+wire  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]             pipe_csi_data_d1                        ;
+wire  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]        pipe_bytes_en_d1                        ;
+wire                                                        pipe_header_en_d1                       ;
+wire                                                        pipe_data_en_d1                         ;
+wire  [15:0]                                                pipe_word_count_d1                      ;
+reg                                                         pipe_sel_pkt_crc_en_d1                  ;
+reg  [31:0]                                                 pipe_sel_pkt_crc_d1                     ;
+wire  [`MEP_CSI2_DEVICE_VCX_DWIDTH-1:0]                     pipe_sel_virtual_channel_x_d1           ;
+wire [7:0]                                                  pipe_sel_vcdt                           ;
+wire [31:0]                                                 pipe_map_dest                           ;
+reg  [7:0]                                                  pipe_remap_vcdt_h                       ;
+reg  [7:0]                                                  pipe_remap_vcdt_l                       ;
+reg  [7:0]                                                  pipe_remap_vcdt                         ;
+reg  [3:0]                                                  pipe_aggr_id_pre_h                      ;
+reg  [3:0]                                                  pipe_aggr_id_pre_l                      ;
+reg  [3:0]                                                  pipe_aggr_id_pre                        ;
+wire [3:0]                                                  pipe_aggr_id                            ;
+wire [5:0]                                                  data_type                               ;
+wire [5:0]                                                  data_type_d1                            ;
+wire                                                        header_en                               ;
+wire                                                        header_en_d1                            ;
+wire                                                        header_up                               ;
+wire                                                        header_dn                               ;
+wire                                                        fifo_wrclk                              ;
+wire                                                        fifo_wrclk_rst_n                        ;
+wire                                                        wr_short                                ;
+wire                                                        sp_fs                                   ;
+wire                                                        sp_fe                                   ;
+wire                                                        fs_detect                               ;
+wire                                                        fe_detect                               ;
+wire [1:0]                                                  pipe_wr_mode                            ;
+reg                                                         pipe_idi_en                             ;
+wire                                                        pipe_short_pkt_detect                   ;
+wire [15:0]                                                 pipe_mapping0                           ;
+wire [15:0]                                                 pipe_mapping1                           ;
+wire [15:0]                                                 pipe_mapping2                           ;
+wire [15:0]                                                 pipe_mapping3                           ;
+wire [15:0]                                                 pipe_mapping4                           ;
+wire [15:0]                                                 pipe_mapping5                           ;
+wire [15:0]                                                 pipe_mapping6                           ;
+wire [15:0]                                                 pipe_mapping7                           ;
+wire [15:0]                                                 pipe_mapping8                           ;
+wire [15:0]                                                 pipe_mapping9                           ;
+wire [15:0]                                                 pipe_mapping10                          ;
+wire [15:0]                                                 pipe_mapping11                          ;
+wire [15:0]                                                 pipe_mapping12                          ;
+wire [15:0]                                                 pipe_mapping13                          ;
+wire [15:0]                                                 pipe_mapping14                          ;
+wire [15:0]                                                 pipe_mapping15                          ;
+wire [15:0]                                                 pipe_mapping_trigger                    ;
+wire                                                        pipe_mapping_trigger_mux_d1             ;
+reg                                                         pipe_mapping_trigger_l_mux_d1           ;
+reg                                                         pipe_mapping_trigger_h_mux_d1           ;
+wire                                                        idi_chk_prbs_header_en                  ;
+wire                                                        idi_chk_prbs_data_en                    ;
+wire [ 2:0]                                                 idi_chk_prbs_byte_en                    ;
+wire [ 5:0]                                                 idi_chk_prbs_data_type                  ;
+wire [63:0]                                                 idi_chk_prbs_data	                    ;
+wire [63:0]                                                 idi_gen_prbs_data                       ;
+wire [ 2:0]                                                 idi_gen_prbs_byte_en                    ;
+wire                                                        idi_gen_prbs_header_en                  ;
+wire                                                        idi_gen_prbs_data_en                    ;
+wire [ 5:0]                                                 idi_gen_prbs_data_type                  ;
+wire [ 3:0]                                                 idi_gen_prbs_virtual_channel            ;
+wire [15:0]                                                 idi_gen_prbs_word_count                 ;
+wire [64-1:0]                                               tdi_in_csi_data                         ;
+wire [3-1:0]                                                tdi_in_bytes_en                         ;
+wire                                                        tdi_in_header_en                        ;
+wire                                                        tdi_in_data_en                          ;
+wire [5:0]                                                  tdi_in_data_type                        ;
+wire [4-1:0]                                                tdi_in_virtual_channel                  ;
+wire [15:0]                                                 tdi_in_word_count                       ;
+wire                                                        tdi_in_pkt_crc_en                       ;
+wire [31:0]                                                 tdi_in_pkt_crc                          ;
+reg                                                         tdi_in_tunnel_mode_en                   ;
+
+wire                                                        tdi_en                                  ;
+wire [64-1:0]                                               tdi_out_csi_data                        ;
+wire [3-1:0]                                                tdi_out_bytes_en                        ;
+wire                                                        tdi_out_header_en                       ;
+wire                                                        tdi_out_data_en                         ;
+wire [5:0]                                                  tdi_out_data_type                       ;
+wire [4-1:0]                                                tdi_out_virtual_channel                 ;
+wire [15:0]                                                 tdi_out_word_count                      ;
+wire                                                        tdi_out_tunnel_mode_en                  ;
+wire                                                        tdi_out_pkt_crc_en                      ;
+wire [31:0]                                                 tdi_out_pkt_crc                         ;
+
+app_idi_if      app_idi_if_mux_mep;
+app_idi_if      app_idi_if_pipe;
+app_route_if    app_idi_if_pipe_d1;
+app_route_if    app_idi_if_pipe_drop_unmap;
+app_route_if    app_idi_if_pipe_d2;
+app_route_if    app_idi_if_pipe_fs_detect;
+app_route_if    app_idi_if_pipe_out;
+
+always@(*)begin
+    case(reg_pipe_stream_sel)
+    2'd0:begin
+        app_idi_if_mux_mep.csi_data                = mep0_csi_data              ;
+        app_idi_if_mux_mep.bytes_en                = mep0_bytes_en              ;
+        app_idi_if_mux_mep.header_en               = mep0_header_en             ;
+        app_idi_if_mux_mep.data_en                 = mep0_data_en               ;
+        app_idi_if_mux_mep.data_type               = mep0_data_type             ;
+        app_idi_if_mux_mep.virtual_channel         = mep0_virtual_channel       ;
+        app_idi_if_mux_mep.virtual_channel_x       = mep0_virtual_channel_x     ;
+        app_idi_if_mux_mep.word_count              = mep0_word_count            ;            
+        app_idi_if_mux_mep.pkt_crc_en              = mep0_pkt_crc_en            ;            
+        app_idi_if_mux_mep.pkt_crc                 = mep0_pkt_crc               ;            
+    end     
+    2'd1:begin
+        app_idi_if_mux_mep.csi_data                = mep1_csi_data              ;
+        app_idi_if_mux_mep.bytes_en                = mep1_bytes_en              ;
+        app_idi_if_mux_mep.header_en               = mep1_header_en             ;
+        app_idi_if_mux_mep.data_en                 = mep1_data_en               ;
+        app_idi_if_mux_mep.data_type               = mep1_data_type             ;
+        app_idi_if_mux_mep.virtual_channel         = mep1_virtual_channel       ;
+        app_idi_if_mux_mep.virtual_channel_x       = mep1_virtual_channel_x     ;
+        app_idi_if_mux_mep.word_count              = mep1_word_count            ;            
+        app_idi_if_mux_mep.pkt_crc_en              = mep1_pkt_crc_en            ;            
+        app_idi_if_mux_mep.pkt_crc                 = mep1_pkt_crc               ;            
+    end
+    2'd2:begin
+        app_idi_if_mux_mep.csi_data                = mep2_csi_data              ;
+        app_idi_if_mux_mep.bytes_en                = mep2_bytes_en              ;
+        app_idi_if_mux_mep.header_en               = mep2_header_en             ;
+        app_idi_if_mux_mep.data_en                 = mep2_data_en               ;
+        app_idi_if_mux_mep.data_type               = mep2_data_type             ;
+        app_idi_if_mux_mep.virtual_channel         = mep2_virtual_channel       ;
+        app_idi_if_mux_mep.virtual_channel_x       = mep2_virtual_channel_x     ;
+        app_idi_if_mux_mep.word_count              = mep2_word_count            ;            
+        app_idi_if_mux_mep.pkt_crc_en              = mep2_pkt_crc_en            ;            
+        app_idi_if_mux_mep.pkt_crc                 = mep2_pkt_crc               ;            
+    end
+    2'd3:begin
+        app_idi_if_mux_mep.csi_data                = mep3_csi_data              ;
+        app_idi_if_mux_mep.bytes_en                = mep3_bytes_en              ;
+        app_idi_if_mux_mep.header_en               = mep3_header_en             ;
+        app_idi_if_mux_mep.data_en                 = mep3_data_en               ;
+        app_idi_if_mux_mep.data_type               = mep3_data_type             ;
+        app_idi_if_mux_mep.virtual_channel         = mep3_virtual_channel       ;
+        app_idi_if_mux_mep.virtual_channel_x       = mep3_virtual_channel_x     ;
+        app_idi_if_mux_mep.word_count              = mep3_word_count            ;            
+        app_idi_if_mux_mep.pkt_crc_en              = mep3_pkt_crc_en            ;            
+        app_idi_if_mux_mep.pkt_crc                 = mep3_pkt_crc               ;            
+    end
+    endcase
+end
+
+assign idi_chk_prbs_header_en = app_idi_if_mux_mep.header_en               ;
+assign idi_chk_prbs_data_en   = app_idi_if_mux_mep.data_en                 ;
+assign idi_chk_prbs_byte_en   = app_idi_if_mux_mep.bytes_en                ;
+assign idi_chk_prbs_data_type = app_idi_if_mux_mep.data_type               ;
+assign idi_chk_prbs_data	  = app_idi_if_mux_mep.csi_data                ;
+
+/*  pattern_test  AUTO_TEMPLATE (
+	.chk_clk		(fifo_wrclk),
+	.chk_rst_n		(fifo_wrclk_rst_n),
+	.gen_clk		(fifo_wrclk),
+	.gen_rst_n		(fifo_wrclk_rst_n),
+    .idi_gen_\(.*\)	(idi_gen_prbs_\1[]),
+    .idi_chk_\(.*\)	(idi_chk_prbs_\1[]),
+    .reg\(.*\)vprbs_\(.*\)	(reg\1vprbs_\2[]),
+)*/
+pattern_test u_pattern_test(
+			    .idi_gen_header_en	(idi_gen_prbs_header_en),
+			    .idi_gen_data_en	(idi_gen_prbs_data_en),
+			    .idi_gen_byte_en	(idi_gen_prbs_byte_en[2:0]),
+			    .idi_gen_data	(idi_gen_prbs_data[63:0]),
+			    .idi_gen_data_type	(idi_gen_prbs_data_type[5:0]),
+			    .idi_gen_virtual_channel(idi_gen_prbs_virtual_channel[3:0]),
+			    .idi_gen_word_count	(idi_gen_prbs_word_count[15:0]),
+                /*AUTOINST*/
+			    // Outputs
+			    .reg_rd_vprbs_rx_check(reg_rd_vprbs_rx_check), // Templated
+			    .reg_rd_vprbs_rx_err(reg_rd_vprbs_rx_err[31:0]), // Templated
+			    .reg_rd_vprbs_rx_fail(reg_rd_vprbs_rx_fail), // Templated
+			    // Inputs
+			    .chk_clk		(fifo_wrclk),	 // Templated
+			    .chk_rst_n		(fifo_wrclk_rst_n), // Templated
+			    .gen_clk		(fifo_wrclk),	 // Templated
+			    .gen_rst_n		(fifo_wrclk_rst_n), // Templated
+			    .reg_vprbs_rx_chk_en(reg_vprbs_rx_chk_en), // Templated
+			    .reg_vprbs_rx_err_clear(reg_vprbs_rx_err_clear), // Templated
+			    .reg_vprbs_rx_load	(reg_vprbs_rx_load), // Templated
+			    .reg_vprbs_rx_lock_continue(reg_vprbs_rx_lock_continue), // Templated
+			    .reg_vprbs_rx_locked_match_cnt(reg_vprbs_rx_locked_match_cnt[3:0]), // Templated
+			    .reg_vprbs_rx_mode	(reg_vprbs_rx_mode[2:0]), // Templated
+			    .reg_vprbs_rx_order	(reg_vprbs_rx_order), // Templated
+			    .reg_vprbs_rx_uncheck_tolerance(reg_vprbs_rx_uncheck_tolerance[3:0]), // Templated
+			    .reg_vprbs_tx_err_inject_en(reg_vprbs_tx_err_inject_en), // Templated
+			    .reg_vprbs_tx_err_inject_intv_num(reg_vprbs_tx_err_inject_intv_num[7:0]), // Templated
+			    .reg_vprbs_tx_err_inject_intv_time(reg_vprbs_tx_err_inject_intv_time[7:0]), // Templated
+			    .reg_vprbs_tx_gen_en(reg_vprbs_tx_gen_en), // Templated
+			    .reg_vprbs_tx_idi_driver_data_type(reg_vprbs_tx_idi_driver_data_type[5:0]), // Templated
+			    .reg_vprbs_tx_idi_driver_pkt_interval(reg_vprbs_tx_idi_driver_pkt_interval[15:0]), // Templated
+			    .reg_vprbs_tx_idi_driver_total_interval(reg_vprbs_tx_idi_driver_total_interval[15:0]), // Templated
+			    .reg_vprbs_tx_idi_driver_virtual_channel(reg_vprbs_tx_idi_driver_virtual_channel[3:0]), // Templated
+			    .reg_vprbs_tx_idi_driver_word_count(reg_vprbs_tx_idi_driver_word_count[15:0]), // Templated
+			    .reg_vprbs_tx_mode	(reg_vprbs_tx_mode[2:0]), // Templated
+			    .reg_vprbs_tx_order	(reg_vprbs_tx_order), // Templated
+			    .reg_vprbs_tx_pat_reset(reg_vprbs_tx_pat_reset), // Templated
+			    .idi_chk_header_en	(idi_chk_prbs_header_en), // Templated
+			    .idi_chk_data_en	(idi_chk_prbs_data_en), // Templated
+			    .idi_chk_byte_en	(idi_chk_prbs_byte_en[2:0]), // Templated
+			    .idi_chk_data_type	(idi_chk_prbs_data_type[5:0]), // Templated
+			    .idi_chk_data	(idi_chk_prbs_data[63:0]), // Templated
+			    .reg_vprbs_loopback	(reg_vprbs_loopback)); // Templated
+
+assign app_idi_if_pipe.csi_data          = reg_vprbs_tx_gen_en ? idi_gen_prbs_data                :  app_idi_if_mux_mep.csi_data                                            ;
+assign app_idi_if_pipe.bytes_en          = reg_vprbs_tx_gen_en ? idi_gen_prbs_byte_en             :  app_idi_if_mux_mep.bytes_en                                            ;
+assign app_idi_if_pipe.header_en         = reg_vprbs_tx_gen_en ? idi_gen_prbs_header_en           :  app_idi_if_mux_mep.header_en                                           ;
+assign app_idi_if_pipe.data_en           = reg_vprbs_tx_gen_en ? idi_gen_prbs_data_en             :  app_idi_if_mux_mep.data_en                                             ;
+assign app_idi_if_pipe.data_type         = reg_vprbs_tx_gen_en ? idi_gen_prbs_data_type           :  app_idi_if_mux_mep.data_type                                           ;
+assign app_idi_if_pipe.virtual_channel   = reg_vprbs_tx_gen_en ? idi_gen_prbs_virtual_channel[1:0]:  app_idi_if_mux_mep.virtual_channel                                     ;
+assign app_idi_if_pipe.virtual_channel_x = reg_vprbs_tx_gen_en ? idi_gen_prbs_virtual_channel[3:2]:  app_idi_if_mux_mep.virtual_channel_x                                   ;
+assign app_idi_if_pipe.word_count        = reg_vprbs_tx_gen_en ? idi_gen_prbs_word_count          :  app_idi_if_mux_mep.word_count                                          ;
+assign app_idi_if_pipe.pkt_crc_en        = reg_vprbs_tx_gen_en ? 1'd0                             :  app_idi_if_mux_mep.pkt_crc_en                                          ;
+assign app_idi_if_pipe.pkt_crc           = reg_vprbs_tx_gen_en ? 32'd0                            :  app_idi_if_mux_mep.pkt_crc                                             ;
+
+assign pipe_sel_vcdt  = {app_idi_if_pipe.virtual_channel,app_idi_if_pipe.data_type};
+
+assign pipe_mapping0  = {reg_pipe_map0_vc_dest,reg_pipe_map0_dt_dest,reg_pipe_map0_vc_source,reg_pipe_map0_dt_source} ;
+assign pipe_mapping1  = {reg_pipe_map1_vc_dest,reg_pipe_map1_dt_dest,reg_pipe_map1_vc_source,reg_pipe_map1_dt_source} ;
+assign pipe_mapping2  = {reg_pipe_map2_vc_dest,reg_pipe_map2_dt_dest,reg_pipe_map2_vc_source,reg_pipe_map2_dt_source} ;
+assign pipe_mapping3  = {reg_pipe_map3_vc_dest,reg_pipe_map3_dt_dest,reg_pipe_map3_vc_source,reg_pipe_map3_dt_source} ;
+assign pipe_mapping4  = {reg_pipe_map4_vc_dest,reg_pipe_map4_dt_dest,reg_pipe_map4_vc_source,reg_pipe_map4_dt_source} ;
+assign pipe_mapping5  = {reg_pipe_map5_vc_dest,reg_pipe_map5_dt_dest,reg_pipe_map5_vc_source,reg_pipe_map5_dt_source} ;
+assign pipe_mapping6  = {reg_pipe_map6_vc_dest,reg_pipe_map6_dt_dest,reg_pipe_map6_vc_source,reg_pipe_map6_dt_source} ;
+assign pipe_mapping7  = {reg_pipe_map7_vc_dest,reg_pipe_map7_dt_dest,reg_pipe_map7_vc_source,reg_pipe_map7_dt_source} ;
+assign pipe_mapping8  = {reg_pipe_map8_vc_dest,reg_pipe_map8_dt_dest,reg_pipe_map8_vc_source,reg_pipe_map8_dt_source} ;
+assign pipe_mapping9  = {reg_pipe_map9_vc_dest,reg_pipe_map9_dt_dest,reg_pipe_map9_vc_source,reg_pipe_map9_dt_source} ;
+assign pipe_mapping10 = {reg_pipe_map10_vc_dest,reg_pipe_map10_dt_dest,reg_pipe_map10_vc_source,reg_pipe_map10_dt_source} ;
+assign pipe_mapping11 = {reg_pipe_map11_vc_dest,reg_pipe_map11_dt_dest,reg_pipe_map11_vc_source,reg_pipe_map11_dt_source} ;
+assign pipe_mapping12 = {reg_pipe_map12_vc_dest,reg_pipe_map12_dt_dest,reg_pipe_map12_vc_source,reg_pipe_map12_dt_source} ;
+assign pipe_mapping13 = {reg_pipe_map13_vc_dest,reg_pipe_map13_dt_dest,reg_pipe_map13_vc_source,reg_pipe_map13_dt_source} ;
+assign pipe_mapping14 = {reg_pipe_map14_vc_dest,reg_pipe_map14_dt_dest,reg_pipe_map14_vc_source,reg_pipe_map14_dt_source} ;
+assign pipe_mapping15 = {reg_pipe_map15_vc_dest,reg_pipe_map15_dt_dest,reg_pipe_map15_vc_source,reg_pipe_map15_dt_source} ;
+
+assign pipe_mapping_trigger[0 ] = (pipe_sel_vcdt == pipe_mapping0 [7:0])&&reg_pipe_map_en[0 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[1 ] = (pipe_sel_vcdt == pipe_mapping1 [7:0])&&reg_pipe_map_en[1 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[2 ] = (pipe_sel_vcdt == pipe_mapping2 [7:0])&&reg_pipe_map_en[2 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[3 ] = (pipe_sel_vcdt == pipe_mapping3 [7:0])&&reg_pipe_map_en[3 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[4 ] = (pipe_sel_vcdt == pipe_mapping4 [7:0])&&reg_pipe_map_en[4 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[5 ] = (pipe_sel_vcdt == pipe_mapping5 [7:0])&&reg_pipe_map_en[5 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[6 ] = (pipe_sel_vcdt == pipe_mapping6 [7:0])&&reg_pipe_map_en[6 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[7 ] = (pipe_sel_vcdt == pipe_mapping7 [7:0])&&reg_pipe_map_en[7 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[8 ] = (pipe_sel_vcdt == pipe_mapping8 [7:0])&&reg_pipe_map_en[8 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[9 ] = (pipe_sel_vcdt == pipe_mapping9 [7:0])&&reg_pipe_map_en[9 ]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[10] = (pipe_sel_vcdt == pipe_mapping10[7:0])&&reg_pipe_map_en[10]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[11] = (pipe_sel_vcdt == pipe_mapping11[7:0])&&reg_pipe_map_en[11]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[12] = (pipe_sel_vcdt == pipe_mapping12[7:0])&&reg_pipe_map_en[12]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[13] = (pipe_sel_vcdt == pipe_mapping13[7:0])&&reg_pipe_map_en[13]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[14] = (pipe_sel_vcdt == pipe_mapping14[7:0])&&reg_pipe_map_en[14]&&app_idi_if_pipe.header_en;
+assign pipe_mapping_trigger[15] = (pipe_sel_vcdt == pipe_mapping15[7:0])&&reg_pipe_map_en[15]&&app_idi_if_pipe.header_en;
+
+always@(posedge fifo_wrclk or negedge fifo_wrclk_rst_n)begin
+    if(~fifo_wrclk_rst_n)
+        pipe_mapping_trigger_l_mux_d1 <= 1'd0;
+    else if(|pipe_mapping_trigger[7:0])
+        pipe_mapping_trigger_l_mux_d1 <= 1'd1;
+    else 
+        pipe_mapping_trigger_l_mux_d1 <= 1'd0;
+end
+
+always@(posedge fifo_wrclk or negedge fifo_wrclk_rst_n)begin
+    if(~fifo_wrclk_rst_n)
+        pipe_mapping_trigger_h_mux_d1 <= 1'd0;
+    else if(|pipe_mapping_trigger[15:8])
+        pipe_mapping_trigger_h_mux_d1 <= 1'd1;
+    else 
+        pipe_mapping_trigger_h_mux_d1 <= 1'd0;
+end
+
+always@(posedge fifo_wrclk or negedge fifo_wrclk_rst_n)begin
+    if(~fifo_wrclk_rst_n)
+        pipe_remap_vcdt_l <= 8'd0 ;
+    else if(pipe_mapping_trigger[0])
+            pipe_remap_vcdt_l <= pipe_mapping0 [15:8] ;
+    else if(pipe_mapping_trigger[1])
+            pipe_remap_vcdt_l <= pipe_mapping1 [15:8] ;
+    else if(pipe_mapping_trigger[2])
+            pipe_remap_vcdt_l <= pipe_mapping2 [15:8] ;
+    else if(pipe_mapping_trigger[3])
+            pipe_remap_vcdt_l <= pipe_mapping3 [15:8] ;
+    else if(pipe_mapping_trigger[4])
+            pipe_remap_vcdt_l <= pipe_mapping4 [15:8] ;
+    else if(pipe_mapping_trigger[5])
+            pipe_remap_vcdt_l <= pipe_mapping5 [15:8] ;
+    else if(pipe_mapping_trigger[6])
+            pipe_remap_vcdt_l <= pipe_mapping6 [15:8] ;
+    else if(pipe_mapping_trigger[7])
+            pipe_remap_vcdt_l <= pipe_mapping7 [15:8] ;
+    else
+        pipe_remap_vcdt_l <= pipe_sel_vcdt ;
+end
+
+always@(posedge fifo_wrclk or negedge fifo_wrclk_rst_n)begin
+    if(~fifo_wrclk_rst_n)
+        pipe_remap_vcdt_h <= 8'd0 ;
+    else if(pipe_mapping_trigger[8 ])
+            pipe_remap_vcdt_h <= pipe_mapping8 [15:8] ;
+    else if(pipe_mapping_trigger[9 ])
+            pipe_remap_vcdt_h <= pipe_mapping9 [15:8] ;
+    else if(pipe_mapping_trigger[10])
+            pipe_remap_vcdt_h <= pipe_mapping10[15:8] ;
+    else if(pipe_mapping_trigger[11])
+            pipe_remap_vcdt_h <= pipe_mapping11[15:8] ;
+    else if(pipe_mapping_trigger[12])
+            pipe_remap_vcdt_h <= pipe_mapping12[15:8] ;
+    else if(pipe_mapping_trigger[13])
+            pipe_remap_vcdt_h <= pipe_mapping13[15:8] ;
+    else if(pipe_mapping_trigger[14])
+            pipe_remap_vcdt_h <= pipe_mapping14[15:8] ;
+    else if(pipe_mapping_trigger[15])
+            pipe_remap_vcdt_h <= pipe_mapping15[15:8] ;
+    else
+        pipe_remap_vcdt_h <= pipe_sel_vcdt ;
+end
+
+always@(posedge fifo_wrclk or negedge fifo_wrclk_rst_n)begin
+    if(~fifo_wrclk_rst_n)
+        pipe_aggr_id_pre_l <= 4'b0111 ;
+    else if(pipe_mapping_trigger[0])
+        pipe_aggr_id_pre_l <= {2'd0,reg_pipe_map0_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[1])
+        pipe_aggr_id_pre_l <= {2'd0,reg_pipe_map1_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[2])
+        pipe_aggr_id_pre_l <= {2'd0,reg_pipe_map2_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[3])
+        pipe_aggr_id_pre_l <= {2'd0,reg_pipe_map3_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[4]) 
+        pipe_aggr_id_pre_l <= {2'd0,reg_pipe_map4_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[5])
+        pipe_aggr_id_pre_l <= {2'd0,reg_pipe_map5_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[6])
+        pipe_aggr_id_pre_l <= {2'd0,reg_pipe_map6_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[7])
+        pipe_aggr_id_pre_l <= {2'd0,reg_pipe_map7_aggr_id[1:0]} ;
+    else
+        pipe_aggr_id_pre_l <= 4'b0111 ;
+end
+
+always@(posedge fifo_wrclk or negedge fifo_wrclk_rst_n)begin
+    if(~fifo_wrclk_rst_n)
+        pipe_aggr_id_pre_h <= 4'b0111 ;
+    else if(pipe_mapping_trigger[8 ])
+        pipe_aggr_id_pre_h <= {2'd0,reg_pipe_map8_aggr_id[1:0]}  ;
+    else if(pipe_mapping_trigger[9 ])
+        pipe_aggr_id_pre_h <= {2'd0,reg_pipe_map9_aggr_id[1:0]}  ;
+    else if(pipe_mapping_trigger[10])
+        pipe_aggr_id_pre_h <= {2'd0,reg_pipe_map10_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[11])
+        pipe_aggr_id_pre_h <= {2'd0,reg_pipe_map11_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[12])
+        pipe_aggr_id_pre_h <= {2'd0,reg_pipe_map12_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[13])
+        pipe_aggr_id_pre_h <= {2'd0,reg_pipe_map13_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[14])
+        pipe_aggr_id_pre_h <= {2'd0,reg_pipe_map14_aggr_id[1:0]} ;
+    else if(pipe_mapping_trigger[15])
+        pipe_aggr_id_pre_h <= {2'd0,reg_pipe_map15_aggr_id[1:0]} ;
+    else
+        pipe_aggr_id_pre_h <= 4'b0111 ;
+end
+
+assign    pipe_sel_csi_data             = app_idi_if_pipe.csi_data            ;
+assign    pipe_sel_bytes_en             = app_idi_if_pipe.bytes_en            ;
+assign    pipe_sel_header_en            = app_idi_if_pipe.header_en           ;
+assign    pipe_sel_data_en              = app_idi_if_pipe.data_en             ;
+assign    pipe_sel_word_count           = app_idi_if_pipe.word_count          ;
+assign    pipe_sel_virtual_channel_x    = app_idi_if_pipe.virtual_channel_x   ;
+assign    pipe_sel_pkt_crc_en           = app_idi_if_pipe.pkt_crc_en          ;
+assign    pipe_sel_pkt_crc              = app_idi_if_pipe.pkt_crc             ;
+
+//app_route_if 132(DW) - 12(dtvc) = idi + pkt_crc
+bus_delay #(
+    .DELAY_CYCLES    (1                ),
+    .BUS_WIDTH       (87+33            )
+)
+u0_bus_delay(
+    .clk            (fifo_wrclk        ),
+    .rst_n          (fifo_wrclk_rst_n  ),
+    .inbus          ({pipe_sel_csi_data,pipe_sel_bytes_en,pipe_sel_header_en,pipe_sel_data_en,pipe_sel_word_count,pipe_sel_virtual_channel_x,pipe_sel_pkt_crc_en,pipe_sel_pkt_crc}),
+    .outbus         ({pipe_csi_data_d1,pipe_bytes_en_d1,pipe_header_en_d1,pipe_data_en_d1,pipe_word_count_d1,pipe_sel_virtual_channel_x_d1,pipe_sel_pkt_crc_en_d1,pipe_sel_pkt_crc_d1})
+);
+
+assign app_idi_if_pipe_d1.csi_data             = pipe_csi_data_d1;
+assign app_idi_if_pipe_d1.bytes_en             = pipe_bytes_en_d1;
+assign app_idi_if_pipe_d1.header_en            = pipe_header_en_d1;
+assign app_idi_if_pipe_d1.data_en              = pipe_data_en_d1;
+assign app_idi_if_pipe_d1.data_type            = pipe_mapping_trigger_h_mux_d1 ? pipe_remap_vcdt_h[5:0] : pipe_remap_vcdt_l[5:0];
+assign app_idi_if_pipe_d1.virtual_channel      = pipe_mapping_trigger_h_mux_d1 ? pipe_remap_vcdt_h[7:6] : pipe_remap_vcdt_l[7:6];
+assign app_idi_if_pipe_d1.virtual_channel_x    = pipe_sel_virtual_channel_x_d1;
+assign app_idi_if_pipe_d1.word_count           = pipe_word_count_d1;             
+assign app_idi_if_pipe_d1.aggr_id              = pipe_mapping_trigger_h_mux_d1 ? pipe_aggr_id_pre_h:pipe_aggr_id_pre_l;    
+assign app_idi_if_pipe_d1.pkt_crc_en           = pipe_sel_pkt_crc_en_d1;             
+assign app_idi_if_pipe_d1.pkt_crc              = pipe_sel_pkt_crc_d1;             
+
+//app_route_if 132(DW) = idi + pkt_crc + 12(dtvc)
+//****drop_mapping_fault_pkt***//
+assign  pipe_mapping_trigger_mux_d1 = pipe_mapping_trigger_h_mux_d1 | pipe_mapping_trigger_l_mux_d1;
+
+always@(*)begin
+    if((reg_drop_mapping_fault_pkt==1'b1)&&(|reg_pipe_map_en))
+        if(pipe_mapping_trigger_mux_d1==1'b1)
+            app_idi_if_pipe_drop_unmap = app_idi_if_pipe_d1;
+        else
+            app_idi_if_pipe_drop_unmap = 132'd0;
+    else
+        app_idi_if_pipe_drop_unmap = app_idi_if_pipe_d1;
+end
+
+
+//****pipe_wr_mode==2, allow video data write in fifo during the period of fs and fe***//
+//****fs_detect***//
+assign header_en         = app_idi_if_pipe_drop_unmap.header_en         ;
+assign data_type         = app_idi_if_pipe_drop_unmap.data_type         ;
+
+bus_delay #(
+    .DELAY_CYCLES   (1                  ),
+    .BUS_WIDTH      (1                  ),
+    .INIT_VAL       (1'd0               )
+) u_bus_delay_header_en(
+   .outbus          (header_en_d1       ),
+   .clk             (fifo_wrclk         ),
+   .rst_n           (fifo_wrclk_rst_n   ),
+   .inbus           (header_en          )
+);
+
+bus_delay #(
+    .DELAY_CYCLES   (1                  ),
+    .BUS_WIDTH      (6                  ),
+    .INIT_VAL       (6'd0               )
+) u_bus_delay_data_type(
+   .outbus          (data_type_d1       ),
+   .clk             (fifo_wrclk         ),
+   .rst_n           (fifo_wrclk_rst_n   ),
+   .inbus           (data_type          )
+);
+assign header_up         =  header_en & ~header_en_d1  ;
+assign header_dn         = ~header_en &  header_en_d1  ;
+
+assign    wr_short  = (~header_up)&(header_dn)&(header_en_d1);
+assign    sp_fs     = (data_type_d1 == `CSI_FRAME_START);
+assign    sp_fe     = (data_type_d1 == `CSI_FRAME_END);
+assign    fs_detect = (wr_short&sp_fs) ? 1'd1 : 1'd0 ;
+assign    fe_detect = (wr_short&sp_fe) ? 1'd1 : 1'd0 ;
+
+always@(posedge fifo_wrclk or negedge fifo_wrclk_rst_n)begin
+    if(~fifo_wrclk_rst_n)begin
+        pipe_idi_en <= 1'd0;
+    end
+    else if(pipe_wr_mode==2'b10)begin
+        if(fs_detect)
+            pipe_idi_en <= 1'd1;
+        else if(fe_detect)
+            pipe_idi_en <= 1'd0;
+    end
+    else begin
+        pipe_idi_en <= 1'd0;
+    end
+end
+
+//app_route_if 132(DW) = idi + pkt_crc + 12(dtvc)
+bus_delay #(
+    .DELAY_CYCLES   (1                              ),
+    .BUS_WIDTH      (132                            ),
+    .INIT_VAL       (132'd0                         )
+) u_bus_delay_app_idi_if_pipe_d2(
+   .outbus          (app_idi_if_pipe_d2             ),
+   .clk             (fifo_wrclk                     ),
+   .rst_n           (fifo_wrclk_rst_n               ),
+   .inbus           (app_idi_if_pipe_drop_unmap     )
+);
+
+assign app_idi_if_pipe_fs_detect = (fs_detect|pipe_idi_en) ? app_idi_if_pipe_d2    : 132'd0   ;
+
+always@(*)begin
+    if(pipe_wr_mode==2'b11)
+        app_idi_if_pipe_out = app_idi_if_pipe_d2;
+    else if(pipe_wr_mode==2'b10)
+        app_idi_if_pipe_out = app_idi_if_pipe_fs_detect;
+    else
+        app_idi_if_pipe_out = 132'd0;
+end
+
+//****drop ls/le short pkt***//
+assign pipe_short_pkt_detect    = reg_drop_short_pkt & app_idi_if_pipe_out.header_en & (app_idi_if_pipe_out.data_type[5:2] == 4'd0) & ((app_idi_if_pipe_out.data_type[1:0] == 2'b10) | (app_idi_if_pipe_out.data_type[1:0] == 2'b11));
+
+assign drop_sp_csi_data            = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.csi_data          : `MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE'd0       ;
+assign drop_sp_bytes_en            = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.bytes_en          : `MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH'd0  ;
+assign drop_sp_header_en           = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.header_en         : 1'd0                                       ;
+assign drop_sp_data_en             = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.data_en           : 1'd0                                       ;
+assign drop_sp_data_type           = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.data_type         : 6'd0                                       ;
+assign drop_sp_virtual_channel     = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.virtual_channel   : 2'd0                                       ;
+assign drop_sp_virtual_channel_x   = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.virtual_channel_x : `MEP_CSI2_DEVICE_VCX_DWIDTH'd0             ;
+assign drop_sp_word_count          = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.word_count        : 16'd0                                      ;
+assign drop_sp_aggr_id             = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.aggr_id           : 4'b0111                                    ;
+assign drop_sp_pkt_crc_en          = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.pkt_crc_en        : 1'd0                                       ;
+assign drop_sp_pkt_crc             = ~pipe_short_pkt_detect ? app_idi_if_pipe_out.pkt_crc           : 32'd0                                      ;
+
+//**** idi_tunnel_mode bypass mapping function****//
+assign tdi_in_csi_data          =  app_idi_if_pipe.csi_data                                              ;
+assign tdi_in_bytes_en          =  app_idi_if_pipe.bytes_en                                              ;
+assign tdi_in_header_en         =  app_idi_if_pipe.header_en                                             ;
+assign tdi_in_data_en           =  app_idi_if_pipe.data_en                                               ;
+assign tdi_in_data_type         =  app_idi_if_pipe.data_type                                             ;
+assign tdi_in_virtual_channel   = {app_idi_if_pipe.virtual_channel_x,app_idi_if_pipe.virtual_channel}    ;
+assign tdi_in_word_count        =  app_idi_if_pipe.word_count                                            ;
+assign tdi_in_pkt_crc_en        =  app_idi_if_pipe.pkt_crc_en                                            ;
+assign tdi_in_pkt_crc           =  app_idi_if_pipe.pkt_crc                                               ;
+       
+
+always@(*)begin
+    case(reg_pipe_stream_sel)
+    2'd0:tdi_in_tunnel_mode_en = mep0_tunnel_mode_en;
+    2'd1:tdi_in_tunnel_mode_en = mep1_tunnel_mode_en;
+    2'd2:tdi_in_tunnel_mode_en = mep2_tunnel_mode_en;
+    2'd3:tdi_in_tunnel_mode_en = mep3_tunnel_mode_en;
+    endcase
+end
+
+
+/*  as6d_app_idi_tunnel_mode_delay  AUTO_TEMPLATE (
+		.tdi_en		(tdi_en),
+        .in\(.*\)   (tdi_in\1[]),
+        .out\(.*\)  (tdi_out\1[]),
+        .reg_mep_tdi_en        (1'd0),
+        .reg_mep_tdi_en_force  (1'd0),
+        .clk        (fifo_wrclk),
+        .rst_n      (fifo_wrclk_rst_n),
+)*/
+as6d_app_idi_tunnel_mode_delay u0_as6d_app_idi_tunnel_mode_delay(
+								 .tdi_en		(tdi_en),
+								 .out_bytes_en		(tdi_out_bytes_en[2:0]),
+								 .out_csi_data		(tdi_out_csi_data[63:0]),
+								 .out_data_en		(tdi_out_data_en),
+								 .out_data_type		(tdi_out_data_type[5:0]),
+								 .out_header_en		(tdi_out_header_en),
+								 .out_virtual_channel	(tdi_out_virtual_channel[3:0]),
+								 .out_word_count	(tdi_out_word_count[15:0]),
+								 .out_tunnel_mode_en	(tdi_out_tunnel_mode_en),
+								 .out_pkt_crc_en	(tdi_out_pkt_crc_en),
+								 .out_pkt_crc		(tdi_out_pkt_crc[31:0]),
+                                /*AUTOINST*/
+								 // Inputs
+								 .clk			(fifo_wrclk),	 // Templated
+								 .rst_n			(fifo_wrclk_rst_n), // Templated
+								 .reg_mep_tdi_en_force	(1'd0),		 // Templated
+								 .reg_mep_tdi_en	(1'd0),		 // Templated
+								 .in_bytes_en		(tdi_in_bytes_en[2:0]), // Templated
+								 .in_csi_data		(tdi_in_csi_data[63:0]), // Templated
+								 .in_data_en		(tdi_in_data_en), // Templated
+								 .in_data_type		(tdi_in_data_type[5:0]), // Templated
+								 .in_header_en		(tdi_in_header_en), // Templated
+								 .in_virtual_channel	(tdi_in_virtual_channel[3:0]), // Templated
+								 .in_word_count		(tdi_in_word_count[15:0]), // Templated
+								 .in_tunnel_mode_en	(tdi_in_tunnel_mode_en), // Templated
+								 .in_pkt_crc_en		(tdi_in_pkt_crc_en), // Templated
+								 .in_pkt_crc		(tdi_in_pkt_crc[31:0])); // Templated
+
+assign pipe_csi_data            = tdi_en ? tdi_out_csi_data             : drop_sp_csi_data          ;
+assign pipe_bytes_en            = tdi_en ? tdi_out_bytes_en             : drop_sp_bytes_en          ;
+assign pipe_header_en           = tdi_en ? tdi_out_header_en            : drop_sp_header_en         ;
+assign pipe_data_en             = tdi_en ? tdi_out_data_en              : drop_sp_data_en           ;
+assign pipe_data_type           = tdi_en ? 6'h1A                        : drop_sp_data_type         ;
+assign pipe_virtual_channel_x   = tdi_en ? tdi_out_virtual_channel[3:2] : drop_sp_virtual_channel_x ;
+assign pipe_virtual_channel     = tdi_en ? tdi_out_virtual_channel[1:0] : drop_sp_virtual_channel   ;
+assign pipe_word_count          = tdi_en ? tdi_out_word_count           : drop_sp_word_count        ;
+assign pipe_aggr_id             = tdi_en ? {tdi_out_tunnel_mode_en,3'd7}: drop_sp_aggr_id           ;
+assign pipe_pkt_crc_en          = tdi_en ? tdi_out_pkt_crc_en           : drop_sp_pkt_crc_en        ;
+assign pipe_pkt_crc             = tdi_en ? tdi_out_pkt_crc              : drop_sp_pkt_crc           ;
+
+endmodule

@@ -25,10 +25,24 @@
 设计采用分层和模块化的架构，主要由四个核心部分组成：
 
 1.  **四个并行的“视频管道” (Video Pipe)**：每个管道独立处理一路输入视频，包含视频丢失检测模块，入口数据可关断。
-2.  **每个汇聚器含一个“视频状态管理” (video_status_management)**：作为管理单元,响应mask配置变更和入口数据检测，管理视频状态，切换黑像素的填充和撤离。
-3.  **每个汇聚器含一个“同步汇聚调度器” (schedule_concat)**：作为执行单元，按配置顺序调度pipe，同时区分mask pipe和normal pipe。
-4.  **每个汇聚器含一个“黑像素生成器” (black_pixel_generator)**：作为操作单元，提供填充用的黑像素数据。
-5.  **四个“视频管道像素写入控制” (pipe_wr_mode_ctrl)**：作为中央时序仲裁器，从多路输入中生成统一的帧同步信号。
+2.  **每个汇聚器含一个“同步汇聚模块” (schedule_concat)**：位于在汇聚器中，作为同步汇聚功能的顶层模块，下辖三个模块。
+3.  **每个schedule_concat含一个“视频状态管理” (video_status_management)**：作为管理单元,响应mask配置变更和入口数据检测，管理视频状态，切换黑像素的填充和撤离。
+4.  **每个schedule_concat含一个“同步汇聚调度器” (schedule_concat_line_interleaved)**：作为执行单元，按配置顺序调度pipe，同时区分mask pipe和normal pipe。
+5.  **每个schedule_concat含一个“黑像素生成器” (black_pixel_generator)**：作为操作单元，提供填充用的黑像素数据。
+6.  **四个“视频管道像素写入控制” (pipe_wr_mode_ctrl)**：位于video_pipe模块之前，作为视频管道的写入控制单元，负责管理视频数据的写入开关。
+
+**模块层级结构**
+
+as6d_app_pipe_sch_concat (TOP)
+├── as6d_app_video_status_management
+│   ├── video_status_buffer_wr_ctrl (x4 instances)
+│   ├── as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper (x4 instances)
+│   └── pipe_mask_ctrl
+│       ├── timestamp_align_determination
+│       └── video_status_determination
+├── as6d_app_pipe_sch_concat_line_interleaved
+│   └── multi_value_comparator
+└── black_pixel_generator
 
 ## 原理图
 ![系统架构图](.\sync_aggr.svg)
@@ -163,28 +177,18 @@ pipe清空由pipe_mask_bitmap对应位置1触发；执行video_pipe FIFO清空�
 
 ![同步汇聚状态机](.\sch_concat.svg)
 
-#### 工作流程-schedule_concat
+#### 工作流程-schedule_concat (待补充)
 
-### 2.3 视频失锁检测器 (Video Loss Detector - VLD)
-
-- **功能**：解码IDI短包和长包头，监控视频有效性，实现“视频丢失”判断。
-
-#### 输入与输出-VLD
-
-#### 原理-VLD
-
-#### 状态机-VLD
-
-### 2.4 视频管道像素写入控制（pipe_wr_mode_ctrl）
+### 2.3 视频管道像素写入控制 (pipe_wr_mode_ctrl)
 
 - **功能**：控制video_pipe的像素写入状态
 
 #### 输入与输出-pipe_wr_mode_ctrl
 
-| 端口名     | I/O | 位宽 | 描述                            |
-|:-----------|:---:|:-----|:--------------------------------|
-| pipe_wr_mode   |  I  | 2    | 像素写入控制<br> 11:全写入<br> 10:于FS-FE之间开窗写入<br> 0x:全禁止       |
-| frame_active   |  O  | 1    | 像素写入状态<br> 1:允许 <br> 0:禁止       |
+| 端口名 | I/O | 位宽 | 描述 |
+| :--- | :-: | :--- | :--- |
+| `pipe_wr_mode` | I | 2 | 像素写入控制 |
+| `frame_active` | O | 1 | 像素写入状态 |
 
 ### 2.4 黑像素生成器 (Black Pixel Generator - BPG)
 

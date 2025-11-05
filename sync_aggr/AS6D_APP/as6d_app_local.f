@@ -1,0 +1,38 @@
+
++incdir+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/
++incdir+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_MEP/
+
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_fifo_rd_ctrl.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_video_pipe_lane.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_video_pipe.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_lcrc_check.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_aggr_lane.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_aggr.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_idi_gen.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_pipe_sch.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_data_post.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/bus_delay.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/bus_delay_cg.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_pipe_route.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_pipe_route_lane.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_video_loss_detect_time_window.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_elastbuf.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_pkt_filter.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_idi_tunnel_mode_delay.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_sync.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_pulse_cnt.v
+-v ${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_mon_top.v
+-v ${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_mon_mux_lane.v
+-v ${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_mon_sel.v
+-v ${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_mon_swp.v
+-f ${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/mem_local.f
+
+${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/dig_cell.v
+${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/StdCell_Wrap.v
+
+-f ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/pattern_test.f
+
+${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/app_common/app_pkt_filter_lane.v
+${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/app_common/pulse_cnt.v
+${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/app_common/monitor_idi_packet.v

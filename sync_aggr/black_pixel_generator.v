@@ -13,18 +13,18 @@ module black_pixel_generator (
     input  wire         rst_n,
     
     // Configuration Registers
-    input  wire [5:0]   reg_BPG_datatype,    // Long packet datatype (e.g., 0x2A for RAW10)
-    input  wire [15:0]  reg_BPG_wordcount,   // Line pixel byte count
-    input  wire [2:0]   reg_BPG_vc,          // MIPI Virtual Channel
+    input  wire [5:0]   video_status_info_datatype,   // Long packet datatype (e.g., 0x2A for RAW10)
+    input  wire [15:0]  video_status_info_wordcount,  // Line pixel byte count
+    input  wire [2:0]   video_status_info_vc,         // MIPI Virtual Channel
     
     // Packet Info from pipe_mask_ctrl
-    input  wire [15:0]  local_framecount,    // Frame number for FS/FE packets
+    input  wire [15:0]  local_framecount,             // Frame number for FS/FE packets
     
     // Handshake with schedule_concat
-    output reg          unready,             // Not ready to output (1: not ready, 0: ready)
-    input  wire         up_state,            // Permission to output
-    output reg          ack,                 // Acknowledge start
-    output reg          line_end,            // Line output complete
+    output reg          unready,                      // Not ready to output (1: not ready, 0: ready)
+    input  wire         up_state,                     // Permission to output
+    output reg          ack,                          // Acknowledge start
+    output reg          line_end,                     // Line output complete
     
     // Data Output (IDI format)
     output reg          black_pixel_data_vld,
@@ -55,8 +55,8 @@ module black_pixel_generator (
     // Stage 1: Beat Calculation (Combinational)
     //==========================================================================
     // Calculate total beats and last beat byte enable based on wordcount
-    wire [15:0] beats_calc = (reg_BPG_wordcount + 15) >> 4;  // ceil(wordcount/16)
-    wire [3:0]  remainder  = reg_BPG_wordcount[3:0];
+    wire [15:0] beats_calc = (video_status_info_wordcount + 15) >> 4;  // ceil(wordcount/16)
+    wire [3:0]  remainder  = video_status_info_wordcount[3:0];
     wire [3:0]  last_byte_en_calc = (remainder == 4'd0) ? 4'b1111 :
                                     (remainder <= 4'd1) ? 4'b0001 :
                                     (remainder <= 4'd2) ? 4'b0011 :
@@ -236,7 +236,7 @@ module black_pixel_generator (
             case (current_state)
                 SEND_FS: begin
                     // FS Short Packet
-                    black_pixel_data[4:0]     <= reg_BPG_vc;           // Virtual Channel
+                    black_pixel_data[4:0]     <= video_status_info_vc; // Virtual Channel
                     black_pixel_data[10:5]    <= 6'h00;                // Datatype: FS
                     black_pixel_data[26:11]   <= local_framecount;     // Frame number
                     black_pixel_data[127:27]  <= 101'd0;               // Reserved
@@ -251,9 +251,9 @@ module black_pixel_generator (
                 
                 SEND_LONG_HEADER: begin
                     // Long Packet Header
-                    black_pixel_data[4:0]     <= reg_BPG_vc;           // Virtual Channel
-                    black_pixel_data[10:5]    <= reg_BPG_datatype;     // Datatype (e.g., 0x2A)
-                    black_pixel_data[26:11]   <= reg_BPG_wordcount;    // Word count (bytes)
+                    black_pixel_data[4:0]     <= video_status_info_vc;       // Virtual Channel
+                    black_pixel_data[10:5]    <= video_status_info_datatype; // Datatype (e.g., 0x2A)
+                    black_pixel_data[26:11]   <= video_status_info_wordcount;// Word count (bytes)
                     black_pixel_data[127:27]  <= 101'd0;               // Reserved
                     black_pixel_data[131:128] <= 4'd0;                 // byte_en (not used)
                     black_pixel_data[132]     <= 1'b1;                 // header_flag
@@ -290,7 +290,7 @@ module black_pixel_generator (
                 
                 SEND_FE: begin
                     // FE Short Packet
-                    black_pixel_data[4:0]     <= reg_BPG_vc;           // Virtual Channel
+                    black_pixel_data[4:0]     <= video_status_info_vc; // Virtual Channel
                     black_pixel_data[10:5]    <= 6'h01;                // Datatype: FE
                     black_pixel_data[26:11]   <= local_framecount;     // Frame number
                     black_pixel_data[127:27]  <= 101'd0;               // Reserved

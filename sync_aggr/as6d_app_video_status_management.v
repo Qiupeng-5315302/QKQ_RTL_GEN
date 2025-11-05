@@ -46,6 +46,7 @@ module as6d_app_video_status_management(
     // =========================================================================
     output                  start_sch_pulse,              // Start scheduling pulse to schedule_concat
     output  [3:0]           start_sch_pipe_mask_bitmap,   // Mask pipe bitmap aligned with start_sch_pulse
+    output  [3:0]           start_sch_pipe_rdy_bitmap,   // rdy pipe bitmap aligned with start_sch_pulse
     input                   end_sch_pulse,                // End scheduling pulse from schedule_concat
     
     // =========================================================================
@@ -60,6 +61,14 @@ module as6d_app_video_status_management(
     input   [1:0]           aggre_mode,                   // Aggregation mode
     input                   video_mask_latch_reset,       // Video mask latch reset
     input   [19:0]          reg_sync_aggr_video_timeout_threshold, // Video timeout threshold
+    
+    // =========================================================================
+    // BPG Configuration Inputs
+    // =========================================================================
+    input   [5:0]           video_status_info_datatype,   // Video status datatype for BPG
+    input   [15:0]          video_status_info_linecount,  // Video status line count for BPG
+    input   [15:0]          video_status_info_wordcount,  // Video status word count for BPG
+    input   [2:0]           video_status_info_vc,         // Video status virtual channel for BPG
     
     // =========================================================================
     // Pipe Write Mode Control (to video_pipe modules)
@@ -84,14 +93,14 @@ module as6d_app_video_status_management(
 // us Counter from pipe_mask_ctrl (aggr_clk domain)
 wire    [79:0]          local_us_cnt;
 
-// AFIFO signals between buffer_wr_ctrl and pipe_mask_ctrl
-wire                    afifo_wr_en_0, afifo_wr_en_1, afifo_wr_en_2, afifo_wr_en_3;
-wire    [101:0]         afifo_wr_data_0, afifo_wr_data_1, afifo_wr_data_2, afifo_wr_data_3;
-wire                    afifo_full_0, afifo_full_1, afifo_full_2, afifo_full_3;
+// Video Status Buffer signals between buffer_wr_ctrl and pipe_mask_ctrl
+wire                    video_status_buffer_wr_en_0, video_status_buffer_wr_en_1, video_status_buffer_wr_en_2, video_status_buffer_wr_en_3;
+wire    [101:0]         video_status_buffer_wr_data_0, video_status_buffer_wr_data_1, video_status_buffer_wr_data_2, video_status_buffer_wr_data_3;
+wire                    video_status_buffer_full_0, video_status_buffer_full_1, video_status_buffer_full_2, video_status_buffer_full_3;
 
-wire                    afifo_rd_en_0, afifo_rd_en_1, afifo_rd_en_2, afifo_rd_en_3;
-wire    [101:0]         afifo_rd_data_0, afifo_rd_data_1, afifo_rd_data_2, afifo_rd_data_3;
-wire                    afifo_empty_0, afifo_empty_1, afifo_empty_2, afifo_empty_3;
+wire                    video_status_buffer_rd_en_0, video_status_buffer_rd_en_1, video_status_buffer_rd_en_2, video_status_buffer_rd_en_3;
+wire    [101:0]         video_status_buffer_rd_data_0, video_status_buffer_rd_data_1, video_status_buffer_rd_data_2, video_status_buffer_rd_data_3;
+wire                    video_status_buffer_empty_0, video_status_buffer_empty_1, video_status_buffer_empty_2, video_status_buffer_empty_3;
 
 // =========================================================================
 // Submodule: video_status_buffer_wr_ctrl (4 instances)
@@ -108,9 +117,9 @@ video_status_buffer_wr_ctrl u_video_status_buffer_wr_ctrl_0(
     .aggr_clk               (aggr_clk),
     .aggr_clk_rst_n         (aggr_clk_rst_n),
     .local_us_cnt           (local_us_cnt),
-    .wr_en                  (afifo_wr_en_0),
-    .wr_data                (afifo_wr_data_0),
-    .afifo_full             (afifo_full_0)
+    .wr_en                  (video_status_buffer_wr_en_0),
+    .wr_data                (video_status_buffer_wr_data_0),
+    .afifo_full             (video_status_buffer_full_0)
 );
 
 // Instance 1
@@ -124,9 +133,9 @@ video_status_buffer_wr_ctrl u_video_status_buffer_wr_ctrl_1(
     .aggr_clk               (aggr_clk),
     .aggr_clk_rst_n         (aggr_clk_rst_n),
     .local_us_cnt           (local_us_cnt),
-    .wr_en                  (afifo_wr_en_1),
-    .wr_data                (afifo_wr_data_1),
-    .afifo_full             (afifo_full_1)
+    .wr_en                  (video_status_buffer_wr_en_1),
+    .wr_data                (video_status_buffer_wr_data_1),
+    .afifo_full             (video_status_buffer_full_1)
 );
 
 // Instance 2
@@ -140,9 +149,9 @@ video_status_buffer_wr_ctrl u_video_status_buffer_wr_ctrl_2(
     .aggr_clk               (aggr_clk),
     .aggr_clk_rst_n         (aggr_clk_rst_n),
     .local_us_cnt           (local_us_cnt),
-    .wr_en                  (afifo_wr_en_2),
-    .wr_data                (afifo_wr_data_2),
-    .afifo_full             (afifo_full_2)
+    .wr_en                  (video_status_buffer_wr_en_2),
+    .wr_data                (video_status_buffer_wr_data_2),
+    .afifo_full             (video_status_buffer_full_2)
 );
 
 // Instance 3
@@ -156,27 +165,173 @@ video_status_buffer_wr_ctrl u_video_status_buffer_wr_ctrl_3(
     .aggr_clk               (aggr_clk),
     .aggr_clk_rst_n         (aggr_clk_rst_n),
     .local_us_cnt           (local_us_cnt),
-    .wr_en                  (afifo_wr_en_3),
-    .wr_data                (afifo_wr_data_3),
-    .afifo_full             (afifo_full_3)
+    .wr_en                  (video_status_buffer_wr_en_3),
+    .wr_data                (video_status_buffer_wr_data_3),
+    .afifo_full             (video_status_buffer_full_3)
 );
 
 // =========================================================================
-// TODO: Instantiate 4 AFIFO modules (async FIFO)
+// Submodule: 4 AFIFO Instances
 // =========================================================================
-// afifo #(.DATA_WIDTH(102), .ADDR_WIDTH(4)) u_afifo_0 (
-//     .wr_clk     (fifo_wr_clk_0),
-//     .wr_rst_n   (fifo_wr_clk_rst_n_0),
-//     .wr_en      (afifo_wr_en_0),
-//     .wr_data    (afifo_wr_data_0),
-//     .full       (afifo_full_0),
-//     .rd_clk     (aggr_clk),
-//     .rd_rst_n   (aggr_clk_rst_n),
-//     .rd_en      (afifo_rd_en_0),
-//     .rd_data    (afifo_rd_data_0),
-//     .empty      (afifo_empty_0)
-// );
-// ... similar for afifo_1, afifo_2, afifo_3
+// AFIFO Instance 0
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper u_video_status_buffer_0 (
+    // Write Clock Domain
+    .wr_clk                     (fifo_wr_clk_0),
+    .wr_rst_n                   (fifo_wr_clk_rst_n_0),
+    .wr_data                    (video_status_buffer_wr_data_0),
+    .wr_en                      (video_status_buffer_wr_en_0),
+    .wr_domain_clear            (1'b0),
+    
+    // Read Clock Domain
+    .rd_clk                     (aggr_clk),
+    .rd_rst_n                   (aggr_clk_rst_n),
+    .rd_data                    (video_status_buffer_rd_data_0),
+    .rd_data_val                (video_status_buffer_rd_data_val_0),        // data_vld connected to data_val
+    .rd_en                      (video_status_buffer_rd_en_0),       // Read when not empty
+    .rd_domain_clear            (1'b0),
+    
+    // Status Flags
+    .empty                      (video_status_buffer_empty_0),
+    .full                       (video_status_buffer_full_0),
+    .prog_full                  (),                     // Not used
+    .data_count                 (),                     // Not used
+    
+    // Configuration (set to default safe values)
+    .ram_bypass                 (1'b0),
+    .reg_dft_tpram_config       (9'b0),
+    .prog_full_assert_cfg       (5'd14),                // Almost full threshold
+    .prog_full_negate_cfg       (5'd12),
+    .ecc_addr_protect_en        (1'b0),
+    .ecc_bypass                 (1'b1),                 // Bypass ECC
+    .ecc_fault_detc_en          (1'b0),
+    
+    // Status outputs (ignored for now)
+    .ecc_fault                  (),
+    .single_err                 (),
+    .double_err                 (),
+    .ovf_int                    (),
+    .udf_int                    ()
+);
+
+// AFIFO Instance 1
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper u_video_status_buffer_1 (
+    // Write Clock Domain
+    .wr_clk                     (fifo_wr_clk_1),
+    .wr_rst_n                   (fifo_wr_clk_rst_n_1),
+    .wr_data                    (video_status_buffer_wr_data_1),
+    .wr_en                      (video_status_buffer_wr_en_1),
+    .wr_domain_clear            (1'b0),
+    
+    // Read Clock Domain
+    .rd_clk                     (aggr_clk),
+    .rd_rst_n                   (aggr_clk_rst_n),
+    .rd_data                    (video_status_buffer_rd_data_1),
+    .rd_data_val                (video_status_buffer_rd_data_val_1),
+    .rd_en                      (video_status_buffer_rd_en_1),
+    .rd_domain_clear            (1'b0),
+    
+    // Status Flags
+    .empty                      (video_status_buffer_empty_1),
+    .full                       (video_status_buffer_full_1),
+    .prog_full                  (),
+    .data_count                 (),
+    
+    // Configuration
+    .ram_bypass                 (1'b0),
+    .reg_dft_tpram_config       (9'b0),
+    .prog_full_assert_cfg       (5'd14),
+    .prog_full_negate_cfg       (5'd12),
+    .ecc_addr_protect_en        (1'b0),
+    .ecc_bypass                 (1'b1),
+    .ecc_fault_detc_en          (1'b0),
+    
+    // Status outputs
+    .ecc_fault                  (),
+    .single_err                 (),
+    .double_err                 (),
+    .ovf_int                    (),
+    .udf_int                    ()
+);
+
+// AFIFO Instance 2
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper u_video_status_buffer_2 (
+    // Write Clock Domain
+    .wr_clk                     (fifo_wr_clk_2),
+    .wr_rst_n                   (fifo_wr_clk_rst_n_2),
+    .wr_data                    (video_status_buffer_wr_data_2),
+    .wr_en                      (video_status_buffer_wr_en_2),
+    .wr_domain_clear            (1'b0),
+    
+    // Read Clock Domain
+    .rd_clk                     (aggr_clk),
+    .rd_rst_n                   (aggr_clk_rst_n),
+    .rd_data                    (video_status_buffer_rd_data_2),
+    .rd_data_val                (video_status_buffer_rd_data_val_2),
+    .rd_en                      (video_status_buffer_rd_en_2),
+    .rd_domain_clear            (1'b0),
+    
+    // Status Flags
+    .empty                      (video_status_buffer_empty_2),
+    .full                       (video_status_buffer_full_2),
+    .prog_full                  (),
+    .data_count                 (),
+    
+    // Configuration
+    .ram_bypass                 (1'b0),
+    .reg_dft_tpram_config       (9'b0),
+    .prog_full_assert_cfg       (5'd14),
+    .prog_full_negate_cfg       (5'd12),
+    .ecc_addr_protect_en        (1'b0),
+    .ecc_bypass                 (1'b1),
+    .ecc_fault_detc_en          (1'b0),
+    
+    // Status outputs
+    .ecc_fault                  (),
+    .single_err                 (),
+    .double_err                 (),
+    .ovf_int                    (),
+    .udf_int                    ()
+);
+
+// AFIFO Instance 3
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper u_video_status_buffer_3 (
+    // Write Clock Domain
+    .wr_clk                     (fifo_wr_clk_3),
+    .wr_rst_n                   (fifo_wr_clk_rst_n_3),
+    .wr_data                    (video_status_buffer_wr_data_3),
+    .wr_en                      (video_status_buffer_wr_en_3),
+    .wr_domain_clear            (1'b0),
+    
+    // Read Clock Domain
+    .rd_clk                     (aggr_clk),
+    .rd_rst_n                   (aggr_clk_rst_n),
+    .rd_data                    (video_status_buffer_rd_data_3),
+    .rd_data_val                (video_status_buffer_rd_data_val_3),
+    .rd_en                      (video_status_buffer_rd_en_3),
+    .rd_domain_clear            (1'b0),
+    
+    // Status Flags
+    .empty                      (video_status_buffer_empty_3),
+    .full                       (video_status_buffer_full_3),
+    .prog_full                  (),
+    .data_count                 (),
+    
+    // Configuration
+    .ram_bypass                 (1'b0),
+    .reg_dft_tpram_config       (9'b0),
+    .prog_full_assert_cfg       (5'd14),
+    .prog_full_negate_cfg       (5'd12),
+    .ecc_addr_protect_en        (1'b0),
+    .ecc_bypass                 (1'b1),
+    .ecc_fault_detc_en          (1'b0),
+    
+    // Status outputs
+    .ecc_fault                  (),
+    .single_err                 (),
+    .double_err                 (),
+    .ovf_int                    (),
+    .udf_int                    ()
+);
 
 // =========================================================================
 // Submodule: pipe_mask_ctrl
@@ -196,15 +351,21 @@ pipe_mask_ctrl u_pipe_mask_ctrl(
     .aggre_mode                         (aggre_mode),
     .video_mask_latch_reset             (video_mask_latch_reset),
     
-    // FIFO Interface (connected to AFIFO read side)
-    .data_vld_0                         (~afifo_empty_0),
-    .data_vld_1                         (~afifo_empty_1),
-    .data_vld_2                         (~afifo_empty_2),
-    .data_vld_3                         (~afifo_empty_3),
-    .data_0                             (afifo_rd_data_0),
-    .data_1                             (afifo_rd_data_1),
-    .data_2                             (afifo_rd_data_2),
-    .data_3                             (afifo_rd_data_3),
+    // BPG Configuration Inputs
+    .video_status_info_datatype         (video_status_info_datatype),
+    .video_status_info_linecount        (video_status_info_linecount),
+    .video_status_info_wordcount        (video_status_info_wordcount),
+    .video_status_info_vc               (video_status_info_vc),
+    
+    // FIFO Interface (connected to Video Status Buffer read side)
+    .data_vld_0                         (video_status_buffer_rd_data_val_0),
+    .data_vld_1                         (video_status_buffer_rd_data_val_1),
+    .data_vld_2                         (video_status_buffer_rd_data_val_2),
+    .data_vld_3                         (video_status_buffer_rd_data_val_3),
+    .data_0                             (video_status_buffer_rd_data_0),
+    .data_1                             (video_status_buffer_rd_data_1),
+    .data_2                             (video_status_buffer_rd_data_2),
+    .data_3                             (video_status_buffer_rd_data_3),
     .reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold),
     
     // Schedule Concat Interface
@@ -219,6 +380,7 @@ pipe_mask_ctrl u_pipe_mask_ctrl(
     .pipe_mask_bitmap                   (start_sch_pipe_mask_bitmap),
     .pipe_normal_bitmap                 (),  // Not used
     .pipe_restart_bitmap                (),  // Not used
+    .video_status_pass_bitmap           (start_sch_pipe_rdy_bitmap),
     
     // BPG Configuration Outputs
     .local_framecount_out               (local_framecount_out),
@@ -228,7 +390,12 @@ pipe_mask_ctrl u_pipe_mask_ctrl(
     // us Counter (1MHz clock domain)
     .clk_1M                             (clk_1M),
     .clk_1M_rst_n                       (aggr_clk_rst_n),
-    .local_us_cnt                       (local_us_cnt)  // Output to video_status_buffer_wr_ctrl instances
+    .local_us_cnt                       (local_us_cnt),  // Output to video_status_buffer_wr_ctrl instances
+
+    .video_status_buffer_rd_en_0        (video_status_buffer_rd_en_0),
+    .video_status_buffer_rd_en_1        (video_status_buffer_rd_en_1),
+    .video_status_buffer_rd_en_2        (video_status_buffer_rd_en_2),
+    .video_status_buffer_rd_en_3        (video_status_buffer_rd_en_3)
 );
 
 endmodule

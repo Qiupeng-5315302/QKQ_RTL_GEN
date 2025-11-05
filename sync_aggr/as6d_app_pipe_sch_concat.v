@@ -1,15 +1,17 @@
 module as6d_app_pipe_sch_concat(
 /*AUTOARG*/
    // Outputs
-   up_state_concat, ack_concat, line_end_concat, pipe0_wr_mode,
-   pipe1_wr_mode, pipe2_wr_mode, pipe3_wr_mode, pipe0_wr_mode_strobe,
-   pipe1_wr_mode_strobe, pipe2_wr_mode_strobe, pipe3_wr_mode_strobe,
+   up_state_concat, ack_concat, line_end_concat, 
+   pipe0_wr_mode, pipe1_wr_mode, pipe2_wr_mode, pipe3_wr_mode, 
+   pipe0_wr_mode_strobe, pipe1_wr_mode_strobe, pipe2_wr_mode_strobe, pipe3_wr_mode_strobe,
    pipe_clear_bit_map, sch_data_type_align_fail_int,
+   black_pixel_data_vld, black_pixel_data,
    // Inputs
    aggre_clk, aggre_clk_rst_n, aggre_mode, clk_1M,
    fifo_wr_clk_0, fifo_wr_clk_1, fifo_wr_clk_2, fifo_wr_clk_3,
    fifo_wr_clk_rst_n_0, fifo_wr_clk_rst_n_1, fifo_wr_clk_rst_n_2, fifo_wr_clk_rst_n_3,
    idi_header_en_0, idi_header_en_1, idi_header_en_2, idi_header_en_3,
+   idi_datatype_0, idi_datatype_1, idi_datatype_2, idi_datatype_3,
    idi_wordcount_0, idi_wordcount_1, idi_wordcount_2, idi_wordcount_3,
    idi_linecount_0, idi_linecount_1, idi_linecount_2, idi_linecount_3,
    pipe0_concat_en, pipe1_concat_en, pipe2_concat_en, pipe3_concat_en, 
@@ -20,6 +22,8 @@ module as6d_app_pipe_sch_concat(
    frame_sync_lock, master_pipe, auto_mask_en,
    force_video_mask, video_mask_restart, video_mask_latch_reset,
    reg_sync_aggr_video_timeout_threshold, pipe_frame_active,
+   video_status_info_datatype, video_status_info_linecount,
+   video_status_info_wordcount, video_status_info_vc,
    video_pipe_date_type_for_concat_align_vld3,
    video_pipe_date_type_for_concat_align_vld2,
    video_pipe_date_type_for_concat_align_vld1,
@@ -51,6 +55,10 @@ module as6d_app_pipe_sch_concat(
     input                   idi_header_en_1;
     input                   idi_header_en_2;
     input                   idi_header_en_3;
+    input   [5:0]           idi_datatype_0;
+    input   [5:0]           idi_datatype_1;
+    input   [5:0]           idi_datatype_2;
+    input   [5:0]           idi_datatype_3;
     input   [15:0]          idi_wordcount_0;
     input   [15:0]          idi_wordcount_1;
     input   [15:0]          idi_wordcount_2;
@@ -94,6 +102,14 @@ module as6d_app_pipe_sch_concat(
     input       [3:0]       pipe_frame_active;            // Pipe frame active status
     
     // =========================================================================
+    // BPG Configuration Inputs
+    // =========================================================================
+    input       [5:0]       video_status_info_datatype;   // Video status datatype for BPG
+    input       [15:0]      video_status_info_linecount;  // Video status line count for BPG
+    input       [15:0]      video_status_info_wordcount;  // Video status word count for BPG
+    input       [2:0]       video_status_info_vc;         // Video status virtual channel for BPG
+    
+    // =========================================================================
     // Video Datatype for Alignment
     // =========================================================================
     input                   video_pipe_date_type_for_concat_align_vld0;
@@ -108,69 +124,227 @@ module as6d_app_pipe_sch_concat(
     // =========================================================================
     // Outputs
     // =========================================================================
-    output reg  [3:0]       up_state_concat;
-    output wire [3:0]       ack_concat;
-    output wire [3:0]       line_end_concat;
     output wire [1:0]       pipe0_wr_mode;
     output wire [1:0]       pipe1_wr_mode;
     output wire [1:0]       pipe2_wr_mode;
     output wire [1:0]       pipe3_wr_mode;
+    output wire             up_state_concat[0:3];
+    output wire [3:0]       ack_concat;
+    output wire [3:0]       line_end_concat;
     output wire             pipe0_wr_mode_strobe;
     output wire             pipe1_wr_mode_strobe;
     output wire             pipe2_wr_mode_strobe;
     output wire             pipe3_wr_mode_strobe;
-    output reg  [3:0]       pipe_clear_bit_map;
-    output reg              sch_data_type_align_fail_int;
+    output wire [3:0]       pipe_clear_bit_map;
+    output wire             sch_data_type_align_fail_int;
+    output wire             black_pixel_data_vld;
+    output wire [139:0]     black_pixel_data;
 
     // =========================================================================
-    // Internal Signals - Placeholder (module is hollowed out)
+    // Internal Signals
     // =========================================================================
-    // TODO: Implement internal logic and submodule instantiations
+    // Signals from video_status_management to pipe_sch_concat_line_interleaved
+    wire                    start_sch_pulse;
+    wire    [3:0]           start_sch_pipe_mask_bitmap;
+    wire    [3:0]           start_sch_pipe_rdy_bitmap;
+    wire                    end_sch_pulse;
     
-    // =========================================================================
-    // Output Logic - Default values
-    // =========================================================================
-    // up_state_concat: Default to 0
-    always @(posedge aggre_clk or negedge aggre_clk_rst_n) begin
-        if (~aggre_clk_rst_n)
-            up_state_concat <= 4'd0;
-        else
-            up_state_concat <= 4'd0;  // TODO: Connect to scheduler
-    end
+    // BPG Configuration Signals from video_status_management
+    wire    [15:0]          local_framecount_out;
+    wire    [15:0]          local_linecount_out;
+    wire    [5:0]           local_pkt_datatype_out;
     
-    // ack_concat and line_end_concat: Pass through
-    assign ack_concat = {pipe3_concat_en & ack3, pipe2_concat_en & ack2, 
-                         pipe1_concat_en & ack1, pipe0_concat_en & ack0};
-    assign line_end_concat = {pipe3_concat_en & line_end3, pipe2_concat_en & line_end2, 
-                              pipe1_concat_en & line_end1, pipe0_concat_en & line_end0};
+    // BPG Interface Signals
+    wire                    bpg_empty;
+    wire                    bpg_ack;
+    wire                    bpg_line_end;
+    wire                    bpg_up_state;
     
-    // pipe_wr_mode: Default to normal mode
-    assign pipe0_wr_mode = 2'b10;  // TODO: Connect to video_status_management
-    assign pipe1_wr_mode = 2'b10;
-    assign pipe2_wr_mode = 2'b10;
-    assign pipe3_wr_mode = 2'b10;
+    // Pipe concat enable bitmap
+    wire    [3:0]           pipe_concat_en;
+    assign pipe_concat_en = {pipe3_concat_en, pipe2_concat_en, pipe1_concat_en, pipe0_concat_en};
     
-    // pipe_wr_mode_strobe: Default to 0
-    assign pipe0_wr_mode_strobe = 1'b0;
-    assign pipe1_wr_mode_strobe = 1'b0;
-    assign pipe2_wr_mode_strobe = 1'b0;
-    assign pipe3_wr_mode_strobe = 1'b0;
+// =========================================================================
+// Submodule Integration 1: as6d_app_video_status_management
+// =========================================================================
+as6d_app_video_status_management u_video_status_management (
+    // FIFO Write Side Interfaces
+    .fifo_wr_clk_0          (fifo_wr_clk_0),
+    .fifo_wr_clk_rst_n_0    (fifo_wr_clk_rst_n_0),
+    .idi_header_en_0        (idi_header_en_0),
+    .idi_datatype_0         (idi_datatype_0),
+    .idi_wordcount_0        (idi_wordcount_0),
+    .idi_linecount_0        (idi_linecount_0),
     
-    // pipe_clear_bit_map: Default to 0
-    always @(posedge aggre_clk or negedge aggre_clk_rst_n) begin
-        if (~aggre_clk_rst_n)
-            pipe_clear_bit_map <= 4'd0;
-        else
-            pipe_clear_bit_map <= 4'd0;  // TODO: Connect to video_status_management
-    end
+    .fifo_wr_clk_1          (fifo_wr_clk_1),
+    .fifo_wr_clk_rst_n_1    (fifo_wr_clk_rst_n_1),
+    .idi_header_en_1        (idi_header_en_1),
+    .idi_datatype_1         (idi_datatype_1),
+    .idi_wordcount_1        (idi_wordcount_1),
+    .idi_linecount_1        (idi_linecount_1),
     
-    // sch_data_type_align_fail_int: Default to 0
-    always @(posedge aggre_clk or negedge aggre_clk_rst_n) begin
-        if (~aggre_clk_rst_n)
-            sch_data_type_align_fail_int <= 1'b0;
-        else
-            sch_data_type_align_fail_int <= 1'b0;  // TODO: Connect to scheduler
-    end
+    .fifo_wr_clk_2          (fifo_wr_clk_2),
+    .fifo_wr_clk_rst_n_2    (fifo_wr_clk_rst_n_2),
+    .idi_header_en_2        (idi_header_en_2),
+    .idi_datatype_2         (idi_datatype_2),
+    .idi_wordcount_2        (idi_wordcount_2),
+    .idi_linecount_2        (idi_linecount_2),
+    
+    .fifo_wr_clk_3          (fifo_wr_clk_3),
+    .fifo_wr_clk_rst_n_3    (fifo_wr_clk_rst_n_3),
+    .idi_header_en_3        (idi_header_en_3),
+    .idi_datatype_3         (idi_datatype_3),
+    .idi_wordcount_3        (idi_wordcount_3),
+    .idi_linecount_3        (idi_linecount_3),
+    
+    // Aggregator Clock Domain
+    .aggr_clk               (aggre_clk),
+    .aggr_clk_rst_n         (aggre_clk_rst_n),
+    .clk_1M                 (clk_1M),
+    
+    // Handshake with schedule_concat
+    .start_sch_pulse        (start_sch_pulse),
+    .start_sch_pipe_mask_bitmap (start_sch_pipe_mask_bitmap),
+    .start_sch_pipe_rdy_bitmap  (start_sch_pipe_rdy_bitmap),
+    .end_sch_pulse          (end_sch_pulse),
+    
+    // Configuration Registers
+    .pipe_concat_en         (pipe_concat_en),
+    .Force_Video_Mask       (force_video_mask),
+    .Auto_Mask_En           (auto_mask_en),
+    .Video_Mask_Restart_En  (video_mask_restart),
+    .pipe_frame_active      (pipe_frame_active),
+    .frame_sync_lock        (frame_sync_lock),
+    .aggre_mode             (aggre_mode),
+    .video_mask_latch_reset (video_mask_latch_reset),
+    .reg_sync_aggr_video_timeout_threshold (reg_sync_aggr_video_timeout_threshold),
+    
+    // BPG Configuration Inputs
+    .video_status_info_datatype  (video_status_info_datatype),
+    .video_status_info_linecount (video_status_info_linecount),
+    .video_status_info_wordcount (video_status_info_wordcount),
+    .video_status_info_vc        (video_status_info_vc),
+    
+    // Pipe Write Mode Control
+    .pipe_clear_bit_map     (pipe_clear_bit_map),
+    .pipe_wr_mode_0         (pipe0_wr_mode),
+    .pipe_wr_mode_1         (pipe1_wr_mode),
+    .pipe_wr_mode_2         (pipe2_wr_mode),
+    .pipe_wr_mode_3         (pipe3_wr_mode),
+    
+    // BPG Configuration Outputs
+    .local_framecount_out   (local_framecount_out),
+    .local_linecount_out    (local_linecount_out),
+    .local_pkt_datatype_out (local_pkt_datatype_out)
+);
+
+// =========================================================================
+// Submodule Integration 2: as6d_app_pipe_sch_concat_line_interleaved
+// =========================================================================
+as6d_app_pipe_sch_concat_line_interleaved u_pipe_sch_concat_line_interleaved (
+    // Clock and Reset
+    .aggre_clk              (aggre_clk),
+    .aggre_clk_rst_n        (aggre_clk_rst_n),
+    
+    // Configuration Inputs
+    .aggre_mode             (aggre_mode),
+    .pipe0_concat_en        (pipe0_concat_en),
+    .pipe1_concat_en        (pipe1_concat_en),
+    .pipe2_concat_en        (pipe2_concat_en),
+    .pipe3_concat_en        (pipe3_concat_en),
+    .pipe_mask_bitmap       (start_sch_pipe_mask_bitmap),
+    .master_pipe            (master_pipe),
+    .pipe_rdy_bitmap        (start_sch_pipe_rdy_bitmap),
+    
+    // Scheduling Control
+    .start_sch_pulse        (start_sch_pulse),
+    .end_sch_pulse          (end_sch_pulse),
+    
+    // Video Pipe DataType for Alignment Detection
+    .video_pipe_date_type_for_concat_align_vld0 (video_pipe_date_type_for_concat_align_vld0),
+    .video_pipe_date_type_for_concat_align0     (video_pipe_date_type_for_concat_align0),
+    .video_pipe_date_type_for_concat_align_vld1 (video_pipe_date_type_for_concat_align_vld1),
+    .video_pipe_date_type_for_concat_align1     (video_pipe_date_type_for_concat_align1),
+    .video_pipe_date_type_for_concat_align_vld2 (video_pipe_date_type_for_concat_align_vld2),
+    .video_pipe_date_type_for_concat_align2     (video_pipe_date_type_for_concat_align2),
+    .video_pipe_date_type_for_concat_align_vld3 (video_pipe_date_type_for_concat_align_vld3),
+    .video_pipe_date_type_for_concat_align3     (video_pipe_date_type_for_concat_align3),
+    
+    // Video Pipe Acknowledgement and Line End Signals
+    .ack0                   (ack0),
+    .ack1                   (ack1),
+    .ack2                   (ack2),
+    .ack3                   (ack3),
+    .line_end0              (line_end0),
+    .line_end1              (line_end1),
+    .line_end2              (line_end2),
+    .line_end3              (line_end3),
+    
+    // BPG Interface - Inputs from BPG
+    .bpg_empty              (bpg_empty),
+    .bpg_ack                (bpg_ack),
+    .bpg_line_end           (bpg_line_end),
+    
+    // BPG Interface - Outputs to BPG
+    .bpg_up_state           (bpg_up_state),
+    
+    // Video Pipe Up State Concat Outputs
+    .up_state_concat        (up_state_concat),
+    
+    // Status Outputs
+    .sch_data_type_align_fail_int (sch_data_type_align_fail_int)
+);
+
+// =========================================================================
+// Submodule Integration 3: black_pixel_generator
+// =========================================================================
+black_pixel_generator u_black_pixel_generator (
+    // Clock and Reset
+    .clk                        (aggre_clk),
+    .rst_n                      (aggre_clk_rst_n),
+    
+    // Configuration Registers (from top-level inputs)
+    .video_status_info_datatype  (video_status_info_datatype),
+    .video_status_info_wordcount (video_status_info_wordcount),
+    .video_status_info_vc        (video_status_info_vc),
+    
+    // Packet Info from pipe_mask_ctrl
+    .local_framecount       (local_framecount_out),
+    
+    // Handshake with schedule_concat
+    .unready                (bpg_empty),            // BPG not ready = empty
+    .up_state               (bpg_up_state),
+    .ack                    (bpg_ack),
+    .line_end               (bpg_line_end),
+    
+    // Data Output (IDI format) - connected to module output
+    .black_pixel_data_vld   (black_pixel_data_vld),
+    .black_pixel_data       (black_pixel_data)
+);
+
+// =========================================================================
+// Output Signal Assignments
+// =========================================================================
+// ack_concat and line_end_concat outputs - combine from video pipes and BPG
+assign ack_concat = {
+    (start_sch_pipe_mask_bitmap[3] ? bpg_ack : ack3),
+    (start_sch_pipe_mask_bitmap[2] ? bpg_ack : ack2),
+    (start_sch_pipe_mask_bitmap[1] ? bpg_ack : ack1),
+    (start_sch_pipe_mask_bitmap[0] ? bpg_ack : ack0)
+};
+
+assign line_end_concat = {
+    (start_sch_pipe_mask_bitmap[3] ? bpg_line_end : line_end3),
+    (start_sch_pipe_mask_bitmap[2] ? bpg_line_end : line_end2),
+    (start_sch_pipe_mask_bitmap[1] ? bpg_line_end : line_end1),
+    (start_sch_pipe_mask_bitmap[0] ? bpg_line_end : line_end0)
+};
+
+// pipe_wr_mode_strobe outputs - currently not implemented, set to 0
+assign pipe0_wr_mode_strobe = 1'b0;
+assign pipe1_wr_mode_strobe = 1'b0;
+assign pipe2_wr_mode_strobe = 1'b0;
+assign pipe3_wr_mode_strobe = 1'b0;
 
 endmodule
 //Local Variables:

@@ -1,0 +1,16 @@
+
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/app_video_prbs_chk.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/app_video_prbs_gen.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/idi_pattern_driver.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/pattern_test.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/prbs_11.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/prbs_15.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/prbs_16.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/prbs_23.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/prbs_31.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/prbs_32.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/prbs_7.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/prbs_9.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/scrambler_core_64bit.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/sync_bus.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/pattern_test/vprbs_err_inject.v

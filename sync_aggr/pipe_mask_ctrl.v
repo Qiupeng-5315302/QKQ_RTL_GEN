@@ -20,6 +20,11 @@ module pipe_mask_ctrl (
     input  wire        frame_sync_lock,
     input  wire [1:0]  aggre_mode,
     input  wire        video_mask_latch_reset,
+
+    input  wire [ 5:0] video_status_info_datatype;
+    input  wire [15:0] video_status_info_linecount;    
+    input  wire [15:0] video_status_info_wordcount;
+    input  wire [ 2:0] video_status_info_vc;    
     
     // FIFO Interface (for sub-modules)
     input  wire         data_vld_0,
@@ -44,6 +49,7 @@ module pipe_mask_ctrl (
     output reg  [3:0]  pipe_mask_bitmap,
     output wire [3:0]  pipe_normal_bitmap,
     output wire [3:0]  pipe_restart_bitmap,
+    output wire [3:0]  video_status_pass_bitmap;
 
     //clk_1M
     input  wire        clk_1M,
@@ -53,7 +59,12 @@ module pipe_mask_ctrl (
     // Local Packet Info Outputs (for BPG)
     output wire [15:0] local_framecount_out,
     output wire [15:0] local_linecount_out,
-    output wire [ 5:0] local_pkt_datatype_out
+    output wire [ 5:0] local_pkt_datatype_out,
+
+    output wire        video_status_buffer_rd_en_0,
+    output wire        video_status_buffer_rd_en_1,
+    output wire        video_status_buffer_rd_en_2,
+    output wire        video_status_buffer_rd_en_3,
 );
 
     //==========================================================================
@@ -90,7 +101,7 @@ module pipe_mask_ctrl (
     
     // Signals from/to video_status_determination sub-module
     wire       start_video_status_determing;
-    wire [3:0] video_status_pass_bitmap;
+
     wire [3:0] video_status_fail_bitmap;
     
     // Derived signals
@@ -278,7 +289,7 @@ module pipe_mask_ctrl (
     always @(*) begin
         integer i;
         for (i = 0; i < 4; i = i + 1) begin
-            if (pipe_mask_bitmap[i] && !Video_Mask_Restart_En[i]) begin
+            if ((current_state == INIT) ||(pipe_mask_bitmap[i] && !Video_Mask_Restart_En[i])) begin
                 pipe_wr_mode[2*i+1 : 2*i] = 2'b00;
             end
             else begin
@@ -341,10 +352,7 @@ module pipe_mask_ctrl (
     //==========================================================================
     // local packet info maintain
     //==========================================================================
-    wire    [ 5:0]  video_status_info_datatype;
-    wire    [15:0]  video_status_info_linecount;    
-    wire    [15:0]  video_status_info_wordcount;
-    wire    [ 2:0]  video_status_info_vc;    
+
    
     reg     [15:0]  local_linecount;
     reg     [15:0]  local_framecount;
@@ -448,7 +456,10 @@ module pipe_mask_ctrl (
     assign local_linecount_out   = local_linecount;
     assign local_pkt_datatype_out = local_pkt_datatype;
 
-
+    assign video_status_buffer_rd_en_0 = video_status_pass_bitmap[0];
+    assign video_status_buffer_rd_en_1 = video_status_pass_bitmap[1];
+    assign video_status_buffer_rd_en_2 = video_status_pass_bitmap[2];
+    assign video_status_buffer_rd_en_3 = video_status_pass_bitmap[3];
     //==========================================================================
     // Sub-Module Instantiation
     //==========================================================================

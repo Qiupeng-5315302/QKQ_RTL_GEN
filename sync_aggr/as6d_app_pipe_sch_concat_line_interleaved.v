@@ -43,10 +43,8 @@
         input                   bpg_line_end,                       // BPG line_end signal
         
         // BPG Interface - Outputs to BPG
-        output  reg [3:0]       bpg_up_state,                       // BPG up_state (4-bit, one per pipe)
-        output  wire [3:0]      bpg_ack_concat,                     // BPG ack feedback to scheduler
-        output  wire [3:0]      bpg_line_end_concat,                // BPG line_end feedback to scheduler
-        
+        output  reg             bpg_up_state,                       // BPG up_state (4-bit, one per pipe)
+       
         // Video Pipe Up State Concat Outputs
         output  reg             up_state_concat[0:3],
         
@@ -82,8 +80,9 @@
     wire    [1:0]           group_index_mux;
     
     // BPG MUX signals - combine video_pipe and BPG based on pipe_mask_bitmap
-    wire                    ack_combined[0:3];
-    wire                    line_end_combined[0:3];
+    wire    [0:3]           ack_combined;
+    wire    [0:3]           line_end_combined;
+    wire    [0:3]           bpg_up_state_bitmap;
     
     integer                 j;
     genvar                  i;
@@ -107,35 +106,11 @@
     // Output assignments - split up_state between video_pipe and BPG
     // up_state_concat: only for non-masked pipes (video_pipe)
     // bpg_up_state: only for masked pipes (BPG)
-    always @(posedge aggre_clk or negedge aggre_clk_rst_n) begin
-        if (~aggre_clk_rst_n) begin
-            for (j=0; j<=3; j=j+1) begin
-                up_state_concat[j] <= 1'd0;
-            end
-            bpg_up_state <= 4'd0;
-        end
-        else begin
-            for (j=0; j<=3; j=j+1) begin
-                up_state_concat[j] <= up_state_internal[j] & (~pipe_mask_bitmap[j]);
-            end
-            bpg_up_state[0] <= up_state_internal[0] & pipe_mask_bitmap[0];
-            bpg_up_state[1] <= up_state_internal[1] & pipe_mask_bitmap[1];
-            bpg_up_state[2] <= up_state_internal[2] & pipe_mask_bitmap[2];
-            bpg_up_state[3] <= up_state_internal[3] & pipe_mask_bitmap[3];
-        end
-    end
-    
-    // Feedback signals for BPG
-    assign bpg_ack_concat[0] = ack_combined[0] & pipe_mask_bitmap[0];
-    assign bpg_ack_concat[1] = ack_combined[1] & pipe_mask_bitmap[1];
-    assign bpg_ack_concat[2] = ack_combined[2] & pipe_mask_bitmap[2];
-    assign bpg_ack_concat[3] = ack_combined[3] & pipe_mask_bitmap[3];
-    
-    assign bpg_line_end_concat[0] = line_end_combined[0] & pipe_mask_bitmap[0];
-    assign bpg_line_end_concat[1] = line_end_combined[1] & pipe_mask_bitmap[1];
-    assign bpg_line_end_concat[2] = line_end_combined[2] & pipe_mask_bitmap[2];
-    assign bpg_line_end_concat[3] = line_end_combined[3] & pipe_mask_bitmap[3];
 
+    assign up_state_concat = up_state_internal & (~pipe_mask_bitmap);
+    assign bpg_up_state_bitmap = up_state_internal & pipe_mask_bitmap;
+    assign bpg_up_state = |bpg_up_state_bitmap ;
+    
     assign start_sch_pulse_datatype_align = start_sch_pulse & ~out_comp_fail;
 
     //video_pipe_date_type concat_align detect, trigger pmu reset
@@ -167,8 +142,10 @@
 				.in_data3	(video_pipe_date_type_for_concat_align3[5:0])); // Templated
 
     always@(posedge aggre_clk or negedge aggre_clk_rst_n)begin
-        if(~aggre_clk_rst_n) sch_data_type_align_fail_int <= 1'd0;
-        else if(aggre_mode == 2'd1) sch_data_type_align_fail_int <= out_comp_fail;
+        if(~aggre_clk_rst_n) 
+            sch_data_type_align_fail_int <= 1'd0;
+        else if(aggre_mode == 2'd1) 
+            sch_data_type_align_fail_int <= out_comp_fail;
     end
     
     //***sync aggregation machine state begin
