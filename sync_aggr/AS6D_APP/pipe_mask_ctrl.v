@@ -21,10 +21,10 @@ module pipe_mask_ctrl (
     input  wire [1:0]  aggre_mode,
     input  wire        video_mask_latch_reset,
 
-    input  wire [ 5:0] video_status_info_datatype,
-    input  wire [15:0] video_status_info_linecount,    
-    input  wire [15:0] video_status_info_wordcount,
-    input  wire [ 2:0] video_status_info_vc,
+    input  wire [ 5:0] reg_sync_aggr_video_status_info_datatype,
+    input  wire [15:0] reg_sync_aggr_video_status_info_linecount,    
+    input  wire [15:0] reg_sync_aggr_video_status_info_wordcount,
+    input  wire [ 4:0] reg_sync_aggr_video_status_info_vc,
     
     // FIFO Interface (for sub-modules)
     input  wire         data_vld_0,
@@ -36,8 +36,8 @@ module pipe_mask_ctrl (
     input  wire [101:0] data_2,
     input  wire [101:0] data_3,
     input  wire [ 19:0] reg_sync_aggr_video_timeout_threshold,
-    input  wire         reg_sync_aggr_check_framecount,
-    input  wire         reg_sync_aggr_check_linecount,
+    input  wire         reg_sync_aggr_check_framecount_en,
+    input  wire         reg_sync_aggr_check_linecount_en,
     
     // Schedule Concat Interface
     output reg         start_sch_pulse,
@@ -45,7 +45,10 @@ module pipe_mask_ctrl (
     
     // Video Pipe Control
     output reg  [3:0]  pipe_clear_pulse,
-    output reg  [7:0]  pipe_wr_mode,
+    output wire [1:0]       pipe0_wr_mode;
+    output wire [1:0]       pipe1_wr_mode;
+    output wire [1:0]       pipe2_wr_mode;
+    output wire [1:0]       pipe3_wr_mode;
     
     // Bitmap Outputs
     output reg  [3:0]  pipe_mask_bitmap,
@@ -106,6 +109,8 @@ module pipe_mask_ctrl (
 
     wire [3:0] video_status_fail_bitmap;
     
+    wire [7:0]       pipe_wr_mode;
+
     // Derived signals
     assign pipe_normal_bitmap  = ~pipe_mask_bitmap & pipe_concat_en;
     assign pipe_restart_bitmap = pipe_mask_bitmap & Video_Mask_Restart_En & pipe_frame_active;
@@ -244,11 +249,9 @@ module pipe_mask_ctrl (
             pipe_mask_bitmap <= 4'b1111;
         end
         else begin
-            case (current_state)
+            case (next_state)
                 INIT: begin
-                    if (next_state == IDLE) begin
-                        pipe_mask_bitmap <= pipe_concat_en & local_force_video_mask;
-                    end
+                    pipe_mask_bitmap <= pipe_concat_en & local_force_video_mask;
                 end
                 
                 MASK_BITMAP_SUB_RECOVER: begin
@@ -301,6 +304,11 @@ module pipe_mask_ctrl (
         end
     end
     
+    assign  pipe0_wr_mode = pipe_wr_mode[1:0];
+    assign  pipe1_wr_mode = pipe_wr_mode[3:2];
+    assign  pipe2_wr_mode = pipe_wr_mode[5:4];
+    assign  pipe3_wr_mode = pipe_wr_mode[7:6];
+
     // Fault detection for debug
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -365,8 +373,8 @@ module pipe_mask_ctrl (
   
     reg     [15:0]  local_linecount;
     reg     [15:0]  local_framecount;
-    reg     [1:0] local_datatype_cs;
-    reg     [1:0] local_datatype_ns;
+    reg     [ 1:0]  local_datatype_cs;
+    reg     [ 1:0]  local_datatype_ns;
 
     localparam  DATATYPE_IDLE       = 2'd0;
     localparam  DATATYPE_FS         = 2'd1;
@@ -425,7 +433,7 @@ module pipe_mask_ctrl (
                 else
                     local_datatype_ns = DATATYPE_FS;
             DATATYPE_LONGPKT:
-                if(start_sch_pulse && (local_linecount == video_status_info_linecount))
+                if(start_sch_pulse && (local_linecount == reg_sync_aggr_video_status_info_linecount))
                     local_datatype_ns = DATATYPE_FE;
                 else 
                     local_datatype_ns = DATATYPE_LONGPKT;
@@ -442,13 +450,13 @@ module pipe_mask_ctrl (
     assign check_datatype_shortpkt = check_datatype_fs || check_datatype_fe;
     assign check_datatype_longpkt = (local_datatype_cs == DATATYPE_LONGPKT);
     assign check_pkt_datatype = check_datatype_shortpkt || check_datatype_longpkt;
-    assign check_shortpkt_framecount = check_datatype_shortpkt && reg_sync_aggr_check_framecount;
-    assign check_longpkt_linecount = check_datatype_longpkt && reg_sync_aggr_check_linecount;
+    assign check_shortpkt_framecount = check_datatype_shortpkt && reg_sync_aggr_check_framecount_en;
+    assign check_longpkt_linecount = check_datatype_longpkt && reg_sync_aggr_check_linecount_en;
     assign check_pkt_count = check_shortpkt_framecount | check_longpkt_linecount;
 
     assign local_pkt_datatype = (check_datatype_fs) ? 6'h0 :
                                 (check_datatype_fe) ? 6'h1 :
-                                (check_datatype_longpkt) ? video_status_info_datatype : 6'h0;
+                                (check_datatype_longpkt) ? reg_sync_aggr_video_status_info_datatype : 6'h0;
 
     assign local_pkt_count = (check_datatype_fs) ? local_framecount :
                              (check_datatype_fe) ? local_framecount :

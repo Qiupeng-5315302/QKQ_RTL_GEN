@@ -73,17 +73,20 @@ ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_pipe_2048x140_fwft_fi
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_pipe_32x140_afifo_wrapper.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_vp_fwft_afifo_1r1w_4096x128_afifo_wrapper.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_vp_fwft_afifo_1r1w_4096x128_fwft_afifo_wrapper.v
+${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_status_buffer_1r1w_16x102_afifo_wrapper.v
+${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
+${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_status_buffer_1r1w_16x102_ram_wrapper.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/ram_wrapper/as6d_app_video_pipe_1r1w_2048x140_ram_wrapper.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/ram_wrapper/as6d_app_video_pipe_1r1w_32x140_ram_wrapper.v
 
 // Pipe scheduler concatenation RTL files
-${SYNC_AGGR_ROOT}/as6d_app_pipe_sch.v
-${SYNC_AGGR_ROOT}/as6d_app_video_status_management.v
-${SYNC_AGGR_ROOT}/black_pixel_generator.v
-${SYNC_AGGR_ROOT}/video_status_buffer_wr_ctrl.v
-${SYNC_AGGR_ROOT}/pipe_mask_ctrl.v
-${SYNC_AGGR_ROOT}/video_status_determination.v
-${SYNC_AGGR_ROOT}/timestamp_align_determination.v
+${SYNC_AGGR_ROOT}/AS6D_APP/as6d_app_pipe_sch.v
+${SYNC_AGGR_ROOT}/AS6D_APP/as6d_app_video_status_management.v
+${SYNC_AGGR_ROOT}/AS6D_APP/black_pixel_generator.v
+${SYNC_AGGR_ROOT}/AS6D_APP/video_status_buffer_wr_ctrl.v
+${SYNC_AGGR_ROOT}/AS6D_APP/pipe_mask_ctrl.v
+${SYNC_AGGR_ROOT}/AS6D_APP/video_status_determination.v
+${SYNC_AGGR_ROOT}/AS6D_APP/timestamp_align_determination.v
 
 // Common application files
 ${SYNC_AGGR_ROOT}/AS6T28_COMRTL/app_common/app_pkt_filter_lane.v

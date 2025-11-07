@@ -284,3 +284,22 @@ black_pixel_data[139:0] 数据分片格式定义如下：
 | `[138:136]` | aggre_id[2:0]:异步汇聚2模式使用，其余模式不关注  | 3'd0 |
 | `[139]` | tunnel_mode_en:隧道模式使能，暂不关注  | 1'd0 |
 ---
+
+## 寄存器新增列表
+
+| 名称 | 位宽 | 驱动模块例化路径 |
+| :--- | :--- | :--- |
+| `reg_sync_aggr_auto_mask_en` | 4 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` |
+| `reg_sync_aggr_force_video_mask` | 4 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` |
+| `reg_sync_aggr_video_mask_restart` | 4 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` |
+| `reg_sync_aggr0_video_mask_latch_reset` | 1 | `as6d_app` ->`u_as6d_app_aggregator` -> `u0_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctrl` |
+| `reg_sync_aggr1_video_mask_latch_reset` | 1 | `as6d_app` ->`u_as6d_app_aggregator` -> `u1_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctrl` |
+| `reg_sync_aggr2_video_mask_latch_reset` | 1 | `as6d_app` ->`u_as6d_app_aggregator` -> `u2_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctrl` |
+| `reg_sync_aggr3_video_mask_latch_reset` | 1 | `as6d_app` ->`u_as6d_app_aggregator` -> `u3_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctrl` |
+| `reg_sync_aggr_video_timeout_threshold` | 20 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctrl`-> `u_timestamp_align_determination` |
+| `reg_sync_aggr_check_framecount_en` | 1 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctrl` |
+| `reg_sync_aggr_check_linecount_en` | 1 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctrl` |
+| `reg_sync_aggr_video_status_info_datatype` | 6 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctrl` |
+| `reg_sync_aggr_video_status_info_wordcount` | 16 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctr` |
+| `reg_sync_aggr_video_status_info_linecount` | 16 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctr` |
+| `reg_sync_aggr_video_status_info_vc` | 5 | `as6d_app` ->`u_as6d_app_aggregator` -> `u(0~3)_as6d_app_aggr_lane` -> `u_as6d_app_pipe_sch` -> `u_as6d_app_pipe_sch_concat` -> `u_as6d_app_video_status_management` -> `u_pipe_mask_ctrl` |
