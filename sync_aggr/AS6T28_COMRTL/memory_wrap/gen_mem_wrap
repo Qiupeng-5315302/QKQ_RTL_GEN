@@ -1,0 +1,582 @@
+
+#! /bin/csh
+
+### varible
+setenv port_num        $1
+setenv memory_type     $2
+setenv depth           $3
+setenv bit_width       $4
+setenv perip_vt        $5
+setenv bit_write       $6
+setenv multip          $7
+setenv bank            $8
+setenv redundancy      $9
+setenv low_power       $10
+setenv input_pipe      $11
+setenv output_pipe     $12
+setenv addr_width      $13
+
+#for fca bitnumber cal
+if ("$bit_width" <= "4") then 
+setenv fca_bitnum  1                   
+else if ("$bit_width" <= "8") then
+setenv fca_bitnum  2                   
+else if ("$bit_width" <= "16") then
+setenv fca_bitnum  3                   
+else if ("$bit_width" <= "32") then
+setenv fca_bitnum  4                   
+else if ("$bit_width" <= "64") then
+setenv fca_bitnum  5                   
+else if ("$bit_width" <= "128") then
+setenv fca_bitnum  6                   
+else if ("$bit_width" <= "256") then
+setenv fca_bitnum  7                   
+else if ("$bit_width" <= "512") then
+setenv fca_bitnum  8                   
+endif
+
+
+#gen memory wrap
+echo "///sram wrap generated"                                             > ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+### SP ################################################################
+if ("$port_num" == "SP") then 
+echo "module ${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe} #("                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    parameter MEM_DEPTH   =${depth},"                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    parameter ADDR_WIDTH  =${addr_width},"                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    parameter DATA_WIDTH  =${bit_width}"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "    parameter FCA_BITNUM  =${fca_bitnum}"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ")("                                                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          Clk,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input       [ADDR_WIDTH-1:0]   Addr,"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input       [DATA_WIDTH-1:0]   Din,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "    input       [DATA_WIDTH-1:0]   BitWrB,"                        >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "    input                          CEB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          WEB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input       [6:0]             SPRAM_CONFIG,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    output      [DATA_WIDTH-1:0]   Q"                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ");"                                                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo "//signals define"                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "wire [DATA_WIDTH-1:0]   Mem_Q;"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo "//memory instance define"                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '`ifdef SIM'                                                        >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo " sp_sram  #("                                                      >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "  .MEM_DEPTH (MEM_DEPTH),"                                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "  .ADDR_WIDTH (ADDR_WIDTH),"                                       >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "  .DATA_WIDTH (DATA_WIDTH)"                                        >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo " ) u0_spsram ("                                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .clk       (Clk),"                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .addr      (Addr),"                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .din       (Din),"                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "   .bwb        (BitWrB),"                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+else
+echo "   .bwb        ({DATA_WIDTH{1'b0}}),"                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "   .ceb        (CEB),"                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .web        (WEB),"                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .dout      (Mem_Q)"                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo " );"                                                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '`else'                                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '   `ifdef FPGA'                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "         sp_sram  #("                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "          .MEM_DEPTH (MEM_DEPTH),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "          .ADDR_WIDTH (ADDR_WIDTH),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "          .DATA_WIDTH (DATA_WIDTH)"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "         ) u0_spsram ("                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .clk       (Clk),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .addr      (Addr),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .din       (Din),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .bwb        ({DATA_WIDTH{1'b0}}),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .ceb        (CEB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .web        (WEB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .dout      (Mem_Q)"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "         );"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '   `else '                                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo '         `ifdef TSMC_6NM_6T_LVT'                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            ${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}   u0_spsram ("             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .clk       (Clk),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .addr      (Addr),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .din       (Din),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "              .bwb        (BitWrB),"                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "              .ceb        (CEB),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .web        (WEB),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .dout      (Mem_Q)"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            );"                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#add for umc 28hpc arm memory compiler
+echo '         `elsif UMC_28HPC_ARMMEM'                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            spsram_${depth}x${bit_width}   u0_spsram ("             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#functional inputs
+echo "              .CLK       (Clk),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .A         (Addr),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .D         (Din),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .CEN       (CEB),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .WEN       (WEB),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "              .WEN        (BitWrB),"                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .GWEN       (1'b0),"                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+#config input
+echo "              .EMA        (SPRAM_CONFIG[2:0]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .EMAW       (SPRAM_CONFIG[4:3]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .EMAS       (SPRAM_CONFIG[5]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .RET1N      (SPRAM_CONFIG[6]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+##redundancy input
+#echo "              .CRE1        (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .CRE2        (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .FCA1        ({FCA_BITNUM{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .FCA2        ({FCA_BITNUM{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#dft input
+echo "              .TEN        (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TCEN       (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TWEN       (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TA         ({ADDR_WIDTH{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TD         ({DATA_WIDTH{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SI         (2'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SE         (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .DFTRAMBYP  (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#dft output
+echo "              .CENY      (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .WENY      (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .AY        (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SO        (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#functional outputs
+echo "              .Q          (Mem_Q)"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            );"                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo '         `else'                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           sp_sram  #("                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            .MEM_DEPTH (MEM_DEPTH),"                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            .ADDR_WIDTH (ADDR_WIDTH),"                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            .DATA_WIDTH (DATA_WIDTH)"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           ) u0_spsram ("                                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .clk       (Clk),"                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .addr      (Addr),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .din       (Din),"                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "             .bwb        (BitWrB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+else
+echo "             .bwb        ({DATA_WIDTH{1'b0}}),"                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "             .ceb        (CEB),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .web        (WEB),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .dout      (Mem_Q)"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           );"                                                      >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '         `endif'                                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '   `endif'                                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '`endif'                                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "//output 0 pipeline"                                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "assign Q = Mem_Q;"                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "endmodule"                                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+### TP ################################################################
+if ("$port_num" == "TP") then 
+echo "module ${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe} #("                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    parameter MEM_DEPTH   =${depth},"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    parameter ADDR_WIDTH  =${addr_width},"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    parameter DATA_WIDTH  =${bit_width}"                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "    parameter FCA_BITNUM  =${fca_bitnum}"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ")("                                                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          ClkA,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          ClkB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input       [ADDR_WIDTH-1:0]   AddrA,"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input       [ADDR_WIDTH-1:0]   AddrB,"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input       [DATA_WIDTH-1:0]   Din,"                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo "    input       [8:0]   TPRAM_CONFIG,"                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "    input       [DATA_WIDTH-1:0]   BitWrB,"                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "    input                          CEAB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          CEBB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          WEAB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          REBB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    output      [DATA_WIDTH-1:0]   Q"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ");"                                                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo "//signals define"                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "wire [DATA_WIDTH-1:0]   Mem_Q;"                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo "//memory instance define"                                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '`ifdef SIM'                                                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo " tp_sram  #("                                                       >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "  .MEM_DEPTH (MEM_DEPTH),"                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "  .ADDR_WIDTH (ADDR_WIDTH),"                                        >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "  .DATA_WIDTH (DATA_WIDTH)"                                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo " ) u0_tpsram ("                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .clka       (ClkA),"                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .clkb       (ClkB),"                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .addra      (AddrA),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .addrb      (AddrB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .din        (Din),"                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "   .bwab        (BitWrB),"                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+else
+echo "   .bwab        ({DATA_WIDTH{1'b0}}),"                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "   .ceab        (CEAB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .cebb        (CEBB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .weab        (WEAB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .rebb        (REBB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .dout      (Mem_Q)"                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo " );"                                                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '`else'                                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '   `ifdef FPGA'                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "         tp_sram  #("                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "          .MEM_DEPTH (MEM_DEPTH),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "          .ADDR_WIDTH (ADDR_WIDTH),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "          .DATA_WIDTH (DATA_WIDTH)"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "         ) u0_tpsram ("                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .clka       (ClkA),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .clkb       (ClkB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .addra      (AddrA),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .addrb      (AddrB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .din        (Din),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .bwab        ({DATA_WIDTH{1'b0}}),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .ceab        (CEAB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .cebb        (CEBB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .weab        (WEAB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .rebb        (REBB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           .dout      (Mem_Q)"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "         );"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '   `else '                                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo '         `ifdef TSMC_6NM_6T_LVT'                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            ${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}   u0_tpsram ("             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .clka       (ClkA),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .clkb       (ClkB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .addra      (AddrA),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .addrb      (AddrB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .din       (Din),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "              .bwab        (BitWrB),"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "              .ceab        (CEAB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .cebb        (CEBB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .weab        (WEAB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .rebb        (REBB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+
+echo "              .dout      (Mem_Q)"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            );"                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#add for umc 28hpc arm memory compiler
+echo '         `elsif UMC_28HPC_ARMMEM'                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            tprf_${depth}x${bit_width}   u0_tpsram ("             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#functional inputs
+echo "              .CLKA       (ClkB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .CLKB       (ClkA),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .AA         (AddrB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .AB         (AddrA),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .DB         (Din),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "              .WENB        (BitWrB),"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "              .CENA        (CEBB || REBB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .CENB        (CEAB || WEAB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#config input
+echo "              .EMAA        (TPRAM_CONFIG[2:0]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .EMAB        (TPRAM_CONFIG[5:3]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .EMASA       (TPRAM_CONFIG[6]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .RET1N       (TPRAM_CONFIG[7]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .COLLDISN    (TPRAM_CONFIG[8]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+##redundancy input
+#echo "              .CRE1        (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .CRE2        (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .FCA1        ({FCA_BITNUM{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .FCA2        ({FCA_BITNUM{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#dft input
+echo "              .TENA        (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TCENA       (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TAA         ({ADDR_WIDTH{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TAB         ({ADDR_WIDTH{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TENB        (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TCENB       (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TDB         ({DATA_WIDTH{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SIA         (2'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SEA         (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SIB         (2'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SEB         (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .DFTRAMBYP   (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#dft output
+echo "              .CENYA    (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .AYA      (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .CENYB    (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .AYB      (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SOA      (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SOB      (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#functional outputs
+echo "              .QA      (Mem_Q)"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            );"                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo '         `else'                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           tp_sram  #("                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            .MEM_DEPTH (MEM_DEPTH),"                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            .ADDR_WIDTH (ADDR_WIDTH),"                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            .DATA_WIDTH (DATA_WIDTH)"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           ) u0_tpsram ("                                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .clka       (ClkA),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .clkb       (ClkB),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .addra      (AddrA),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .addrb      (AddrB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .din       (Din),"                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "             .bwab        (BitWrB),"                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+else
+echo "             .bwab        ({DATA_WIDTH{1'b0}}),"                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "             .ceab        (CEAB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .cebb        (CEBB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .weab        (WEAB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .rebb        (REBB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .dout      (Mem_Q)"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           );"                                                      >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '         `endif'                                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '   `endif'                                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '`endif'                                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "//output 0 pipeline"                                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "assign Q = Mem_Q;"                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "endmodule"                                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+### TPUHD ################################################################
+if ("$port_num" == "TPUHD") then 
+echo "module ${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe} #("                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    parameter MEM_DEPTH   =${depth},"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    parameter ADDR_WIDTH  =${addr_width},"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    parameter DATA_WIDTH  =${bit_width}"                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "    parameter FCA_BITNUM  =${fca_bitnum}"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ")("                                                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          Clk,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input       [ADDR_WIDTH-1:0]   AddrA,"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input       [ADDR_WIDTH-1:0]   AddrB,"                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input       [DATA_WIDTH-1:0]   Din,"                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo "    input       [9:0]   TPRAM_CONFIG,"                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "    input       [DATA_WIDTH-1:0]   BitWrB,"                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "    input                          CEAB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          CEBB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          WEAB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    input                          REBB,"                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "    output      [DATA_WIDTH-1:0]   Q"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ");"                                                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo "//signals define"                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "wire [DATA_WIDTH-1:0]   Mem_Q;"                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo "//memory instance define"                                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '`ifdef SIM'                                                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo " tp_sram  #("                                                       >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "  .MEM_DEPTH (MEM_DEPTH),"                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "  .ADDR_WIDTH (ADDR_WIDTH),"                                        >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "  .DATA_WIDTH (DATA_WIDTH)"                                         >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo " ) u0_tpsram ("                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .clka       (Clk),"                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .clkb       (Clk),"                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .addra      (AddrA),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .addrb      (AddrB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .din        (Din),"                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "   .bwab        (BitWrB),"                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+else
+echo "   .bwab        ({DATA_WIDTH{1'b0}}),"                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "   .ceab        (CEAB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .cebb        (CEBB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .weab        (WEAB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .rebb        (REBB),"                                            >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "   .dout      (Mem_Q)"                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo " );"                                                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '`else'                                                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '   `ifdef FPGA'                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "     tp_sram  #("                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "      .MEM_DEPTH (MEM_DEPTH),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "      .ADDR_WIDTH (ADDR_WIDTH),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "      .DATA_WIDTH (DATA_WIDTH)"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "     ) u0_tpsram ("                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .clka       (Clk),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .clkb       (Clk),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .addra      (AddrA),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .addrb      (AddrB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .din        (Din),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .bwab        ({DATA_WIDTH{1'b0}}),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .ceab        (CEAB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .cebb        (CEBB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .weab        (WEAB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .rebb        (REBB),"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "       .dout      (Mem_Q)"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "     );"                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '   `else '                                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo '         `ifdef TSMC_6NM_6T_LVT'                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            ${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}   u0_tpsram ("             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .clka       (Clk),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .clkb       (Clk),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .addra      (AddrA),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .addrb      (AddrB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .din       (Din),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "              .bwab        (BitWrB),"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "              .ceab        (CEAB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .cebb        (CEBB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .weab        (WEAB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .rebb        (REBB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+
+echo "              .dout      (Mem_Q)"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            );"                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#add for umc 28hpc arm memory compiler
+echo '         `elsif UMC_28HPC_ARMMEM'                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            tpsram_${depth}x${bit_width}   u0_tpsram ("             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#functional inputs
+echo "              .CLK       (Clk),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .AA         (AddrB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .AB         (AddrA),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .DB         (Din),"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "              .WENB        (BitWrB),"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "              .CENA        (CEBB || REBB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .CENB        (CEAB || WEAB),"                                 >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#config input
+echo "              .EMA        (TPRAM_CONFIG[2:0]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .EMAW        (TPRAM_CONFIG[4:3]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .EMAS       (TPRAM_CONFIG[5]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .EMAP       (TPRAM_CONFIG[6]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .STOV       (TPRAM_CONFIG[7]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .STOVAB     (TPRAM_CONFIG[8]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .RET1N       (TPRAM_CONFIG[9]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .COLLDISN    (TPRAM_CONFIG[8]),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+##redundancy input
+#echo "              .CRE1        (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .CRE2        (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .FCA1        ({FCA_BITNUM{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo "              .FCA2        ({FCA_BITNUM{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#dft input
+echo "              .TEN        (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TCENA       (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TCENB       (1'b1),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TAA         ({ADDR_WIDTH{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TAB         ({ADDR_WIDTH{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .TDB         ({DATA_WIDTH{1'b0}}),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SIA         (2'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SE         (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .DFTRAMBYP   (1'b0),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#dft output
+echo "              .CENYA    (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .AYA      (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .CENYB    (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .AYB      (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "              .SOA      (),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+#functional outputs
+echo "              .QA      (Mem_Q)"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            );"                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+echo '         `else'                                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           tp_sram  #("                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            .MEM_DEPTH (MEM_DEPTH),"                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            .ADDR_WIDTH (ADDR_WIDTH),"                              >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "            .DATA_WIDTH (DATA_WIDTH)"                               >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           ) u0_tpsram ("                                           >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .clka       (Clk),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .clkb       (Clk),"                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .addra      (AddrA),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .addrb      (AddrB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .din       (Din),"                                     >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+
+if ("$bit_write" == "1") then 
+echo "             .bwab        (BitWrB),"                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+else
+echo "             .bwab        ({DATA_WIDTH{1'b0}}),"                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+echo "             .ceab        (CEAB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .cebb        (CEBB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .weab        (WEAB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .rebb        (REBB),"                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "             .dout      (Mem_Q)"                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "           );"                                                      >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '         `endif'                                                    >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '   `endif'                                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo '`endif'                                                             >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "//output 0 pipeline"                                                >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "assign Q = Mem_Q;"                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo ""                                                                   >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+echo "endmodule"                                                          >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+endif
+
+
+
+#echo ""                                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo ""                                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo ""                                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo ""                                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo ""                                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v
+#echo ""                                                                  >> ./${port_num}${memory_type}${depth}X${bit_width}${perip_vt}BW${bit_write}M${multip}B${bank}R${redundancy}P${low_power}_I${input_pipe}O${output_pipe}.v

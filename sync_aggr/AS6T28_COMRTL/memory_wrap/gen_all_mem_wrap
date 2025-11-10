@@ -1,0 +1,79 @@
+
+###            port_num memory_type depth bit_width perip_vt bit_write multip bank  redundancy low_power input_pipe output_pipe addr_width  
+#./gen_mem_wrap SP       SRAM        1024   32        SVT      0         8      4     1          1         0          0           10 
+#./gen_mem_wrap SP       SRAM        256   13        LVT      0         8      4     1          1         0          0           8 
+#./gen_mem_wrap SP       SRAM        256   39        LVT      0         8      4     1          1         0          0           8 
+#./gen_mem_wrap SP       SRAM        16384 39        LVT      0         8      4     1          1         0          0           14
+
+#./gen_mem_wrap SP       SRAM        4096  64        LVT      0         8      4     1          1         0          0           12
+#./gen_mem_wrap SP       SRAM        4000  64        LVT      0         8      4     1          1         0          0           12
+#
+#./gen_mem_wrap SP       SRAM        4096  64        SVT      0         4      2     0          0         0          0           12
+#./gen_mem_wrap SP       SRAM        4000  64        SVT      0         4      2     0          0         0          0           12
+#
+#./gen_mem_wrap SP       SRAM        4096  64        LVT      1         8      4     1          1         0          0           12
+#./gen_mem_wrap SP       SRAM        4000  64        LVT      1         8      4     1          1         0          0           12
+#
+#./gen_mem_wrap TP       SRAM        4096  64        LVT      0         8      4     1          1         0          0           12
+#./gen_mem_wrap TP       SRAM        4000  64        LVT      0         8      4     1          1         0          0           12
+#
+#./gen_mem_wrap TP       SRAM        4096  64        SVT      0         4      2     0          0         0          0           12
+#./gen_mem_wrap TP       SRAM        4000  64        SVT      0         4      2     0          0         0          0           12
+#
+#./gen_mem_wrap TP       SRAM        4096  64        LVT      1         8      4     1          1         0          0           12
+#./gen_mem_wrap TP       SRAM        2048  137       SVT      0         8      4     1          0         0          0           11
+#./gen_mem_wrap TP       SRAM        1024   68       SVT      0         8      4     1          0         0          0           10
+#./gen_mem_wrap TP       SRAM        1024   69       SVT      0         8      4     1          0         0          0           10
+
+./gen_mem_wrap SP       SRAM        1024   32       SVT      0         8      4     0          0         0          0           10 
+./gen_mem_wrap TP       SRAM        1024   69       SVT      0         8      4     0          0         0          0           10
+./gen_mem_wrap TP       SRAM        1024   68       SVT      0         8      4     0          0         0          0           10
+### AS6D_APP
+./gen_mem_wrap TP       SRAM        4096  137       SVT      0         8      4     0          0         0          0           12 as6d_vp_buffer
+### AS6S_APP
+#./gen_mem_wrap TP       SRAM        2048  137       SVT      0         8      4     0          0         0          0           11 as6s_vp_buffer
+./gen_mem_wrap TPUHD       SRAM        2048  137       SVT      0         8      4     0          0         0          0           11 as6s_vp_buffer
+./gen_mem_wrap TP       SRAM        16  137       SVT      0         8      4     0          0         0          0           4 as6s_vp_buffer
+### AS6S_PCS_GB
+./gen_mem_wrap TP       SRAM          32   74       SVT      0         8      4     0          0         0          0            5 as6s_pcs_tx_data_storage 
+./gen_mem_wrap TP       SRAM          32   84       SVT      0         8      4     0          0         0          0            5 as6s_pcs_tx_fec_storage 
+./gen_mem_wrap TP       SRAM         128   84       SVT      0         8      4     0          0         0          0            7 as6s_pcs_tx_itlv 
+./gen_mem_wrap TP       SRAM          64   84       SVT      0         8      4     0          0         0          0            6 as6s_pcs_tx_itlv 
+./gen_mem_wrap TP       SRAM          32   80       SVT      0         8      4     0          0         0          0            5 as6s_pcs_rx_fec_decoder 
+### AS6D_PCS_GB
+./gen_mem_wrap TP       SRAM          32   74       SVT      0         8      4     0          0         0          0            5 as6d_pcs_tx_data_storage 
+./gen_mem_wrap TP       SRAM         128   80       SVT      0         8      4     0          0         0          0            7 as6d_pcs_rx_fec_decoder 
+./gen_mem_wrap TP       SRAM         128   80       SVT      0         8      4     0          0         0          0            7 as6d_pcs_rx_deinterleaver 
+./gen_mem_wrap TP       SRAM          16   80       SVT      0         8      4     0          0         0          0            4 as6d_pcs_rx_pldb 
+./gen_mem_wrap TPUHD    SRAM          48   80       SVT      0         8      4     0          0         0          0            6 as6d_pcs_rx_retransmit 
+### AS6S_MEP
+./gen_mem_wrap TP       SRAM         256   76       SVT      0         8      4     0          0         0          0            8 as6s_mep_rx_ctrl_data_storage_1r1w_256x68
+./gen_mem_wrap TP       SRAM          32   74       SVT      0         8      4     0          0         0          0            5 as6s_mep_rx_data_storage_1r1w_32x66
+./gen_mem_wrap TP       SRAM          32   72       SVT      0         8      4     0          0         0          0            5 as6s_mep_rx_gpio_data_storage_1r1w_32x64
+./gen_mem_wrap TP       SRAM          32   72       SVT      0         8      4     0          0         0          0            5 as6s_mep_tx_audio_data_async_1r1w_32x64
+./gen_mem_wrap TPUHD    SRAM          32   74       SVT      0         8      4     0          0         0          0            5 as6s_mep_tx_audio_packet_ctrl_1r1w_32x66
+./gen_mem_wrap TPUHD    SRAM        1600   16       SVT      0         8      4     0          0         0          0           11 as6s_mep_tx_ctrl_data_storage_1r1w_1600x10
+./gen_mem_wrap TP       SRAM          32   72       SVT      0         8      4     0          0         0          0            5 as6s_mep_tx_gpio_data_async_1r1w_32x64
+./gen_mem_wrap TP       SRAM          32   72       SVT      0         8      4     0          0         0          0            5 as6s_mep_tx_gpio_data_storage_1r1w_32x64
+./gen_mem_wrap TP       SRAM          32  137       SVT      0         8      4     0          0         0          0            5 as6s_mep_tx_pixel_data_async_1r1w_32x128
+./gen_mem_wrap TPUHD    SRAM        2048  137       SVT      0         8      4     0          0         0          0           11 as6s_mep_tx_pixel_data_storage_1r1w_2048x128
+./gen_mem_wrap TPUHD    SRAM          32  139       SVT      0         8      4     0          0         0          0            5 as6s_mep_tx_pixel_packet_ctrl_1r1w_32x130
+./gen_mem_wrap TP       SRAM         256   78       SVT      0         8      4     0          0         0          0            8 as6s_mep_tx_priority_trans_ctrl_1r1w_256x70
+./gen_mem_wrap TP       SRAM          32   78       SVT      0         8      4     0          0         0          0            5 as6s_mep_tx_priority_trans_gpio_1r1w_32x70
+./gen_mem_wrap TP       SRAM         256   78       SVT      0         8      4     0          0         0          0            8 as6s_mep_tx_priority_trans_idi_1r1w_256x70
+./gen_mem_wrap TP       SRAM         256   78       SVT      0         8      4     0          0         0          0            8 as6s_mep_tx_priority_trans_retra_1r1w_256x70
+./gen_mem_wrap TP       SRAM         160   78       SVT      0         8      4     0          0         0          0            8 as6s_mep_tx_priority_trans_spi_1r1w_160x70
+./gen_mem_wrap TPUHD    SRAM        1600   16       SVT      0         8      4     0          0         0          0           11 as6s_mep_tx_spi_data_storage_1r1w_1600x10
+### AS6D_MEP
+./gen_mem_wrap TP       SRAM          64   72       SVT      0         8      4     0          0         0          0            6 as6d_mep_rx_ctrl_data_storage 
+./gen_mem_wrap TP       SRAM          32   74       SVT      0         8      4     0          0         0          0            5 as6d_mep_rx_data_storage 
+./gen_mem_wrap TP       SRAM          32   72       SVT      0         8      4     0          0         0          0            5 as6d_mep_rx_gpio_data_storage 
+./gen_mem_wrap TP       SRAM          32   72       SVT      0         8      4     0          0         0          0            5 as6d_mep_tx_ctrl_data_async 
+./gen_mem_wrap TP       SRAM          64   72       SVT      0         8      4     0          0         0          0            6 as6d_mep_tx_ctrl_data_storage 
+./gen_mem_wrap TP       SRAM          32   72       SVT      0         8      4     0          0         0          0            5 as6d_mep_tx_gpio_data_async 
+./gen_mem_wrap TP       SRAM          32   72       SVT      0         8      4     0          0         0          0            5 as6d_mep_tx_gpio_data_storage 
+./gen_mem_wrap TP       SRAM          32   76       SVT      0         8      4     0          0         0          0            5 as6d_mep_tx_idi_data_async 
+./gen_mem_wrap TP       SRAM          32   76       SVT      0         8      4     0          0         0          0            5 as6d_mep_tx_idi_data_storage 
+./gen_mem_wrap TP       SRAM         256   70       SVT      0         8      4     0          0         0          0            8 as6d_mep_tx_priority_trans_ctrl
+./gen_mem_wrap TP       SRAM          32   70       SVT      0         8      4     0          0         0          0            5 as6d_mep_tx_priority_trans_gpio
+./gen_mem_wrap TP       SRAM         256   70       SVT      0         8      4     0          0         0          0            8 as6d_mep_tx_priority_trans_retra

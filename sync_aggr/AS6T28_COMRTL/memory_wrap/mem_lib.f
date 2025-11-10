@@ -1,0 +1,30 @@
+
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_1024x68/tprf_1024x68.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_1024x69/tprf_1024x69.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_1024x74/tprf_1024x74.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_1024x75/tprf_1024x75.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_128x80/tprf_128x80.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_128x84/tprf_128x84.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_16x80/tprf_16x80.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_32x149/tprf_32x149.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_32x72/tprf_32x72.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_32x74/tprf_32x74.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_32x76/tprf_32x76.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_32x80/tprf_32x80.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_32x84/tprf_32x84.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_64x72/tprf_64x72.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_64x84/tprf_64x84.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/rom_2048x32/rom_2048x32.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_64x80/tprf_64x80.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tpsram_64x80/tpsram_64x80.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_46x80/tprf_46x80.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tpsram_48x80/tpsram_48x80.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tpsram_2048x149/tpsram_2048x149.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_32x78/tprf_32x78.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_256x78/tprf_256x78.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tpsram_4096x80/tpsram_4096x80.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_256x76/tprf_256x76.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_1024x16/tprf_1024x16.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tpsram_1600x16/tpsram_1600x16.v
+-v /data/proj/ip/UMC28HPC_MPW2/Memory/Latest/tprf_160x78/tprf_160x78.v
+
