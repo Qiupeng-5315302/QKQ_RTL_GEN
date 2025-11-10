@@ -110,3 +110,6 @@ ${SYNC_AGGR_ROOT}/AS6T28_COMRTL/pattern_test/sync_bus.v
 // Standard cell wrap
 ${SYNC_AGGR_ROOT}/AS6T28_COMRTL/StdCell_Wrap.v
 ${SYNC_AGGR_ROOT}/AS6T28_COMRTL/dig_cell.v
+${SYNC_AGGR_ROOT}/AS6T28_COMRTL/BUS_DELAY/bus_delay_cg.v
+${SYNC_AGGR_ROOT}/AS6T28_COMRTL/BUS_DELAY/bus_delay.v
+${SYNC_AGGR_ROOT}/AS6T28_COMRTL/BUS_DELAY/bus_delay_clr.v
