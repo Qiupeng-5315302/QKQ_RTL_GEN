@@ -93,7 +93,19 @@ module as6d_app_aggr #(
    sch0_pipe2_concat_en, sch0_pipe2_aggre_en, sch0_pipe1_concat_en,
    sch0_pipe1_aggre_en, sch0_pipe0_concat_en, sch0_pipe0_aggre_en,
    sch0_master_pipe, sch0_fse_filter, sch0_frame_sync_lock,
-   sch0_aggre_mode, reg_send_pkt_match_lp_dt_en_aggr3,
+   sch0_aggre_mode, reg_sync_aggr_video_timeout_threshold,
+   reg_sync_aggr_video_status_info_wordcount,
+   reg_sync_aggr_video_status_info_vc,
+   reg_sync_aggr_video_status_info_linecount,
+   reg_sync_aggr_video_status_info_datatype,
+   reg_sync_aggr_video_mask_restart, reg_sync_aggr_force_video_mask,
+   reg_sync_aggr_check_linecount_en,
+   reg_sync_aggr_check_framecount_en, reg_sync_aggr_auto_mask_en,
+   reg_sync_aggr_3_video_mask_latch_reset,
+   reg_sync_aggr_2_video_mask_latch_reset,
+   reg_sync_aggr_1_video_mask_latch_reset,
+   reg_sync_aggr_0_video_mask_latch_reset,
+   reg_send_pkt_match_lp_dt_en_aggr3,
    reg_send_pkt_match_lp_dt_en_aggr2,
    reg_send_pkt_match_lp_dt_en_aggr1,
    reg_send_pkt_match_lp_dt_en_aggr0, reg_send_pkt_match_lp_dt_aggr3,
@@ -130,70 +142,76 @@ module as6d_app_aggr #(
    reg_app_aggr1_vc_bit_override_value,
    reg_app_aggr1_vc_bit_override_en,
    reg_app_aggr0_vc_bit_override_value,
-   reg_app_aggr0_vc_bit_override_en, line_end_vld_pipe7_aggregator3,
-   line_end_vld_pipe7_aggregator2, line_end_vld_pipe7_aggregator1,
-   line_end_vld_pipe7_aggregator0, line_end_vld_pipe6_aggregator3,
-   line_end_vld_pipe6_aggregator2, line_end_vld_pipe6_aggregator1,
-   line_end_vld_pipe6_aggregator0, line_end_vld_pipe5_aggregator3,
-   line_end_vld_pipe5_aggregator2, line_end_vld_pipe5_aggregator1,
-   line_end_vld_pipe5_aggregator0, line_end_vld_pipe4_aggregator3,
-   line_end_vld_pipe4_aggregator2, line_end_vld_pipe4_aggregator1,
-   line_end_vld_pipe4_aggregator0, line_end_vld_pipe3_aggregator3,
-   line_end_vld_pipe3_aggregator2, line_end_vld_pipe3_aggregator1,
-   line_end_vld_pipe3_aggregator0, line_end_vld_pipe2_aggregator3,
-   line_end_vld_pipe2_aggregator2, line_end_vld_pipe2_aggregator1,
-   line_end_vld_pipe2_aggregator0, line_end_vld_pipe1_aggregator3,
-   line_end_vld_pipe1_aggregator2, line_end_vld_pipe1_aggregator1,
-   line_end_vld_pipe1_aggregator0, line_end_vld_pipe0_aggregator3,
-   line_end_vld_pipe0_aggregator2, line_end_vld_pipe0_aggregator1,
-   line_end_vld_pipe0_aggregator0, line_end7, line_end6, line_end5,
-   line_end4, line_end3, line_end2, line_end1, line_end0,
-   in_video_data_vld7, in_video_data_vld6, in_video_data_vld5,
-   in_video_data_vld4, in_video_data_vld3, in_video_data_vld2,
-   in_video_data_vld1, in_video_data_vld0, in_video_data7,
-   in_video_data6, in_video_data5, in_video_data4, in_video_data3,
-   in_video_data2, in_video_data1, in_video_data0,
-   empty_vld_pipe7_aggregator3, empty_vld_pipe7_aggregator2,
-   empty_vld_pipe7_aggregator1, empty_vld_pipe7_aggregator0,
-   empty_vld_pipe6_aggregator3, empty_vld_pipe6_aggregator2,
-   empty_vld_pipe6_aggregator1, empty_vld_pipe6_aggregator0,
-   empty_vld_pipe5_aggregator3, empty_vld_pipe5_aggregator2,
-   empty_vld_pipe5_aggregator1, empty_vld_pipe5_aggregator0,
-   empty_vld_pipe4_aggregator3, empty_vld_pipe4_aggregator2,
-   empty_vld_pipe4_aggregator1, empty_vld_pipe4_aggregator0,
-   empty_vld_pipe3_aggregator3, empty_vld_pipe3_aggregator2,
-   empty_vld_pipe3_aggregator1, empty_vld_pipe3_aggregator0,
-   empty_vld_pipe2_aggregator3, empty_vld_pipe2_aggregator2,
-   empty_vld_pipe2_aggregator1, empty_vld_pipe2_aggregator0,
-   empty_vld_pipe1_aggregator3, empty_vld_pipe1_aggregator2,
-   empty_vld_pipe1_aggregator1, empty_vld_pipe1_aggregator0,
-   empty_vld_pipe0_aggregator3, empty_vld_pipe0_aggregator2,
-   empty_vld_pipe0_aggregator1, empty_vld_pipe0_aggregator0,
-   csi2device3_idi_halt, csi2device3_idi_anti_halt,
-   csi2device2_idi_halt, csi2device2_idi_anti_halt,
-   csi2device1_idi_halt, csi2device1_idi_anti_halt,
-   csi2device0_idi_halt, csi2device0_idi_anti_halt,
-   app_aggregation_bypass, aggre_clk_rst_n3, aggre_clk_rst_n2,
-   aggre_clk_rst_n1, aggre_clk_rst_n0, aggre_clk3, aggre_clk2,
-   aggre_clk1, aggre_clk0, ack_vld_pipe7_aggregator3,
-   ack_vld_pipe7_aggregator2, ack_vld_pipe7_aggregator1,
-   ack_vld_pipe7_aggregator0, ack_vld_pipe6_aggregator3,
-   ack_vld_pipe6_aggregator2, ack_vld_pipe6_aggregator1,
-   ack_vld_pipe6_aggregator0, ack_vld_pipe5_aggregator3,
-   ack_vld_pipe5_aggregator2, ack_vld_pipe5_aggregator1,
-   ack_vld_pipe5_aggregator0, ack_vld_pipe4_aggregator3,
-   ack_vld_pipe4_aggregator2, ack_vld_pipe4_aggregator1,
-   ack_vld_pipe4_aggregator0, ack_vld_pipe3_aggregator3,
-   ack_vld_pipe3_aggregator2, ack_vld_pipe3_aggregator1,
-   ack_vld_pipe3_aggregator0, ack_vld_pipe2_aggregator3,
-   ack_vld_pipe2_aggregator2, ack_vld_pipe2_aggregator1,
-   ack_vld_pipe2_aggregator0, ack_vld_pipe1_aggregator3,
-   ack_vld_pipe1_aggregator2, ack_vld_pipe1_aggregator1,
-   ack_vld_pipe1_aggregator0, ack_vld_pipe0_aggregator3,
-   ack_vld_pipe0_aggregator2, ack_vld_pipe0_aggregator1,
-   ack_vld_pipe0_aggregator0, ack_pre7, ack_pre6, ack_pre5, ack_pre4,
-   ack_pre3, ack_pre2, ack_pre1, ack_pre0, ack7, ack6, ack5, ack4,
-   ack3, ack2, ack1, ack0
+   reg_app_aggr0_vc_bit_override_en, pipe_frame_active,
+   line_end_vld_pipe7_aggregator3, line_end_vld_pipe7_aggregator2,
+   line_end_vld_pipe7_aggregator1, line_end_vld_pipe7_aggregator0,
+   line_end_vld_pipe6_aggregator3, line_end_vld_pipe6_aggregator2,
+   line_end_vld_pipe6_aggregator1, line_end_vld_pipe6_aggregator0,
+   line_end_vld_pipe5_aggregator3, line_end_vld_pipe5_aggregator2,
+   line_end_vld_pipe5_aggregator1, line_end_vld_pipe5_aggregator0,
+   line_end_vld_pipe4_aggregator3, line_end_vld_pipe4_aggregator2,
+   line_end_vld_pipe4_aggregator1, line_end_vld_pipe4_aggregator0,
+   line_end_vld_pipe3_aggregator3, line_end_vld_pipe3_aggregator2,
+   line_end_vld_pipe3_aggregator1, line_end_vld_pipe3_aggregator0,
+   line_end_vld_pipe2_aggregator3, line_end_vld_pipe2_aggregator2,
+   line_end_vld_pipe2_aggregator1, line_end_vld_pipe2_aggregator0,
+   line_end_vld_pipe1_aggregator3, line_end_vld_pipe1_aggregator2,
+   line_end_vld_pipe1_aggregator1, line_end_vld_pipe1_aggregator0,
+   line_end_vld_pipe0_aggregator3, line_end_vld_pipe0_aggregator2,
+   line_end_vld_pipe0_aggregator1, line_end_vld_pipe0_aggregator0,
+   line_end7, line_end6, line_end5, line_end4, line_end3, line_end2,
+   line_end1, line_end0, in_video_data_vld7, in_video_data_vld6,
+   in_video_data_vld5, in_video_data_vld4, in_video_data_vld3,
+   in_video_data_vld2, in_video_data_vld1, in_video_data_vld0,
+   in_video_data7, in_video_data6, in_video_data5, in_video_data4,
+   in_video_data3, in_video_data2, in_video_data1, in_video_data0,
+   idi_wordcount_3, idi_wordcount_2, idi_wordcount_1, idi_wordcount_0,
+   idi_linecount_3, idi_linecount_2, idi_linecount_1, idi_linecount_0,
+   idi_header_en_3, idi_header_en_2, idi_header_en_1, idi_header_en_0,
+   idi_datatype_3, idi_datatype_2, idi_datatype_1, idi_datatype_0,
+   fifo_wr_clk_rst_n_3, fifo_wr_clk_rst_n_2, fifo_wr_clk_rst_n_1,
+   fifo_wr_clk_rst_n_0, fifo_wr_clk_3, fifo_wr_clk_2, fifo_wr_clk_1,
+   fifo_wr_clk_0, empty_vld_pipe7_aggregator3,
+   empty_vld_pipe7_aggregator2, empty_vld_pipe7_aggregator1,
+   empty_vld_pipe7_aggregator0, empty_vld_pipe6_aggregator3,
+   empty_vld_pipe6_aggregator2, empty_vld_pipe6_aggregator1,
+   empty_vld_pipe6_aggregator0, empty_vld_pipe5_aggregator3,
+   empty_vld_pipe5_aggregator2, empty_vld_pipe5_aggregator1,
+   empty_vld_pipe5_aggregator0, empty_vld_pipe4_aggregator3,
+   empty_vld_pipe4_aggregator2, empty_vld_pipe4_aggregator1,
+   empty_vld_pipe4_aggregator0, empty_vld_pipe3_aggregator3,
+   empty_vld_pipe3_aggregator2, empty_vld_pipe3_aggregator1,
+   empty_vld_pipe3_aggregator0, empty_vld_pipe2_aggregator3,
+   empty_vld_pipe2_aggregator2, empty_vld_pipe2_aggregator1,
+   empty_vld_pipe2_aggregator0, empty_vld_pipe1_aggregator3,
+   empty_vld_pipe1_aggregator2, empty_vld_pipe1_aggregator1,
+   empty_vld_pipe1_aggregator0, empty_vld_pipe0_aggregator3,
+   empty_vld_pipe0_aggregator2, empty_vld_pipe0_aggregator1,
+   empty_vld_pipe0_aggregator0, csi2device3_idi_halt,
+   csi2device3_idi_anti_halt, csi2device2_idi_halt,
+   csi2device2_idi_anti_halt, csi2device1_idi_halt,
+   csi2device1_idi_anti_halt, csi2device0_idi_halt,
+   csi2device0_idi_anti_halt, clk_1M, app_aggregation_bypass,
+   aggre_clk_rst_n3, aggre_clk_rst_n2, aggre_clk_rst_n1,
+   aggre_clk_rst_n0, aggre_clk3, aggre_clk2, aggre_clk1, aggre_clk0,
+   ack_vld_pipe7_aggregator3, ack_vld_pipe7_aggregator2,
+   ack_vld_pipe7_aggregator1, ack_vld_pipe7_aggregator0,
+   ack_vld_pipe6_aggregator3, ack_vld_pipe6_aggregator2,
+   ack_vld_pipe6_aggregator1, ack_vld_pipe6_aggregator0,
+   ack_vld_pipe5_aggregator3, ack_vld_pipe5_aggregator2,
+   ack_vld_pipe5_aggregator1, ack_vld_pipe5_aggregator0,
+   ack_vld_pipe4_aggregator3, ack_vld_pipe4_aggregator2,
+   ack_vld_pipe4_aggregator1, ack_vld_pipe4_aggregator0,
+   ack_vld_pipe3_aggregator3, ack_vld_pipe3_aggregator2,
+   ack_vld_pipe3_aggregator1, ack_vld_pipe3_aggregator0,
+   ack_vld_pipe2_aggregator3, ack_vld_pipe2_aggregator2,
+   ack_vld_pipe2_aggregator1, ack_vld_pipe2_aggregator0,
+   ack_vld_pipe1_aggregator3, ack_vld_pipe1_aggregator2,
+   ack_vld_pipe1_aggregator1, ack_vld_pipe1_aggregator0,
+   ack_vld_pipe0_aggregator3, ack_vld_pipe0_aggregator2,
+   ack_vld_pipe0_aggregator1, ack_vld_pipe0_aggregator0, ack_pre7,
+   ack_pre6, ack_pre5, ack_pre4, ack_pre3, ack_pre2, ack_pre1,
+   ack_pre0, ack7, ack6, ack5, ack4, ack3, ack2, ack1, ack0
    );
 
 /*AUTOINPUT*/
@@ -255,6 +273,7 @@ input			aggre_clk_rst_n1;	// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			aggre_clk_rst_n2;	// To u2_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			aggre_clk_rst_n3;	// To u3_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			app_aggregation_bypass;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			clk_1M;			// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input			csi2device0_idi_anti_halt;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			csi2device0_idi_halt;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			csi2device1_idi_anti_halt;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
@@ -295,6 +314,30 @@ input			empty_vld_pipe7_aggregator0;// To u0_as6d_app_aggr_lane of as6d_app_aggr
 input			empty_vld_pipe7_aggregator1;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			empty_vld_pipe7_aggregator2;// To u2_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			empty_vld_pipe7_aggregator3;// To u3_as6d_app_aggr_lane of as6d_app_aggr_lane.v
+input			fifo_wr_clk_0;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wr_clk_1;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wr_clk_2;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wr_clk_3;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wr_clk_rst_n_0;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wr_clk_rst_n_1;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wr_clk_rst_n_2;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wr_clk_rst_n_3;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [5:0]		idi_datatype_0;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [5:0]		idi_datatype_1;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [5:0]		idi_datatype_2;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [5:0]		idi_datatype_3;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			idi_header_en_0;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			idi_header_en_1;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			idi_header_en_2;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			idi_header_en_3;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [2:0]		idi_linecount_0;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [2:0]		idi_linecount_1;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [2:0]		idi_linecount_2;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [2:0]		idi_linecount_3;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [15:0]		idi_wordcount_0;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [15:0]		idi_wordcount_1;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [15:0]		idi_wordcount_2;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [15:0]		idi_wordcount_3;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [139:0]		in_video_data0;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [139:0]		in_video_data1;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [139:0]		in_video_data2;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
@@ -351,6 +394,7 @@ input			line_end_vld_pipe7_aggregator0;// To u0_as6d_app_aggr_lane of as6d_app_a
 input			line_end_vld_pipe7_aggregator1;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			line_end_vld_pipe7_aggregator2;// To u2_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			line_end_vld_pipe7_aggregator3;// To u3_as6d_app_aggr_lane of as6d_app_aggr_lane.v
+input [3:0]		pipe_frame_active;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [2:0]		reg_app_aggr0_vc_bit_override_en;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input [2:0]		reg_app_aggr0_vc_bit_override_value;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input [2:0]		reg_app_aggr1_vc_bit_override_en;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
@@ -393,8 +437,20 @@ input			reg_send_pkt_match_lp_dt_en_aggr0;// To u0_as6d_app_aggr_lane of as6d_ap
 input			reg_send_pkt_match_lp_dt_en_aggr1;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			reg_send_pkt_match_lp_dt_en_aggr2;// To u2_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			reg_send_pkt_match_lp_dt_en_aggr3;// To u3_as6d_app_aggr_lane of as6d_app_aggr_lane.v
-input [15:0]		reg_sync_aggr_check_framecount;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
-input [15:0]		reg_sync_aggr_check_linecount;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			reg_sync_aggr_0_video_mask_latch_reset;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
+input			reg_sync_aggr_1_video_mask_latch_reset;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
+input			reg_sync_aggr_2_video_mask_latch_reset;// To u2_as6d_app_aggr_lane of as6d_app_aggr_lane.v
+input			reg_sync_aggr_3_video_mask_latch_reset;// To u3_as6d_app_aggr_lane of as6d_app_aggr_lane.v
+input [3:0]		reg_sync_aggr_auto_mask_en;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			reg_sync_aggr_check_framecount_en;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			reg_sync_aggr_check_linecount_en;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [3:0]		reg_sync_aggr_force_video_mask;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [3:0]		reg_sync_aggr_video_mask_restart;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [5:0]		reg_sync_aggr_video_status_info_datatype;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [15:0]		reg_sync_aggr_video_status_info_linecount;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [2:0]		reg_sync_aggr_video_status_info_vc;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [15:0]		reg_sync_aggr_video_status_info_wordcount;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [19:0]		reg_sync_aggr_video_timeout_threshold;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [1:0]		sch0_aggre_mode;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			sch0_frame_sync_lock;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			sch0_fse_filter;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
@@ -699,6 +755,7 @@ assign	up_state_video_pipe7	=	sch0_up_state7|sch1_up_state7|sch2_up_state7|sch3_
 		.pipe1_wr_mode_strobe(),
 		.pipe2_wr_mode_strobe(),
 		.pipe3_wr_mode_strobe(),
+        .reg_sync_aggr_video_mask_latch_reset(reg_sync_aggr_@_video_mask_latch_reset),
  );
 */
 
@@ -783,7 +840,7 @@ u0_as6d_app_aggr_lane  (
 			.aggre_clk_rst_n(aggre_clk_rst_n0),	 // Templated
 			.aggre_mode	(sch0_aggre_mode[1:0]),	 // Templated
 			.app_aggregation_bypass(app_aggregation_bypass), // Templated
-			.auto_mask_en	(4'h0),			 // Templated
+			.clk_1M		(clk_1M),
 			.csi2device_idi_anti_halt(csi2device0_idi_anti_halt), // Templated
 			.csi2device_idi_halt(csi2device0_idi_halt), // Templated
 			.empty0		(video_data_fifo_empty0), // Templated
@@ -802,9 +859,32 @@ u0_as6d_app_aggr_lane  (
 			.empty_vld5	(empty_vld_pipe5_aggregator0), // Templated
 			.empty_vld6	(empty_vld_pipe6_aggregator0), // Templated
 			.empty_vld7	(empty_vld_pipe7_aggregator0), // Templated
-			.force_video_mask(4'h0),		 // Templated
+			.fifo_wr_clk_0	(fifo_wr_clk_0),
+			.fifo_wr_clk_1	(fifo_wr_clk_1),
+			.fifo_wr_clk_2	(fifo_wr_clk_2),
+			.fifo_wr_clk_3	(fifo_wr_clk_3),
+			.fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
+			.fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
+			.fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
+			.fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
 			.frame_sync_lock(sch0_frame_sync_lock),	 // Templated
 			.fse_filter	(sch0_fse_filter),	 // Templated
+			.idi_datatype_0	(idi_datatype_0[5:0]),
+			.idi_datatype_1	(idi_datatype_1[5:0]),
+			.idi_datatype_2	(idi_datatype_2[5:0]),
+			.idi_datatype_3	(idi_datatype_3[5:0]),
+			.idi_header_en_0(idi_header_en_0),
+			.idi_header_en_1(idi_header_en_1),
+			.idi_header_en_2(idi_header_en_2),
+			.idi_header_en_3(idi_header_en_3),
+			.idi_linecount_0(idi_linecount_0[2:0]),
+			.idi_linecount_1(idi_linecount_1[2:0]),
+			.idi_linecount_2(idi_linecount_2[2:0]),
+			.idi_linecount_3(idi_linecount_3[2:0]),
+			.idi_wordcount_0(idi_wordcount_0[15:0]),
+			.idi_wordcount_1(idi_wordcount_1[15:0]),
+			.idi_wordcount_2(idi_wordcount_2[15:0]),
+			.idi_wordcount_3(idi_wordcount_3[15:0]),
 			.in_video_data0	(in_video_data0[139:0]),
 			.in_video_data1	(in_video_data1[139:0]),
 			.in_video_data2	(in_video_data2[139:0]),
@@ -850,6 +930,7 @@ u0_as6d_app_aggr_lane  (
 			.pipe5_aggre_en	(sch0_pipe5_aggre_en),	 // Templated
 			.pipe6_aggre_en	(sch0_pipe6_aggre_en),	 // Templated
 			.pipe7_aggre_en	(sch0_pipe7_aggre_en),	 // Templated
+			.pipe_frame_active(pipe_frame_active[3:0]),
 			.reg_app_aggr_idi_crc_chk_en(reg_app_aggr_idi_crc_chk_en[0]), // Templated
 			.reg_app_aggr_vc_bit_override_en(reg_app_aggr0_vc_bit_override_en[2:0]), // Templated
 			.reg_app_aggr_vc_bit_override_value(reg_app_aggr0_vc_bit_override_value[2:0]), // Templated
@@ -862,11 +943,21 @@ u0_as6d_app_aggr_lane  (
 			.reg_delete_lp_depend_on_wc_mux(reg_delete_lp_depend_on_wc_mux),
 			.reg_send_pkt_match_lp_dt(reg_send_pkt_match_lp_dt_aggr0[5:0]), // Templated
 			.reg_send_pkt_match_lp_dt_en(reg_send_pkt_match_lp_dt_en_aggr0), // Templated
+			.reg_sync_aggr_auto_mask_en(reg_sync_aggr_auto_mask_en[3:0]),
+			.reg_sync_aggr_check_framecount_en(reg_sync_aggr_check_framecount_en),
+			.reg_sync_aggr_check_linecount_en(reg_sync_aggr_check_linecount_en),
+			.reg_sync_aggr_force_video_mask(reg_sync_aggr_force_video_mask[3:0]),
+			.reg_sync_aggr_video_mask_latch_reset(reg_sync_aggr_0_video_mask_latch_reset), // Templated
+			.reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
+			.reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
+			.reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
+			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+			.reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
+			.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 			.video_loss0	(video_loss0),
 			.video_loss1	(video_loss1),
 			.video_loss2	(video_loss2),
 			.video_loss3	(video_loss3),
-			.video_mask_restart(4'h0),		 // Templated
 			.video_pipe_data_aggre_bypass(video_pipe0_data_aggre_bypass[139:0]), // Templated
 			.video_pipe_date_type_for_concat_align0(video_pipe_date_type_for_concat_align0[5:0]),
 			.video_pipe_date_type_for_concat_align1(video_pipe_date_type_for_concat_align1[5:0]),
@@ -876,9 +967,7 @@ u0_as6d_app_aggr_lane  (
 			.video_pipe_date_type_for_concat_align_vld1(video_pipe_date_type_for_concat_align_vld1),
 			.video_pipe_date_type_for_concat_align_vld2(video_pipe_date_type_for_concat_align_vld2),
 			.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
-			.video_pipe_vld_aggre_bypass(video_pipe0_vld_aggre_bypass), // Templated
-			.reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount[15:0]),
-			.reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount[15:0]));
+			.video_pipe_vld_aggre_bypass(video_pipe0_vld_aggre_bypass)); // Templated
 
 as6d_app_aggr_lane#(/*AUTOINSTPARAM*/
 		    // Parameters
@@ -961,7 +1050,7 @@ u1_as6d_app_aggr_lane  (
 			.aggre_clk_rst_n(aggre_clk_rst_n1),	 // Templated
 			.aggre_mode	(sch1_aggre_mode[1:0]),	 // Templated
 			.app_aggregation_bypass(app_aggregation_bypass), // Templated
-			.auto_mask_en	(4'h0),			 // Templated
+			.clk_1M		(clk_1M),
 			.csi2device_idi_anti_halt(csi2device1_idi_anti_halt), // Templated
 			.csi2device_idi_halt(csi2device1_idi_halt), // Templated
 			.empty0		(video_data_fifo_empty0), // Templated
@@ -980,9 +1069,32 @@ u1_as6d_app_aggr_lane  (
 			.empty_vld5	(empty_vld_pipe5_aggregator1), // Templated
 			.empty_vld6	(empty_vld_pipe6_aggregator1), // Templated
 			.empty_vld7	(empty_vld_pipe7_aggregator1), // Templated
-			.force_video_mask(4'h0),		 // Templated
+			.fifo_wr_clk_0	(fifo_wr_clk_0),
+			.fifo_wr_clk_1	(fifo_wr_clk_1),
+			.fifo_wr_clk_2	(fifo_wr_clk_2),
+			.fifo_wr_clk_3	(fifo_wr_clk_3),
+			.fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
+			.fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
+			.fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
+			.fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
 			.frame_sync_lock(sch1_frame_sync_lock),	 // Templated
 			.fse_filter	(sch1_fse_filter),	 // Templated
+			.idi_datatype_0	(idi_datatype_0[5:0]),
+			.idi_datatype_1	(idi_datatype_1[5:0]),
+			.idi_datatype_2	(idi_datatype_2[5:0]),
+			.idi_datatype_3	(idi_datatype_3[5:0]),
+			.idi_header_en_0(idi_header_en_0),
+			.idi_header_en_1(idi_header_en_1),
+			.idi_header_en_2(idi_header_en_2),
+			.idi_header_en_3(idi_header_en_3),
+			.idi_linecount_0(idi_linecount_0[2:0]),
+			.idi_linecount_1(idi_linecount_1[2:0]),
+			.idi_linecount_2(idi_linecount_2[2:0]),
+			.idi_linecount_3(idi_linecount_3[2:0]),
+			.idi_wordcount_0(idi_wordcount_0[15:0]),
+			.idi_wordcount_1(idi_wordcount_1[15:0]),
+			.idi_wordcount_2(idi_wordcount_2[15:0]),
+			.idi_wordcount_3(idi_wordcount_3[15:0]),
 			.in_video_data0	(in_video_data0[139:0]),
 			.in_video_data1	(in_video_data1[139:0]),
 			.in_video_data2	(in_video_data2[139:0]),
@@ -1028,6 +1140,7 @@ u1_as6d_app_aggr_lane  (
 			.pipe5_aggre_en	(sch1_pipe5_aggre_en),	 // Templated
 			.pipe6_aggre_en	(sch1_pipe6_aggre_en),	 // Templated
 			.pipe7_aggre_en	(sch1_pipe7_aggre_en),	 // Templated
+			.pipe_frame_active(pipe_frame_active[3:0]),
 			.reg_app_aggr_idi_crc_chk_en(reg_app_aggr_idi_crc_chk_en[1]), // Templated
 			.reg_app_aggr_vc_bit_override_en(reg_app_aggr1_vc_bit_override_en[2:0]), // Templated
 			.reg_app_aggr_vc_bit_override_value(reg_app_aggr1_vc_bit_override_value[2:0]), // Templated
@@ -1040,11 +1153,21 @@ u1_as6d_app_aggr_lane  (
 			.reg_delete_lp_depend_on_wc_mux(reg_delete_lp_depend_on_wc_mux),
 			.reg_send_pkt_match_lp_dt(reg_send_pkt_match_lp_dt_aggr1[5:0]), // Templated
 			.reg_send_pkt_match_lp_dt_en(reg_send_pkt_match_lp_dt_en_aggr1), // Templated
+			.reg_sync_aggr_auto_mask_en(reg_sync_aggr_auto_mask_en[3:0]),
+			.reg_sync_aggr_check_framecount_en(reg_sync_aggr_check_framecount_en),
+			.reg_sync_aggr_check_linecount_en(reg_sync_aggr_check_linecount_en),
+			.reg_sync_aggr_force_video_mask(reg_sync_aggr_force_video_mask[3:0]),
+			.reg_sync_aggr_video_mask_latch_reset(reg_sync_aggr_1_video_mask_latch_reset), // Templated
+			.reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
+			.reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
+			.reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
+			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+			.reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
+			.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 			.video_loss0	(video_loss0),
 			.video_loss1	(video_loss1),
 			.video_loss2	(video_loss2),
 			.video_loss3	(video_loss3),
-			.video_mask_restart(4'h0),		 // Templated
 			.video_pipe_data_aggre_bypass(video_pipe1_data_aggre_bypass[139:0]), // Templated
 			.video_pipe_date_type_for_concat_align0(video_pipe_date_type_for_concat_align0[5:0]),
 			.video_pipe_date_type_for_concat_align1(video_pipe_date_type_for_concat_align1[5:0]),
@@ -1054,9 +1177,7 @@ u1_as6d_app_aggr_lane  (
 			.video_pipe_date_type_for_concat_align_vld1(video_pipe_date_type_for_concat_align_vld1),
 			.video_pipe_date_type_for_concat_align_vld2(video_pipe_date_type_for_concat_align_vld2),
 			.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
-			.video_pipe_vld_aggre_bypass(video_pipe1_vld_aggre_bypass), // Templated
-			.reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount[15:0]),
-			.reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount[15:0]));
+			.video_pipe_vld_aggre_bypass(video_pipe1_vld_aggre_bypass)); // Templated
 
 as6d_app_aggr_lane#(/*AUTOINSTPARAM*/
 		    // Parameters
@@ -1139,7 +1260,7 @@ u2_as6d_app_aggr_lane  (
 			.aggre_clk_rst_n(aggre_clk_rst_n2),	 // Templated
 			.aggre_mode	(sch2_aggre_mode[1:0]),	 // Templated
 			.app_aggregation_bypass(app_aggregation_bypass), // Templated
-			.auto_mask_en	(4'h0),			 // Templated
+			.clk_1M		(clk_1M),
 			.csi2device_idi_anti_halt(csi2device2_idi_anti_halt), // Templated
 			.csi2device_idi_halt(csi2device2_idi_halt), // Templated
 			.empty0		(video_data_fifo_empty0), // Templated
@@ -1158,9 +1279,32 @@ u2_as6d_app_aggr_lane  (
 			.empty_vld5	(empty_vld_pipe5_aggregator2), // Templated
 			.empty_vld6	(empty_vld_pipe6_aggregator2), // Templated
 			.empty_vld7	(empty_vld_pipe7_aggregator2), // Templated
-			.force_video_mask(4'h0),		 // Templated
+			.fifo_wr_clk_0	(fifo_wr_clk_0),
+			.fifo_wr_clk_1	(fifo_wr_clk_1),
+			.fifo_wr_clk_2	(fifo_wr_clk_2),
+			.fifo_wr_clk_3	(fifo_wr_clk_3),
+			.fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
+			.fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
+			.fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
+			.fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
 			.frame_sync_lock(sch2_frame_sync_lock),	 // Templated
 			.fse_filter	(sch2_fse_filter),	 // Templated
+			.idi_datatype_0	(idi_datatype_0[5:0]),
+			.idi_datatype_1	(idi_datatype_1[5:0]),
+			.idi_datatype_2	(idi_datatype_2[5:0]),
+			.idi_datatype_3	(idi_datatype_3[5:0]),
+			.idi_header_en_0(idi_header_en_0),
+			.idi_header_en_1(idi_header_en_1),
+			.idi_header_en_2(idi_header_en_2),
+			.idi_header_en_3(idi_header_en_3),
+			.idi_linecount_0(idi_linecount_0[2:0]),
+			.idi_linecount_1(idi_linecount_1[2:0]),
+			.idi_linecount_2(idi_linecount_2[2:0]),
+			.idi_linecount_3(idi_linecount_3[2:0]),
+			.idi_wordcount_0(idi_wordcount_0[15:0]),
+			.idi_wordcount_1(idi_wordcount_1[15:0]),
+			.idi_wordcount_2(idi_wordcount_2[15:0]),
+			.idi_wordcount_3(idi_wordcount_3[15:0]),
 			.in_video_data0	(in_video_data0[139:0]),
 			.in_video_data1	(in_video_data1[139:0]),
 			.in_video_data2	(in_video_data2[139:0]),
@@ -1206,6 +1350,7 @@ u2_as6d_app_aggr_lane  (
 			.pipe5_aggre_en	(sch2_pipe5_aggre_en),	 // Templated
 			.pipe6_aggre_en	(sch2_pipe6_aggre_en),	 // Templated
 			.pipe7_aggre_en	(sch2_pipe7_aggre_en),	 // Templated
+			.pipe_frame_active(pipe_frame_active[3:0]),
 			.reg_app_aggr_idi_crc_chk_en(reg_app_aggr_idi_crc_chk_en[2]), // Templated
 			.reg_app_aggr_vc_bit_override_en(reg_app_aggr2_vc_bit_override_en[2:0]), // Templated
 			.reg_app_aggr_vc_bit_override_value(reg_app_aggr2_vc_bit_override_value[2:0]), // Templated
@@ -1218,11 +1363,21 @@ u2_as6d_app_aggr_lane  (
 			.reg_delete_lp_depend_on_wc_mux(reg_delete_lp_depend_on_wc_mux),
 			.reg_send_pkt_match_lp_dt(reg_send_pkt_match_lp_dt_aggr2[5:0]), // Templated
 			.reg_send_pkt_match_lp_dt_en(reg_send_pkt_match_lp_dt_en_aggr2), // Templated
+			.reg_sync_aggr_auto_mask_en(reg_sync_aggr_auto_mask_en[3:0]),
+			.reg_sync_aggr_check_framecount_en(reg_sync_aggr_check_framecount_en),
+			.reg_sync_aggr_check_linecount_en(reg_sync_aggr_check_linecount_en),
+			.reg_sync_aggr_force_video_mask(reg_sync_aggr_force_video_mask[3:0]),
+			.reg_sync_aggr_video_mask_latch_reset(reg_sync_aggr_2_video_mask_latch_reset), // Templated
+			.reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
+			.reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
+			.reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
+			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+			.reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
+			.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 			.video_loss0	(video_loss0),
 			.video_loss1	(video_loss1),
 			.video_loss2	(video_loss2),
 			.video_loss3	(video_loss3),
-			.video_mask_restart(4'h0),		 // Templated
 			.video_pipe_data_aggre_bypass(video_pipe2_data_aggre_bypass[139:0]), // Templated
 			.video_pipe_date_type_for_concat_align0(video_pipe_date_type_for_concat_align0[5:0]),
 			.video_pipe_date_type_for_concat_align1(video_pipe_date_type_for_concat_align1[5:0]),
@@ -1232,9 +1387,7 @@ u2_as6d_app_aggr_lane  (
 			.video_pipe_date_type_for_concat_align_vld1(video_pipe_date_type_for_concat_align_vld1),
 			.video_pipe_date_type_for_concat_align_vld2(video_pipe_date_type_for_concat_align_vld2),
 			.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
-			.video_pipe_vld_aggre_bypass(video_pipe2_vld_aggre_bypass), // Templated
-			.reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount[15:0]),
-			.reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount[15:0]));
+			.video_pipe_vld_aggre_bypass(video_pipe2_vld_aggre_bypass)); // Templated
 
 as6d_app_aggr_lane#(/*AUTOINSTPARAM*/
 		    // Parameters
@@ -1317,7 +1470,7 @@ u3_as6d_app_aggr_lane  (
 			.aggre_clk_rst_n(aggre_clk_rst_n3),	 // Templated
 			.aggre_mode	(sch3_aggre_mode[1:0]),	 // Templated
 			.app_aggregation_bypass(app_aggregation_bypass), // Templated
-			.auto_mask_en	(4'h0),			 // Templated
+			.clk_1M		(clk_1M),
 			.csi2device_idi_anti_halt(csi2device3_idi_anti_halt), // Templated
 			.csi2device_idi_halt(csi2device3_idi_halt), // Templated
 			.empty0		(video_data_fifo_empty0), // Templated
@@ -1336,9 +1489,32 @@ u3_as6d_app_aggr_lane  (
 			.empty_vld5	(empty_vld_pipe5_aggregator3), // Templated
 			.empty_vld6	(empty_vld_pipe6_aggregator3), // Templated
 			.empty_vld7	(empty_vld_pipe7_aggregator3), // Templated
-			.force_video_mask(4'h0),		 // Templated
+			.fifo_wr_clk_0	(fifo_wr_clk_0),
+			.fifo_wr_clk_1	(fifo_wr_clk_1),
+			.fifo_wr_clk_2	(fifo_wr_clk_2),
+			.fifo_wr_clk_3	(fifo_wr_clk_3),
+			.fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
+			.fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
+			.fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
+			.fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
 			.frame_sync_lock(sch3_frame_sync_lock),	 // Templated
 			.fse_filter	(sch3_fse_filter),	 // Templated
+			.idi_datatype_0	(idi_datatype_0[5:0]),
+			.idi_datatype_1	(idi_datatype_1[5:0]),
+			.idi_datatype_2	(idi_datatype_2[5:0]),
+			.idi_datatype_3	(idi_datatype_3[5:0]),
+			.idi_header_en_0(idi_header_en_0),
+			.idi_header_en_1(idi_header_en_1),
+			.idi_header_en_2(idi_header_en_2),
+			.idi_header_en_3(idi_header_en_3),
+			.idi_linecount_0(idi_linecount_0[2:0]),
+			.idi_linecount_1(idi_linecount_1[2:0]),
+			.idi_linecount_2(idi_linecount_2[2:0]),
+			.idi_linecount_3(idi_linecount_3[2:0]),
+			.idi_wordcount_0(idi_wordcount_0[15:0]),
+			.idi_wordcount_1(idi_wordcount_1[15:0]),
+			.idi_wordcount_2(idi_wordcount_2[15:0]),
+			.idi_wordcount_3(idi_wordcount_3[15:0]),
 			.in_video_data0	(in_video_data0[139:0]),
 			.in_video_data1	(in_video_data1[139:0]),
 			.in_video_data2	(in_video_data2[139:0]),
@@ -1384,6 +1560,7 @@ u3_as6d_app_aggr_lane  (
 			.pipe5_aggre_en	(sch3_pipe5_aggre_en),	 // Templated
 			.pipe6_aggre_en	(sch3_pipe6_aggre_en),	 // Templated
 			.pipe7_aggre_en	(sch3_pipe7_aggre_en),	 // Templated
+			.pipe_frame_active(pipe_frame_active[3:0]),
 			.reg_app_aggr_idi_crc_chk_en(reg_app_aggr_idi_crc_chk_en[3]), // Templated
 			.reg_app_aggr_vc_bit_override_en(reg_app_aggr3_vc_bit_override_en[2:0]), // Templated
 			.reg_app_aggr_vc_bit_override_value(reg_app_aggr3_vc_bit_override_value[2:0]), // Templated
@@ -1396,11 +1573,21 @@ u3_as6d_app_aggr_lane  (
 			.reg_delete_lp_depend_on_wc_mux(reg_delete_lp_depend_on_wc_mux),
 			.reg_send_pkt_match_lp_dt(reg_send_pkt_match_lp_dt_aggr3[5:0]), // Templated
 			.reg_send_pkt_match_lp_dt_en(reg_send_pkt_match_lp_dt_en_aggr3), // Templated
+			.reg_sync_aggr_auto_mask_en(reg_sync_aggr_auto_mask_en[3:0]),
+			.reg_sync_aggr_check_framecount_en(reg_sync_aggr_check_framecount_en),
+			.reg_sync_aggr_check_linecount_en(reg_sync_aggr_check_linecount_en),
+			.reg_sync_aggr_force_video_mask(reg_sync_aggr_force_video_mask[3:0]),
+			.reg_sync_aggr_video_mask_latch_reset(reg_sync_aggr_3_video_mask_latch_reset), // Templated
+			.reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
+			.reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
+			.reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
+			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+			.reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
+			.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 			.video_loss0	(video_loss0),
 			.video_loss1	(video_loss1),
 			.video_loss2	(video_loss2),
 			.video_loss3	(video_loss3),
-			.video_mask_restart(4'h0),		 // Templated
 			.video_pipe_data_aggre_bypass(video_pipe3_data_aggre_bypass[139:0]), // Templated
 			.video_pipe_date_type_for_concat_align0(video_pipe_date_type_for_concat_align0[5:0]),
 			.video_pipe_date_type_for_concat_align1(video_pipe_date_type_for_concat_align1[5:0]),
@@ -1410,8 +1597,6 @@ u3_as6d_app_aggr_lane  (
 			.video_pipe_date_type_for_concat_align_vld1(video_pipe_date_type_for_concat_align_vld1),
 			.video_pipe_date_type_for_concat_align_vld2(video_pipe_date_type_for_concat_align_vld2),
 			.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
-			.video_pipe_vld_aggre_bypass(video_pipe3_vld_aggre_bypass), // Templated
-			.reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount[15:0]),
-			.reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount[15:0]));
+			.video_pipe_vld_aggre_bypass(video_pipe3_vld_aggre_bypass)); // Templated
 
 endmodule

@@ -35,7 +35,8 @@ module as6d_app_pipe_sch_concat(
    reg_sync_aggr_video_status_info_linecount,
    reg_sync_aggr_video_status_info_wordcount,
    reg_sync_aggr_video_status_info_vc, video_loss0, video_loss1,
-   video_loss2, video_loss3
+   video_loss2, video_loss3, pipe0_concat_en, pipe1_concat_en,
+   pipe2_concat_en, pipe3_concat_en
    );    
     
     /*AUTOINPUT*/
@@ -116,8 +117,8 @@ module as6d_app_pipe_sch_concat(
     input       [3:0]       reg_sync_aggr_video_mask_restart_en;
     input                   reg_sync_aggr_video_mask_latch_reset;       // Video mask latch reset
     input       [19:0]      reg_sync_aggr_video_timeout_threshold;  // Timeout threshold
-    input                   reg_sync_aggr_check_framecount_en,
-    input                   reg_sync_aggr_check_linecount_en,
+    input                   reg_sync_aggr_check_framecount_en;
+    input                   reg_sync_aggr_check_linecount_en;
     input       [5:0]       reg_sync_aggr_video_status_info_datatype;   // Video status datatype for BPG
     input       [15:0]      reg_sync_aggr_video_status_info_linecount;  // Video status line count for BPG
     input       [15:0]      reg_sync_aggr_video_status_info_wordcount;  // Video status word count for BPG
@@ -130,6 +131,10 @@ module as6d_app_pipe_sch_concat(
     output wire [3:0]       ack_concat;
     output wire [3:0]       line_end_concat;
     
+    input  wire             pipe0_concat_en;
+    input  wire             pipe1_concat_en;
+    input  wire             pipe2_concat_en;
+    input  wire             pipe3_concat_en;
 
 
     // =========================================================================

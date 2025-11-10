@@ -5,7 +5,7 @@ module as6d_app_pipe_sch_concat_line_interleaved(
     
     // Configuration Inputs
     input   [1:0]           aggre_mode,                         // 汇聚模式
-    input   [3:0]           pipe_concat_en
+    input   [3:0]           pipe_concat_en,
     input   [3:0]           pipe_mask_bitmap,
     input   [1:0]           master_pipe,                        // 主pipe选择
     input   [3:0]           pipe_rdy_bitmap,                    // pipe就绪位图
@@ -77,8 +77,6 @@ module as6d_app_pipe_sch_concat_line_interleaved(
     wire                    out_comp_fail;
     wire    [3:0]           vld_group;
     wire    [1:0]           order;
-    wire    [3:0]           ack_concat;
-    wire    [3:0]           line_end_concat;
     wire    [1:0]           group_index_mux;
     
     // BPG MUX signals - combine video_pipe and BPG based on pipe_mask_bitmap

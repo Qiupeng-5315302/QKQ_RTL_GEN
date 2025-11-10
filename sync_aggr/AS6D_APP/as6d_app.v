@@ -378,7 +378,18 @@ module   as6d_app (/*AUTOARG*/
    reg_vc_selz_h_mep0, reg_testbus_sel_swap, reg_testbus_sel_order1,
    reg_testbus_sel_order0, reg_testbus_sel_lo1, reg_testbus_sel_lo0,
    reg_testbus_sel_hi1, reg_testbus_sel_hi0,
-   reg_testbus_hi8bsel_8bmode, reg_sram_lcrc_err_oen,
+   reg_testbus_hi8bsel_8bmode, reg_sync_aggr_video_timeout_threshold,
+   reg_sync_aggr_video_status_info_wordcount,
+   reg_sync_aggr_video_status_info_vc,
+   reg_sync_aggr_video_status_info_linecount,
+   reg_sync_aggr_video_status_info_datatype,
+   reg_sync_aggr_video_mask_restart, reg_sync_aggr_force_video_mask,
+   reg_sync_aggr_check_linecount_en,
+   reg_sync_aggr_check_framecount_en, reg_sync_aggr_auto_mask_en,
+   reg_sync_aggr_3_video_mask_latch_reset,
+   reg_sync_aggr_2_video_mask_latch_reset,
+   reg_sync_aggr_1_video_mask_latch_reset,
+   reg_sync_aggr_0_video_mask_latch_reset, reg_sram_lcrc_err_oen,
    reg_send_pkt_match_lp_dt_en_aggr3,
    reg_send_pkt_match_lp_dt_en_aggr2,
    reg_send_pkt_match_lp_dt_en_aggr1,
@@ -860,44 +871,50 @@ module   as6d_app (/*AUTOARG*/
    reg_app_aggr1_vc_bit_override_en,
    reg_app_aggr0_vc_bit_override_value,
    reg_app_aggr0_vc_bit_override_en, reg_all_pipe_wr_mode_strobe,
-   mep3_word_count, mep3_tunnel_mode_en, mep3_header_en,
-   mep3_data_type, mep3_data_en, mep3_csi_data, mep3_byte_en,
-   mep2_word_count, mep2_tunnel_mode_en, mep2_header_en,
+   pipe_frame_active, mep3_word_count, mep3_tunnel_mode_en,
+   mep3_header_en, mep3_data_type, mep3_data_en, mep3_csi_data,
+   mep3_byte_en, mep2_word_count, mep2_tunnel_mode_en, mep2_header_en,
    mep2_data_type, mep2_data_en, mep2_csi_data, mep2_byte_en,
    mep1_word_count, mep1_tunnel_mode_en, mep1_header_en,
    mep1_data_type, mep1_data_en, mep1_csi_data, mep1_byte_en,
    mep0_word_count, mep0_tunnel_mode_en, mep0_header_en,
    mep0_data_type, mep0_data_en, mep0_csi_data, mep0_byte_en,
+   idi_wordcount_3, idi_wordcount_2, idi_wordcount_1, idi_wordcount_0,
+   idi_linecount_3, idi_linecount_2, idi_linecount_1, idi_linecount_0,
+   idi_header_en_3, idi_header_en_2, idi_header_en_1, idi_header_en_0,
+   idi_datatype_3, idi_datatype_2, idi_datatype_1, idi_datatype_0,
    gpio2app_sch3_frame_sync_lock, gpio2app_sch2_frame_sync_lock,
    gpio2app_sch1_frame_sync_lock, gpio2app_sch0_frame_sync_lock,
    fifo_wrclk_rst_n7, fifo_wrclk_rst_n6, fifo_wrclk_rst_n5,
    fifo_wrclk_rst_n4, fifo_wrclk_rst_n3, fifo_wrclk_rst_n2,
    fifo_wrclk_rst_n1, fifo_wrclk_rst_n0, fifo_wrclk7, fifo_wrclk6,
    fifo_wrclk5, fifo_wrclk4, fifo_wrclk3, fifo_wrclk2, fifo_wrclk1,
-   fifo_wrclk0, fifo_rdclk_rst_n7, fifo_rdclk_rst_n6,
-   fifo_rdclk_rst_n5, fifo_rdclk_rst_n4, fifo_rdclk_rst_n3,
-   fifo_rdclk_rst_n2, fifo_rdclk_rst_n1, fifo_rdclk_rst_n0,
-   fifo_rdclk7, fifo_rdclk6, fifo_rdclk5, fifo_rdclk4, fifo_rdclk3,
-   fifo_rdclk2, fifo_rdclk1, fifo_rdclk0, clk_1M, aggre_clk_rst_n3,
-   aggre_clk_rst_n2, aggre_clk_rst_n1, aggre_clk_rst_n0, aggre_clk3,
-   aggre_clk2, aggre_clk1, aggre_clk0, mep_clk0, mep_clk1, mep_clk2,
-   mep_clk3, mep_clk_rst_n0, mep_clk_rst_n1, mep_clk_rst_n2,
-   mep_clk_rst_n3, reg_pipe0_stream_sel, reg_pipe1_stream_sel,
-   reg_pipe2_stream_sel, reg_pipe3_stream_sel, reg_pipe4_stream_sel,
-   reg_pipe5_stream_sel, reg_pipe6_stream_sel, reg_pipe7_stream_sel,
-   reg_app_sch0, reg_app_sch1, reg_app_sch2, reg_app_sch3,
-   reg_time_window0, reg_time_window1, reg_time_window2,
-   reg_time_window3, reg_time_window4, reg_time_window5,
-   reg_time_window6, reg_time_window7, reg_video_loss_en0,
-   reg_video_loss_en1, reg_video_loss_en2, reg_video_loss_en3,
-   reg_video_loss_en4, reg_video_loss_en5, reg_video_loss_en6,
-   reg_video_loss_en7, reg_line_delay_en0, reg_line_delay_en1,
-   reg_line_delay_en2, reg_line_delay_en3, reg_line_delay_en4,
-   reg_line_delay_en5, reg_line_delay_en6, reg_line_delay_en7,
-   reg_app_aggregation_bypass, reg_sch0_fse_filter,
-   reg_sch1_fse_filter, reg_sch2_fse_filter, reg_sch3_fse_filter,
-   mep0_virtual_channel, mep1_virtual_channel, mep2_virtual_channel,
-   mep3_virtual_channel, mep0_virtual_channel_x,
+   fifo_wrclk0, fifo_wr_clk_rst_n_3, fifo_wr_clk_rst_n_2,
+   fifo_wr_clk_rst_n_1, fifo_wr_clk_rst_n_0, fifo_wr_clk_3,
+   fifo_wr_clk_2, fifo_wr_clk_1, fifo_wr_clk_0, fifo_rdclk_rst_n7,
+   fifo_rdclk_rst_n6, fifo_rdclk_rst_n5, fifo_rdclk_rst_n4,
+   fifo_rdclk_rst_n3, fifo_rdclk_rst_n2, fifo_rdclk_rst_n1,
+   fifo_rdclk_rst_n0, fifo_rdclk7, fifo_rdclk6, fifo_rdclk5,
+   fifo_rdclk4, fifo_rdclk3, fifo_rdclk2, fifo_rdclk1, fifo_rdclk0,
+   clk_1M, aggre_clk_rst_n3, aggre_clk_rst_n2, aggre_clk_rst_n1,
+   aggre_clk_rst_n0, aggre_clk3, aggre_clk2, aggre_clk1, aggre_clk0,
+   mep_clk0, mep_clk1, mep_clk2, mep_clk3, mep_clk_rst_n0,
+   mep_clk_rst_n1, mep_clk_rst_n2, mep_clk_rst_n3,
+   reg_pipe0_stream_sel, reg_pipe1_stream_sel, reg_pipe2_stream_sel,
+   reg_pipe3_stream_sel, reg_pipe4_stream_sel, reg_pipe5_stream_sel,
+   reg_pipe6_stream_sel, reg_pipe7_stream_sel, reg_app_sch0,
+   reg_app_sch1, reg_app_sch2, reg_app_sch3, reg_time_window0,
+   reg_time_window1, reg_time_window2, reg_time_window3,
+   reg_time_window4, reg_time_window5, reg_time_window6,
+   reg_time_window7, reg_video_loss_en0, reg_video_loss_en1,
+   reg_video_loss_en2, reg_video_loss_en3, reg_video_loss_en4,
+   reg_video_loss_en5, reg_video_loss_en6, reg_video_loss_en7,
+   reg_line_delay_en0, reg_line_delay_en1, reg_line_delay_en2,
+   reg_line_delay_en3, reg_line_delay_en4, reg_line_delay_en5,
+   reg_line_delay_en6, reg_line_delay_en7, reg_app_aggregation_bypass,
+   reg_sch0_fse_filter, reg_sch1_fse_filter, reg_sch2_fse_filter,
+   reg_sch3_fse_filter, mep0_virtual_channel, mep1_virtual_channel,
+   mep2_virtual_channel, mep3_virtual_channel, mep0_virtual_channel_x,
    mep1_virtual_channel_x, mep2_virtual_channel_x,
    mep3_virtual_channel_x
    );
@@ -913,7 +930,7 @@ input			aggre_clk_rst_n0;	// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			aggre_clk_rst_n1;	// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			aggre_clk_rst_n2;	// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			aggre_clk_rst_n3;	// To u_as6d_app_sync of as6d_app_sync.v, ...
-input			clk_1M;			// To u_as6d_app_video_pipe of as6d_app_video_pipe.v
+input			clk_1M;			// To u_as6d_app_video_pipe of as6d_app_video_pipe.v, ...
 input			fifo_rdclk0;		// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			fifo_rdclk1;		// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			fifo_rdclk2;		// To u_as6d_app_sync of as6d_app_sync.v, ...
@@ -930,6 +947,14 @@ input			fifo_rdclk_rst_n4;	// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			fifo_rdclk_rst_n5;	// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			fifo_rdclk_rst_n6;	// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			fifo_rdclk_rst_n7;	// To u_as6d_app_sync of as6d_app_sync.v, ...
+input			fifo_wr_clk_0;		// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			fifo_wr_clk_1;		// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			fifo_wr_clk_2;		// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			fifo_wr_clk_3;		// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			fifo_wr_clk_rst_n_0;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			fifo_wr_clk_rst_n_1;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			fifo_wr_clk_rst_n_2;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			fifo_wr_clk_rst_n_3;	// To u_as6d_app_aggregator of as6d_app_aggr.v
 input			fifo_wrclk0;		// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			fifo_wrclk1;		// To u_as6d_app_sync of as6d_app_sync.v, ...
 input			fifo_wrclk2;		// To u_as6d_app_sync of as6d_app_sync.v, ...
@@ -950,6 +975,22 @@ input			gpio2app_sch0_frame_sync_lock;// To u_as6d_app_sync of as6d_app_sync.v
 input			gpio2app_sch1_frame_sync_lock;// To u_as6d_app_sync of as6d_app_sync.v
 input			gpio2app_sch2_frame_sync_lock;// To u_as6d_app_sync of as6d_app_sync.v
 input			gpio2app_sch3_frame_sync_lock;// To u_as6d_app_sync of as6d_app_sync.v
+input [5:0]		idi_datatype_0;		// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [5:0]		idi_datatype_1;		// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [5:0]		idi_datatype_2;		// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [5:0]		idi_datatype_3;		// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			idi_header_en_0;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			idi_header_en_1;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			idi_header_en_2;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			idi_header_en_3;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [2:0]		idi_linecount_0;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [2:0]		idi_linecount_1;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [2:0]		idi_linecount_2;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [2:0]		idi_linecount_3;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [15:0]		idi_wordcount_0;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [15:0]		idi_wordcount_1;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [15:0]		idi_wordcount_2;	// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [15:0]		idi_wordcount_3;	// To u_as6d_app_aggregator of as6d_app_aggr.v
 input [2:0]		mep0_byte_en;		// To u_as6d_app_idi_validity_check of as6d_app_idi_validity_check.v
 input [63:0]		mep0_csi_data;		// To u_as6d_app_idi_validity_check of as6d_app_idi_validity_check.v
 input			mep0_data_en;		// To u_as6d_app_idi_validity_check of as6d_app_idi_validity_check.v
@@ -978,6 +1019,7 @@ input [5:0]		mep3_data_type;		// To u_as6d_app_idi_validity_check of as6d_app_id
 input			mep3_header_en;		// To u_as6d_app_idi_validity_check of as6d_app_idi_validity_check.v
 input			mep3_tunnel_mode_en;	// To u_as6d_app_idi_validity_check of as6d_app_idi_validity_check.v
 input [15:0]		mep3_word_count;	// To u_as6d_app_idi_validity_check of as6d_app_idi_validity_check.v
+input [3:0]		pipe_frame_active;	// To u_as6d_app_aggregator of as6d_app_aggr.v
 input			reg_all_pipe_wr_mode_strobe;// To u_as6d_app_sync of as6d_app_sync.v
 input [2:0]		reg_app_aggr0_vc_bit_override_en;// To u_as6d_app_aggregator of as6d_app_aggr.v
 input [2:0]		reg_app_aggr0_vc_bit_override_value;// To u_as6d_app_aggregator of as6d_app_aggr.v
@@ -1834,9 +1876,21 @@ input			reg_send_pkt_match_lp_dt_en_aggr0;// To u_as6d_app_aggregator of as6d_ap
 input			reg_send_pkt_match_lp_dt_en_aggr1;// To u_as6d_app_aggregator of as6d_app_aggr.v
 input			reg_send_pkt_match_lp_dt_en_aggr2;// To u_as6d_app_aggregator of as6d_app_aggr.v
 input			reg_send_pkt_match_lp_dt_en_aggr3;// To u_as6d_app_aggregator of as6d_app_aggr.v
-input [15:0]		reg_sync_aggr_check_framecount;// To u_as6d_app_aggregator of as6d_app_aggr.v
-input [15:0]		reg_sync_aggr_check_linecount;// To u_as6d_app_aggregator of as6d_app_aggr.v
 input [7:0]		reg_sram_lcrc_err_oen;	// To u_as6d_app_video_pipe of as6d_app_video_pipe.v
+input			reg_sync_aggr_0_video_mask_latch_reset;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			reg_sync_aggr_1_video_mask_latch_reset;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			reg_sync_aggr_2_video_mask_latch_reset;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			reg_sync_aggr_3_video_mask_latch_reset;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [3:0]		reg_sync_aggr_auto_mask_en;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			reg_sync_aggr_check_framecount_en;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input			reg_sync_aggr_check_linecount_en;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [3:0]		reg_sync_aggr_force_video_mask;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [3:0]		reg_sync_aggr_video_mask_restart;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [5:0]		reg_sync_aggr_video_status_info_datatype;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [15:0]		reg_sync_aggr_video_status_info_linecount;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [2:0]		reg_sync_aggr_video_status_info_vc;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [15:0]		reg_sync_aggr_video_status_info_wordcount;// To u_as6d_app_aggregator of as6d_app_aggr.v
+input [19:0]		reg_sync_aggr_video_timeout_threshold;// To u_as6d_app_aggregator of as6d_app_aggr.v
 input			reg_testbus_hi8bsel_8bmode;// To u_as6d_app_mon_top of as6d_app_mon_top.v
 input [5:0]		reg_testbus_sel_hi0;	// To u_as6d_app_mon_top of as6d_app_mon_top.v
 input [5:0]		reg_testbus_sel_hi1;	// To u_as6d_app_mon_top of as6d_app_mon_top.v
@@ -6119,6 +6173,7 @@ as6d_app_aggr    u_as6d_app_aggregator(
 				       .aggre_clk_rst_n2(aggre_clk_rst_n2),
 				       .aggre_clk_rst_n3(aggre_clk_rst_n3),
 				       .app_aggregation_bypass(app_aggregation_bypass),
+				       .clk_1M		(clk_1M),
 				       .csi2device0_idi_anti_halt(),	 // Templated
 				       .csi2device0_idi_halt(),		 // Templated
 				       .csi2device1_idi_anti_halt(),	 // Templated
@@ -6159,6 +6214,30 @@ as6d_app_aggr    u_as6d_app_aggregator(
 				       .empty_vld_pipe7_aggregator1(empty_vld_pipe7_aggregator1),
 				       .empty_vld_pipe7_aggregator2(empty_vld_pipe7_aggregator2),
 				       .empty_vld_pipe7_aggregator3(empty_vld_pipe7_aggregator3),
+				       .fifo_wr_clk_0	(fifo_wr_clk_0),
+				       .fifo_wr_clk_1	(fifo_wr_clk_1),
+				       .fifo_wr_clk_2	(fifo_wr_clk_2),
+				       .fifo_wr_clk_3	(fifo_wr_clk_3),
+				       .fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
+				       .fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
+				       .fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
+				       .fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
+				       .idi_datatype_0	(idi_datatype_0[5:0]),
+				       .idi_datatype_1	(idi_datatype_1[5:0]),
+				       .idi_datatype_2	(idi_datatype_2[5:0]),
+				       .idi_datatype_3	(idi_datatype_3[5:0]),
+				       .idi_header_en_0	(idi_header_en_0),
+				       .idi_header_en_1	(idi_header_en_1),
+				       .idi_header_en_2	(idi_header_en_2),
+				       .idi_header_en_3	(idi_header_en_3),
+				       .idi_linecount_0	(idi_linecount_0[2:0]),
+				       .idi_linecount_1	(idi_linecount_1[2:0]),
+				       .idi_linecount_2	(idi_linecount_2[2:0]),
+				       .idi_linecount_3	(idi_linecount_3[2:0]),
+				       .idi_wordcount_0	(idi_wordcount_0[15:0]),
+				       .idi_wordcount_1	(idi_wordcount_1[15:0]),
+				       .idi_wordcount_2	(idi_wordcount_2[15:0]),
+				       .idi_wordcount_3	(idi_wordcount_3[15:0]),
 				       .in_video_data0	(pipe2sch_video_data0[139:0]), // Templated
 				       .in_video_data1	(pipe2sch_video_data1[139:0]), // Templated
 				       .in_video_data2	(pipe2sch_video_data2[139:0]), // Templated
@@ -6211,6 +6290,7 @@ as6d_app_aggr    u_as6d_app_aggregator(
 				       .line_end_vld_pipe7_aggregator1(line_end_vld_pipe7_aggregator1),
 				       .line_end_vld_pipe7_aggregator2(line_end_vld_pipe7_aggregator2),
 				       .line_end_vld_pipe7_aggregator3(line_end_vld_pipe7_aggregator3),
+				       .pipe_frame_active(pipe_frame_active[3:0]),
 				       .reg_app_aggr0_vc_bit_override_en(reg_app_aggr0_vc_bit_override_en[2:0]),
 				       .reg_app_aggr0_vc_bit_override_value(reg_app_aggr0_vc_bit_override_value[2:0]),
 				       .reg_app_aggr1_vc_bit_override_en(reg_app_aggr1_vc_bit_override_en[2:0]),
@@ -6253,8 +6333,20 @@ as6d_app_aggr    u_as6d_app_aggregator(
 				       .reg_send_pkt_match_lp_dt_en_aggr1(reg_send_pkt_match_lp_dt_en_aggr1),
 				       .reg_send_pkt_match_lp_dt_en_aggr2(reg_send_pkt_match_lp_dt_en_aggr2),
 				       .reg_send_pkt_match_lp_dt_en_aggr3(reg_send_pkt_match_lp_dt_en_aggr3),
-					  .reg_sync_aggr_check_framecount(reg_sync_aggr_check_framecount),
-					  .reg_sync_aggr_check_linecount(reg_sync_aggr_check_linecount),
+				       .reg_sync_aggr_0_video_mask_latch_reset(reg_sync_aggr_0_video_mask_latch_reset),
+				       .reg_sync_aggr_1_video_mask_latch_reset(reg_sync_aggr_1_video_mask_latch_reset),
+				       .reg_sync_aggr_2_video_mask_latch_reset(reg_sync_aggr_2_video_mask_latch_reset),
+				       .reg_sync_aggr_3_video_mask_latch_reset(reg_sync_aggr_3_video_mask_latch_reset),
+				       .reg_sync_aggr_auto_mask_en(reg_sync_aggr_auto_mask_en[3:0]),
+				       .reg_sync_aggr_check_framecount_en(reg_sync_aggr_check_framecount_en),
+				       .reg_sync_aggr_check_linecount_en(reg_sync_aggr_check_linecount_en),
+				       .reg_sync_aggr_force_video_mask(reg_sync_aggr_force_video_mask[3:0]),
+				       .reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
+				       .reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
+				       .reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
+				       .reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+				       .reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
+				       .reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 				       .sch0_aggre_mode	(sch0_aggre_mode[1:0]),
 				       .sch0_frame_sync_lock(sch0_frame_sync_lock),
 				       .sch0_fse_filter	(reg_sch0_fse_filter), // Templated

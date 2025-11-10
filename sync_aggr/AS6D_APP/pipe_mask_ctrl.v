@@ -45,10 +45,10 @@ module pipe_mask_ctrl (
     
     // Video Pipe Control
     output reg  [3:0]  pipe_clear_pulse,
-    output wire [1:0]       pipe0_wr_mode;
-    output wire [1:0]       pipe1_wr_mode;
-    output wire [1:0]       pipe2_wr_mode;
-    output wire [1:0]       pipe3_wr_mode;
+    output wire [1:0]       pipe0_wr_mode,
+    output wire [1:0]       pipe1_wr_mode,
+    output wire [1:0]       pipe2_wr_mode,
+    output wire [1:0]       pipe3_wr_mode,
     
     // Bitmap Outputs
     output reg  [3:0]  pipe_mask_bitmap,

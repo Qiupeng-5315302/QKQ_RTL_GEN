@@ -40,8 +40,7 @@ ${SYNC_AGGR_ROOT}/AS6D_APP/crc32_decode_wrapper_with_crc_en_app_idi.v
 // Pipe scheduler related files
 ${SYNC_AGGR_ROOT}/AS6D_APP/as6d_app_pipe_sch_fcfs_m1.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/as6d_app_pipe_sch_fcfs_m2.v
-${SYNC_AGGR_ROOT}/as6d_app_pipe_sch_concat.v
-${SYNC_AGGR_ROOT}/as6d_app_pipe_sch_concat_line_interleaved.v
+${SYNC_AGGR_ROOT}/AS6D_APP/as6d_app_pipe_sch_concat.v
 
 // Pipe route related files
 ${SYNC_AGGR_ROOT}/AS6D_APP/as6d_app_pipe_route.v
@@ -68,11 +67,6 @@ ${SYNC_AGGR_ROOT}/AS6D_APP/as6d_app_mon_swp.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_pipe_1r1w_2048x140_fifo_wrapper.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_pipe_1r1w_2048x140_fwft_fifo_wrapper.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_pipe_1r1w_32x140_afifo_wrapper.v
-${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_pipe_2048x140_fifo_wrapper.v
-${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_pipe_2048x140_fwft_fifo_wrapper.v
-${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_pipe_32x140_afifo_wrapper.v
-${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_vp_fwft_afifo_1r1w_4096x128_afifo_wrapper.v
-${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_vp_fwft_afifo_1r1w_4096x128_fwft_afifo_wrapper.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_status_buffer_1r1w_16x102_afifo_wrapper.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/mem/fifo_wrapper/as6d_app_video_status_buffer_1r1w_16x102_ram_wrapper.v
@@ -87,6 +81,7 @@ ${SYNC_AGGR_ROOT}/AS6D_APP/video_status_buffer_wr_ctrl.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/pipe_mask_ctrl.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/video_status_determination.v
 ${SYNC_AGGR_ROOT}/AS6D_APP/timestamp_align_determination.v
+${SYNC_AGGR_ROOT}/AS6D_APP/as6d_app_pipe_sch_concat_line_interleaved.v
 
 // Common application files
 ${SYNC_AGGR_ROOT}/AS6T28_COMRTL/app_common/app_pkt_filter_lane.v

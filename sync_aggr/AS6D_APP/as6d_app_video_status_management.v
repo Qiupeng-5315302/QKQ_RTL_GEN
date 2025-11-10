@@ -106,10 +106,10 @@ input           reg_sync_aggr_video_mask_latch_reset;
 // Beginning of automatic wires (for undeclared instantiated-module outputs)
 wire [79:0]		local_us_cnt;		// From u_pipe_mask_ctrl of pipe_mask_ctrl.v
 wire [3:0]		pipe_clear_pulse;	// From u_pipe_mask_ctrl of pipe_mask_ctrl.v
-wire [(DATA_WIDTH-1):0]	video_status_buffer_data_0;// From u_video_status_buffer_0 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
-wire [(DATA_WIDTH-1):0]	video_status_buffer_data_1;// From u_video_status_buffer_1 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
-wire [(DATA_WIDTH-1):0]	video_status_buffer_data_2;// From u_video_status_buffer_2 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
-wire [(DATA_WIDTH-1):0]	video_status_buffer_data_3;// From u_video_status_buffer_3 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
+wire [101:0]		video_status_buffer_data_0;// From u_video_status_buffer_0 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
+wire [101:0]		video_status_buffer_data_1;// From u_video_status_buffer_1 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
+wire [101:0]		video_status_buffer_data_2;// From u_video_status_buffer_2 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
+wire [101:0]		video_status_buffer_data_3;// From u_video_status_buffer_3 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
 wire			video_status_buffer_data_vld_0;// From u_video_status_buffer_0 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
 wire			video_status_buffer_data_vld_1;// From u_video_status_buffer_1 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
 wire			video_status_buffer_data_vld_2;// From u_video_status_buffer_2 of as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v
@@ -218,6 +218,13 @@ video_status_buffer_wr_ctrl u_video_status_buffer_wr_ctrl_3(/*AUTOINST*/
 // Submodule: 4 AFIFO Instances
 // =========================================================================
  /*  as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper  AUTO_TEMPLATE (
+    .FLIPFLOP(1),
+    .ADDR_WIDTH(4),
+    .DATA_WIDTH(102),
+    .PROG_EMPTY_ASSERT(8),
+    .PROG_EMPTY_NEGATE(8),
+    .FIFO_DEEP(16),
+    .RAM_PIPE_STAGE	(1),
     .wr_clk(fifo_wr_clk_@),
     .wr_rst_n(fifo_wr_clk_rst_n_@),
     .rd_clk(aggre_clk),
@@ -248,132 +255,168 @@ video_status_buffer_wr_ctrl u_video_status_buffer_wr_ctrl_3(/*AUTOINST*/
 )*/
 
 // AFIFO Instance 0
-as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper u_video_status_buffer_0 (/*AUTOINST*/
-										     // Outputs
-										     .rd_data		(video_status_buffer_data_0[(DATA_WIDTH-1):0]), // Templated
-										     .rd_data_val	(video_status_buffer_data_vld_0), // Templated
-										     .ecc_fault		(),		 // Templated
-										     .single_err	(),		 // Templated
-										     .double_err	(),		 // Templated
-										     .ovf_int		(),		 // Templated
-										     .udf_int		(),		 // Templated
-										     .prog_full		(),		 // Templated
-										     .empty		(),		 // Templated
-										     .full		(video_status_buffer_full_0), // Templated
-										     .data_count	(),		 // Templated
-										     // Inputs
-										     .wr_clk		(fifo_wr_clk_0), // Templated
-										     .wr_rst_n		(fifo_wr_clk_rst_n_0), // Templated
-										     .rd_clk		(aggre_clk),	 // Templated
-										     .rd_rst_n		(aggre_clk_rst_n), // Templated
-										     .ram_bypass	(1'd1),		 // Templated
-										     .reg_dft_tpram_config(9'd0),	 // Templated
-										     .prog_full_assert_cfg(8),		 // Templated
-										     .prog_full_negate_cfg(8),		 // Templated
-										     .ecc_addr_protect_en(1'd1),	 // Templated
-										     .ecc_fault_detc_en	(1'd1),		 // Templated
-										     .ecc_bypass	(1'd0),		 // Templated
-										     .wr_data		(video_status_buffer_wr_data_0[(DATA_WIDTH-1):0]), // Templated
-										     .wr_en		(video_status_buffer_wr_en_0), // Templated
-										     .rd_en		(video_status_buffer_rd_en_0), // Templated
-										     .wr_domain_clear	(pipe_clear_pulse[0]), // Templated
-										     .rd_domain_clear	(pipe_clear_pulse[0])); // Templated
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper#(/*AUTOINSTPARAM*/
+							     // Parameters
+							     .FLIPFLOP		(1),		 // Templated
+							     .ADDR_WIDTH	(4),		 // Templated
+							     .DATA_WIDTH	(102),		 // Templated
+							     .PROG_EMPTY_ASSERT	(8),		 // Templated
+							     .PROG_EMPTY_NEGATE	(8),		 // Templated
+							     .FIFO_DEEP		(16),		 // Templated
+							     .RAM_PIPE_STAGE	(1))		 // Templated
+u_video_status_buffer_0 (/*AUTOINST*/
+			 // Outputs
+			 .rd_data		(video_status_buffer_data_0[101:0]), // Templated
+			 .rd_data_val		(video_status_buffer_data_vld_0), // Templated
+			 .ecc_fault		(),		 // Templated
+			 .single_err		(),		 // Templated
+			 .double_err		(),		 // Templated
+			 .ovf_int		(),		 // Templated
+			 .udf_int		(),		 // Templated
+			 .prog_full		(),		 // Templated
+			 .empty			(),		 // Templated
+			 .full			(video_status_buffer_full_0), // Templated
+			 .data_count		(),		 // Templated
+			 // Inputs
+			 .wr_clk		(fifo_wr_clk_0), // Templated
+			 .wr_rst_n		(fifo_wr_clk_rst_n_0), // Templated
+			 .rd_clk		(aggre_clk),	 // Templated
+			 .rd_rst_n		(aggre_clk_rst_n), // Templated
+			 .ram_bypass		(1'd1),		 // Templated
+			 .reg_dft_tpram_config	(9'd0),		 // Templated
+			 .prog_full_assert_cfg	(8),		 // Templated
+			 .prog_full_negate_cfg	(8),		 // Templated
+			 .ecc_addr_protect_en	(1'd1),		 // Templated
+			 .ecc_fault_detc_en	(1'd1),		 // Templated
+			 .ecc_bypass		(1'd0),		 // Templated
+			 .wr_data		(video_status_buffer_wr_data_0[101:0]), // Templated
+			 .wr_en			(video_status_buffer_wr_en_0), // Templated
+			 .rd_en			(video_status_buffer_rd_en_0), // Templated
+			 .wr_domain_clear	(pipe_clear_pulse[0]), // Templated
+			 .rd_domain_clear	(pipe_clear_pulse[0])); // Templated
 
 // AFIFO Instance 1
-as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper u_video_status_buffer_1 (/*AUTOINST*/
-										     // Outputs
-										     .rd_data		(video_status_buffer_data_1[(DATA_WIDTH-1):0]), // Templated
-										     .rd_data_val	(video_status_buffer_data_vld_1), // Templated
-										     .ecc_fault		(),		 // Templated
-										     .single_err	(),		 // Templated
-										     .double_err	(),		 // Templated
-										     .ovf_int		(),		 // Templated
-										     .udf_int		(),		 // Templated
-										     .prog_full		(),		 // Templated
-										     .empty		(),		 // Templated
-										     .full		(video_status_buffer_full_1), // Templated
-										     .data_count	(),		 // Templated
-										     // Inputs
-										     .wr_clk		(fifo_wr_clk_1), // Templated
-										     .wr_rst_n		(fifo_wr_clk_rst_n_1), // Templated
-										     .rd_clk		(aggre_clk),	 // Templated
-										     .rd_rst_n		(aggre_clk_rst_n), // Templated
-										     .ram_bypass	(1'd1),		 // Templated
-										     .reg_dft_tpram_config(9'd0),	 // Templated
-										     .prog_full_assert_cfg(8),		 // Templated
-										     .prog_full_negate_cfg(8),		 // Templated
-										     .ecc_addr_protect_en(1'd1),	 // Templated
-										     .ecc_fault_detc_en	(1'd1),		 // Templated
-										     .ecc_bypass	(1'd0),		 // Templated
-										     .wr_data		(video_status_buffer_wr_data_1[(DATA_WIDTH-1):0]), // Templated
-										     .wr_en		(video_status_buffer_wr_en_1), // Templated
-										     .rd_en		(video_status_buffer_rd_en_1), // Templated
-										     .wr_domain_clear	(pipe_clear_pulse[1]), // Templated
-										     .rd_domain_clear	(pipe_clear_pulse[1])); // Templated
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper#(/*AUTOINSTPARAM*/
+							     // Parameters
+							     .FLIPFLOP		(1),		 // Templated
+							     .ADDR_WIDTH	(4),		 // Templated
+							     .DATA_WIDTH	(102),		 // Templated
+							     .PROG_EMPTY_ASSERT	(8),		 // Templated
+							     .PROG_EMPTY_NEGATE	(8),		 // Templated
+							     .FIFO_DEEP		(16),		 // Templated
+							     .RAM_PIPE_STAGE	(1))		 // Templated
+u_video_status_buffer_1 (/*AUTOINST*/
+			 // Outputs
+			 .rd_data		(video_status_buffer_data_1[101:0]), // Templated
+			 .rd_data_val		(video_status_buffer_data_vld_1), // Templated
+			 .ecc_fault		(),		 // Templated
+			 .single_err		(),		 // Templated
+			 .double_err		(),		 // Templated
+			 .ovf_int		(),		 // Templated
+			 .udf_int		(),		 // Templated
+			 .prog_full		(),		 // Templated
+			 .empty			(),		 // Templated
+			 .full			(video_status_buffer_full_1), // Templated
+			 .data_count		(),		 // Templated
+			 // Inputs
+			 .wr_clk		(fifo_wr_clk_1), // Templated
+			 .wr_rst_n		(fifo_wr_clk_rst_n_1), // Templated
+			 .rd_clk		(aggre_clk),	 // Templated
+			 .rd_rst_n		(aggre_clk_rst_n), // Templated
+			 .ram_bypass		(1'd1),		 // Templated
+			 .reg_dft_tpram_config	(9'd0),		 // Templated
+			 .prog_full_assert_cfg	(8),		 // Templated
+			 .prog_full_negate_cfg	(8),		 // Templated
+			 .ecc_addr_protect_en	(1'd1),		 // Templated
+			 .ecc_fault_detc_en	(1'd1),		 // Templated
+			 .ecc_bypass		(1'd0),		 // Templated
+			 .wr_data		(video_status_buffer_wr_data_1[101:0]), // Templated
+			 .wr_en			(video_status_buffer_wr_en_1), // Templated
+			 .rd_en			(video_status_buffer_rd_en_1), // Templated
+			 .wr_domain_clear	(pipe_clear_pulse[1]), // Templated
+			 .rd_domain_clear	(pipe_clear_pulse[1])); // Templated
 
 // AFIFO Instance 2
-as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper u_video_status_buffer_2 (/*AUTOINST*/
-										     // Outputs
-										     .rd_data		(video_status_buffer_data_2[(DATA_WIDTH-1):0]), // Templated
-										     .rd_data_val	(video_status_buffer_data_vld_2), // Templated
-										     .ecc_fault		(),		 // Templated
-										     .single_err	(),		 // Templated
-										     .double_err	(),		 // Templated
-										     .ovf_int		(),		 // Templated
-										     .udf_int		(),		 // Templated
-										     .prog_full		(),		 // Templated
-										     .empty		(),		 // Templated
-										     .full		(video_status_buffer_full_2), // Templated
-										     .data_count	(),		 // Templated
-										     // Inputs
-										     .wr_clk		(fifo_wr_clk_2), // Templated
-										     .wr_rst_n		(fifo_wr_clk_rst_n_2), // Templated
-										     .rd_clk		(aggre_clk),	 // Templated
-										     .rd_rst_n		(aggre_clk_rst_n), // Templated
-										     .ram_bypass	(1'd1),		 // Templated
-										     .reg_dft_tpram_config(9'd0),	 // Templated
-										     .prog_full_assert_cfg(8),		 // Templated
-										     .prog_full_negate_cfg(8),		 // Templated
-										     .ecc_addr_protect_en(1'd1),	 // Templated
-										     .ecc_fault_detc_en	(1'd1),		 // Templated
-										     .ecc_bypass	(1'd0),		 // Templated
-										     .wr_data		(video_status_buffer_wr_data_2[(DATA_WIDTH-1):0]), // Templated
-										     .wr_en		(video_status_buffer_wr_en_2), // Templated
-										     .rd_en		(video_status_buffer_rd_en_2), // Templated
-										     .wr_domain_clear	(pipe_clear_pulse[2]), // Templated
-										     .rd_domain_clear	(pipe_clear_pulse[2])); // Templated
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper#(/*AUTOINSTPARAM*/
+							     // Parameters
+							     .FLIPFLOP		(1),		 // Templated
+							     .ADDR_WIDTH	(4),		 // Templated
+							     .DATA_WIDTH	(102),		 // Templated
+							     .PROG_EMPTY_ASSERT	(8),		 // Templated
+							     .PROG_EMPTY_NEGATE	(8),		 // Templated
+							     .FIFO_DEEP		(16),		 // Templated
+							     .RAM_PIPE_STAGE	(1))		 // Templated
+u_video_status_buffer_2 (/*AUTOINST*/
+			 // Outputs
+			 .rd_data		(video_status_buffer_data_2[101:0]), // Templated
+			 .rd_data_val		(video_status_buffer_data_vld_2), // Templated
+			 .ecc_fault		(),		 // Templated
+			 .single_err		(),		 // Templated
+			 .double_err		(),		 // Templated
+			 .ovf_int		(),		 // Templated
+			 .udf_int		(),		 // Templated
+			 .prog_full		(),		 // Templated
+			 .empty			(),		 // Templated
+			 .full			(video_status_buffer_full_2), // Templated
+			 .data_count		(),		 // Templated
+			 // Inputs
+			 .wr_clk		(fifo_wr_clk_2), // Templated
+			 .wr_rst_n		(fifo_wr_clk_rst_n_2), // Templated
+			 .rd_clk		(aggre_clk),	 // Templated
+			 .rd_rst_n		(aggre_clk_rst_n), // Templated
+			 .ram_bypass		(1'd1),		 // Templated
+			 .reg_dft_tpram_config	(9'd0),		 // Templated
+			 .prog_full_assert_cfg	(8),		 // Templated
+			 .prog_full_negate_cfg	(8),		 // Templated
+			 .ecc_addr_protect_en	(1'd1),		 // Templated
+			 .ecc_fault_detc_en	(1'd1),		 // Templated
+			 .ecc_bypass		(1'd0),		 // Templated
+			 .wr_data		(video_status_buffer_wr_data_2[101:0]), // Templated
+			 .wr_en			(video_status_buffer_wr_en_2), // Templated
+			 .rd_en			(video_status_buffer_rd_en_2), // Templated
+			 .wr_domain_clear	(pipe_clear_pulse[2]), // Templated
+			 .rd_domain_clear	(pipe_clear_pulse[2])); // Templated
 
 // AFIFO Instance 3
-as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper u_video_status_buffer_3 (/*AUTOINST*/
-										     // Outputs
-										     .rd_data		(video_status_buffer_data_3[(DATA_WIDTH-1):0]), // Templated
-										     .rd_data_val	(video_status_buffer_data_vld_3), // Templated
-										     .ecc_fault		(),		 // Templated
-										     .single_err	(),		 // Templated
-										     .double_err	(),		 // Templated
-										     .ovf_int		(),		 // Templated
-										     .udf_int		(),		 // Templated
-										     .prog_full		(),		 // Templated
-										     .empty		(),		 // Templated
-										     .full		(video_status_buffer_full_3), // Templated
-										     .data_count	(),		 // Templated
-										     // Inputs
-										     .wr_clk		(fifo_wr_clk_3), // Templated
-										     .wr_rst_n		(fifo_wr_clk_rst_n_3), // Templated
-										     .rd_clk		(aggre_clk),	 // Templated
-										     .rd_rst_n		(aggre_clk_rst_n), // Templated
-										     .ram_bypass	(1'd1),		 // Templated
-										     .reg_dft_tpram_config(9'd0),	 // Templated
-										     .prog_full_assert_cfg(8),		 // Templated
-										     .prog_full_negate_cfg(8),		 // Templated
-										     .ecc_addr_protect_en(1'd1),	 // Templated
-										     .ecc_fault_detc_en	(1'd1),		 // Templated
-										     .ecc_bypass	(1'd0),		 // Templated
-										     .wr_data		(video_status_buffer_wr_data_3[(DATA_WIDTH-1):0]), // Templated
-										     .wr_en		(video_status_buffer_wr_en_3), // Templated
-										     .rd_en		(video_status_buffer_rd_en_3), // Templated
-										     .wr_domain_clear	(pipe_clear_pulse[3]), // Templated
-										     .rd_domain_clear	(pipe_clear_pulse[3])); // Templated
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper#(/*AUTOINSTPARAM*/
+							     // Parameters
+							     .FLIPFLOP		(1),		 // Templated
+							     .ADDR_WIDTH	(4),		 // Templated
+							     .DATA_WIDTH	(102),		 // Templated
+							     .PROG_EMPTY_ASSERT	(8),		 // Templated
+							     .PROG_EMPTY_NEGATE	(8),		 // Templated
+							     .FIFO_DEEP		(16),		 // Templated
+							     .RAM_PIPE_STAGE	(1))		 // Templated
+u_video_status_buffer_3 (/*AUTOINST*/
+			 // Outputs
+			 .rd_data		(video_status_buffer_data_3[101:0]), // Templated
+			 .rd_data_val		(video_status_buffer_data_vld_3), // Templated
+			 .ecc_fault		(),		 // Templated
+			 .single_err		(),		 // Templated
+			 .double_err		(),		 // Templated
+			 .ovf_int		(),		 // Templated
+			 .udf_int		(),		 // Templated
+			 .prog_full		(),		 // Templated
+			 .empty			(),		 // Templated
+			 .full			(video_status_buffer_full_3), // Templated
+			 .data_count		(),		 // Templated
+			 // Inputs
+			 .wr_clk		(fifo_wr_clk_3), // Templated
+			 .wr_rst_n		(fifo_wr_clk_rst_n_3), // Templated
+			 .rd_clk		(aggre_clk),	 // Templated
+			 .rd_rst_n		(aggre_clk_rst_n), // Templated
+			 .ram_bypass		(1'd1),		 // Templated
+			 .reg_dft_tpram_config	(9'd0),		 // Templated
+			 .prog_full_assert_cfg	(8),		 // Templated
+			 .prog_full_negate_cfg	(8),		 // Templated
+			 .ecc_addr_protect_en	(1'd1),		 // Templated
+			 .ecc_fault_detc_en	(1'd1),		 // Templated
+			 .ecc_bypass		(1'd0),		 // Templated
+			 .wr_data		(video_status_buffer_wr_data_3[101:0]), // Templated
+			 .wr_en			(video_status_buffer_wr_en_3), // Templated
+			 .rd_en			(video_status_buffer_rd_en_3), // Templated
+			 .wr_domain_clear	(pipe_clear_pulse[3]), // Templated
+			 .rd_domain_clear	(pipe_clear_pulse[3])); // Templated
 
 wire [3:0]  force_video_mask;
 wire [3:0]  auto_mask_en;
@@ -455,3 +498,8 @@ pipe_mask_ctrl u_pipe_mask_ctrl(/*AUTOINST*/
 				.clk_1M_rst_n	(clk_1M_rst_n));
 
 endmodule
+//Local Variables:
+//verilog-auto-inst-param-value : t
+//verilog-library-files:("./mem/fifo_wrapper/as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v")
+//verilog-library-extensions:(".v"".vh"".sv"".svh")
+//End:
