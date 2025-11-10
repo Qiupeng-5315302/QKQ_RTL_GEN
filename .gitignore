@@ -1,0 +1,2 @@
+# Ignore simulation directories
+sync_aggr/test_sync_aggr/sim/
