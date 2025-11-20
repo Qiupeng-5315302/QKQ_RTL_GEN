@@ -1,4 +1,5 @@
 
+
 module as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper(/*AUTOARG*/
    // Outputs
    rd_data, rd_data_val, ecc_fault, single_err, double_err, ovf_int,
@@ -22,7 +23,7 @@ module as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper(/*AUTOARG*/
     parameter   FIFO_DEEP             = 1<<ADDR_WIDTH; //fifo data depth
     parameter   RAM_PIPE_STAGE        = 2;             //RAM read dalay
 
-    localparam  PRE_REG_NUM           = RAM_PIPE_STAGE + 2;
+    localparam  PRE_REG_NUM           = RAM_PIPE_STAGE + 20;
 
 
     // -----------------------------------------------------------------------------

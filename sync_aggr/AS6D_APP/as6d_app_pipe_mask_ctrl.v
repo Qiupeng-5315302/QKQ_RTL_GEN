@@ -1,3 +1,4 @@
+
 // =============================================================================
 // Module       : pipe_mask_ctrl.v
 // Description  : Video pipeline mask control state machine
@@ -6,16 +7,16 @@
 // Date         : 2025-10-30
 // =============================================================================
 
-module pipe_mask_ctrl (
+module as6d_app_pipe_mask_ctrl (
     // Clock and Reset
     input  wire        clk,
     input  wire        rst_n,
     
     // Configuration Registers
     input  wire [3:0]  pipe_concat_en,
-    input  wire [3:0]  Force_Video_Mask,
-    input  wire [3:0]  Auto_Mask_En,
-    input  wire [3:0]  Video_Mask_Restart_En,
+    input  wire [3:0]  force_video_mask,
+    input  wire [3:0]  auto_mask_en,
+    input  wire [3:0]  video_mask_restart,
     input  wire [3:0]  pipe_frame_active,
     input  wire        frame_sync_lock,
     input  wire [1:0]  aggre_mode,
@@ -44,11 +45,11 @@ module pipe_mask_ctrl (
     input  wire        end_sch_pulse,
     
     // Video Pipe Control
-    output reg  [3:0]  pipe_clear_pulse,
-    output wire [1:0]       pipe0_wr_mode,
-    output wire [1:0]       pipe1_wr_mode,
-    output wire [1:0]       pipe2_wr_mode,
-    output wire [1:0]       pipe3_wr_mode,
+    output reg  [7:0]  pipe_wr_mode,
+    output wire        pipe0_mem_clear,
+    output wire        pipe1_mem_clear,
+    output wire        pipe2_mem_clear,
+    output wire        pipe3_mem_clear,
     
     // Bitmap Outputs
     output reg  [3:0]  pipe_mask_bitmap,
@@ -109,11 +110,11 @@ module pipe_mask_ctrl (
 
     wire [3:0] video_status_fail_bitmap;
     
-    wire [7:0]       pipe_wr_mode;
-
+    reg  [3:0] pipe_mem_clear;
+    wire       update_mask;
     // Derived signals
     assign pipe_normal_bitmap  = ~pipe_mask_bitmap & pipe_concat_en;
-    assign pipe_restart_bitmap = pipe_mask_bitmap & Video_Mask_Restart_En & pipe_frame_active;
+    assign pipe_restart_bitmap = pipe_mask_bitmap & video_mask_restart & pipe_frame_active;
     
     // Control pulse generation
     assign start_timestamp_align = (current_state == IDLE) && 
@@ -238,8 +239,8 @@ module pipe_mask_ctrl (
             local_auto_mask_en     <= 4'b0;
         end
         else if (current_state == INIT) begin
-            local_force_video_mask <= Force_Video_Mask;
-            local_auto_mask_en     <= Auto_Mask_En;
+            local_force_video_mask <= force_video_mask;
+            local_auto_mask_en     <= auto_mask_en;
         end
     end
     
@@ -261,20 +262,10 @@ module pipe_mask_ctrl (
                 MASK_BITMAP_ADD_TIME_OUT: begin
                     pipe_mask_bitmap <= pipe_mask_bitmap | (pipe_normal_bitmap & video_status_fail_bitmap);
                 end
+                default: begin
+                    pipe_mask_bitmap <= pipe_mask_bitmap;
+                end
             endcase
-        end
-    end
-    
-    // pipe_clear_pulse generation
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            pipe_clear_pulse <= 4'b0;
-        end
-        else if (current_state != CLEAR_MASK_PIPE && next_state == CLEAR_MASK_PIPE) begin
-            pipe_clear_pulse <= pipe_mask_bitmap;
-        end
-        else begin
-            pipe_clear_pulse <= 4'b0;
         end
     end
     
@@ -291,23 +282,40 @@ module pipe_mask_ctrl (
         end
     end
     
+    wire    [3:0]   pipe_mem_clear_restart;
+    wire    [3:0]   pipe_restart_window;
+    wire    [7:0]   pipe_wr_mode_restart;
     // pipe_wr_mode generation
     always @(*) begin
         integer i;
-        for (i = 0; i < 4; i = i + 1) begin
-            if ((current_state == INIT) ||(pipe_mask_bitmap[i] && !Video_Mask_Restart_En[i])) begin
-                pipe_wr_mode[2*i+1 : 2*i] = 2'b00;
+        for (i = 0; i < 4; i = i + 1) begin:pipe_wr_mode_bk
+            if (pipe_restart_window[i]) begin
+                pipe_wr_mode[(2*i) +: 2] = pipe_wr_mode_restart[(2*i) +: 2];
             end
             else begin
-                pipe_wr_mode[2*i+1 : 2*i] = 2'b10;
+                pipe_wr_mode[(2*i) +: 2] = pipe_mask_bitmap[i] ? 2'b00 : 2'b10 ;
+            end
+        end
+    end
+    // pipe_mem_clear generation
+    always @(*) begin
+        integer i;
+        for (i = 0; i < 4; i = i + 1) begin:pipe_wr_mode_bk
+            if (pipe_restart_window[i]) begin
+                pipe_mem_clear[i] = pipe_mem_clear_restart[i];
+            end
+            else begin
+                pipe_mem_clear[i] = pipe_mask_bitmap[i] ? 1'b1 : 2'b0 ;
             end
         end
     end
     
-    assign  pipe0_wr_mode = pipe_wr_mode[1:0];
-    assign  pipe1_wr_mode = pipe_wr_mode[3:2];
-    assign  pipe2_wr_mode = pipe_wr_mode[5:4];
-    assign  pipe3_wr_mode = pipe_wr_mode[7:6];
+    assign  pipe0_mem_clear = pipe_mem_clear[0];
+    assign  pipe1_mem_clear = pipe_mem_clear[1];
+    assign  pipe2_mem_clear = pipe_mem_clear[2];
+    assign  pipe3_mem_clear = pipe_mem_clear[3];
+
+    assign  update_mask = (next_state == CLEAR_MASK_PIPE);
 
     // Fault detection for debug
     always @(posedge clk or negedge rst_n) begin
@@ -330,6 +338,9 @@ module pipe_mask_ctrl (
 
     wire    [79:0]  local_timestamp;
     reg             clk_1M_edge;
+    wire            clk_1M_edge_sync;
+    reg             clk_1M_edge_sync_d1;
+    wire            clk_1M_edge_sync_pulse;
 
     always @(posedge clk_1M or negedge clk_1M_rst_n)begin
         if(!clk_1M_rst_n)
@@ -338,24 +349,26 @@ module pipe_mask_ctrl (
             clk_1M_edge <= ~clk_1M_edge;
     end
 
-    sync2_cell u_sync2_cell_clk_1M_edge(   
-        .clk(treed_intp_clk),
-        .reset(treed_intp_clk_reset),
-        .data(clk1m_edge),
-        .qout(clk1m_edge_dly)
+    sync2_cell_rstb u_sync2_cell_rstb_clk_1M_edge(   
+        .clk(clk),
+        .reset_n(rst_n),
+        .data(clk_1M_edge),
+        .qout(clk_1M_edge_sync)
     ); //1us
 
-    edge_det#(.PULSE_MODE (2)
-    )clk10k_edge_det(
-        .clk(clk),
-        .reset(rst_n),
-        .din(clk10k_edge_dly),
-        .d_edge(pulse_1m_sync));
+    always@(posedge clk or negedge rst_n)begin
+        if (!rst_n)
+            clk_1M_edge_sync_d1 <= 1'd0;
+        else
+            clk_1M_edge_sync_d1 <= clk_1M_edge_sync;
+    end
+
+    assign    clk_1M_edge_sync_pulse = clk_1M_edge_sync_d1 ^ clk_1M_edge_sync;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n)
             local_us_cnt <= 80'd0;
-        else if (pulse_1m_sync)
+        else if (clk_1M_edge_sync_pulse)
             local_us_cnt <= local_us_cnt + 1'd1;
     end
 
@@ -383,13 +396,13 @@ module pipe_mask_ctrl (
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            local_linecount <= 16'd0;
+            local_linecount <= 16'd1;
         end
         else if(start_sch_pulse && (local_datatype_cs == DATATYPE_LONGPKT)) begin
             local_linecount <= local_linecount + 16'd1;
         end
         else if(start_sch_pulse && (local_datatype_cs == DATATYPE_FS)) begin
-            local_linecount <= 16'd0;
+            local_linecount <= 16'd1;
         end
     end
 
@@ -441,10 +454,11 @@ module pipe_mask_ctrl (
                 if(start_sch_pulse)
                     local_datatype_ns = DATATYPE_FS;
                 else 
-                    local_datatype_ns = DATATYPE_FS;
+                    local_datatype_ns = DATATYPE_FE;
         endcase
     end
-
+    wire [5:0] local_pkt_datatype;
+    wire [15:0] local_pkt_count;
     assign check_datatype_fs = (local_datatype_cs == DATATYPE_FS);
     assign check_datatype_fe = (local_datatype_cs == DATATYPE_FE);
     assign check_datatype_shortpkt = check_datatype_fs || check_datatype_fe;
@@ -467,59 +481,94 @@ module pipe_mask_ctrl (
     assign local_linecount_out   = local_linecount;
     assign local_pkt_datatype_out = local_pkt_datatype;
 
-    assign video_status_buffer_rd_en_0 = video_status_pass_bitmap[0];
-    assign video_status_buffer_rd_en_1 = video_status_pass_bitmap[1];
-    assign video_status_buffer_rd_en_2 = video_status_pass_bitmap[2];
-    assign video_status_buffer_rd_en_3 = video_status_pass_bitmap[3];
+    assign video_status_buffer_rd_en_0 = video_status_pass_bitmap[0] && ((current_state == CLEAR_MASK_PIPE) && (next_state == DURING_SCHEDULING_PIPE));
+    assign video_status_buffer_rd_en_1 = video_status_pass_bitmap[1] && ((current_state == CLEAR_MASK_PIPE) && (next_state == DURING_SCHEDULING_PIPE));
+    assign video_status_buffer_rd_en_2 = video_status_pass_bitmap[2] && ((current_state == CLEAR_MASK_PIPE) && (next_state == DURING_SCHEDULING_PIPE));
+    assign video_status_buffer_rd_en_3 = video_status_pass_bitmap[3] && ((current_state == CLEAR_MASK_PIPE) && (next_state == DURING_SCHEDULING_PIPE));
     //==========================================================================
     // Sub-Module Instantiation
     //==========================================================================
     
     // Timestamp Alignment Determination Module
-    timestamp_align_determination u_timestamp_align_determination (
-        .clk                                    (clk),
-        .rst_n                                  (rst_n),
-        .reg_sync_aggr_video_timeout_threshold  (reg_sync_aggr_video_timeout_threshold),
-        .pipe_normal_bitmap                     (pipe_normal_bitmap),
-        .pipe_restart_bitmap                    (pipe_restart_bitmap),
-        .data_vld_0                             (data_vld[0]),
-        .data_vld_1                             (data_vld[1]),
-        .data_vld_2                             (data_vld[2]),
-        .data_vld_3                             (data_vld[3]),
-        .data_0                                 (data_0),
-        .data_1                                 (data_1),
-        .data_2                                 (data_2),
-        .data_3                                 (data_3),
-        .local_timestamp                        (local_timestamp),
-        .start_timestamp_align                  (start_timestamp_align),
-        .timestamp_align_pass                   (timestamp_align_pass),
-        .timestamp_align_fail                   (timestamp_align_fail),
-        .timestamp_align_pass_bitmap            (timestamp_align_pass_bitmap)
-    );
+    /*  as6d_app_timestamp_align_determination  AUTO_TEMPLATE (
+    )*/
+    as6d_app_timestamp_align_determination u_as6d_app_timestamp_align_determination (/*AUTOINST*/
+										     // Outputs
+										     .timestamp_align_pass(timestamp_align_pass),
+										     .timestamp_align_fail(timestamp_align_fail),
+										     .timestamp_align_pass_bitmap(timestamp_align_pass_bitmap[3:0]),
+										     // Inputs
+										     .clk		(clk),
+										     .rst_n		(rst_n),
+										     .reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
+										     .pipe_normal_bitmap(pipe_normal_bitmap[3:0]),
+										     .pipe_restart_bitmap(pipe_restart_bitmap[3:0]),
+										     .data_vld_0	(data_vld_0),
+										     .data_0		(data_0[101:0]),
+										     .data_vld_1	(data_vld_1),
+										     .data_1		(data_1[101:0]),
+										     .data_vld_2	(data_vld_2),
+										     .data_2		(data_2[101:0]),
+										     .data_vld_3	(data_vld_3),
+										     .data_3		(data_3[101:0]),
+										     .local_timestamp	(local_timestamp[79:0]),
+										     .start_timestamp_align(start_timestamp_align));
     
     // Video Status Determination Module
-    video_status_determination u_video_status_determination (
-        .clk                                    (clk),
-        .rst_n                                  (rst_n),
-        .Auto_Mask_En                           (local_auto_mask_en),
-        .pipe_normal_bitmap                     (pipe_normal_bitmap),
-        .timestamp_align_pass_bitmap            (timestamp_align_pass_bitmap),
-        .data_vld_0                             (data_vld[0]),
-        .data_vld_1                             (data_vld[1]),
-        .data_vld_2                             (data_vld[2]),
-        .data_vld_3                             (data_vld[3]),
-        .data_0                                 (data_0),
-        .data_1                                 (data_1),
-        .data_2                                 (data_2),
-        .data_3                                 (data_3),
-        .check_video_pkt_datatype               (check_pkt_datatype),
-        .check_video_pkt_count                  (check_pkt_count),
-        .local_pkt_datatype                     (local_pkt_datatype),
-        .local_pkt_count                        (local_pkt_count),
-        .start_video_status_determing           (start_video_status_determing),
-        .video_status_pass_bitmap               (video_status_pass_bitmap),
-        .video_status_fail_bitmap               (video_status_fail_bitmap)
-    );
+    /*as6d_app_video_status_determination  AUTO_TEMPLATE (
+        .auto_mask_en(local_auto_mask_en),
+        .check_video_pkt_datatype(check_pkt_datatype),
+		.check_video_pkt_count(check_pkt_count),
+    )*/
+    as6d_app_video_status_determination u_as6d_app_video_status_determination (/*AUTOINST*/
+									       // Outputs
+									       .video_status_pass_bitmap(video_status_pass_bitmap[3:0]),
+									       .video_status_fail_bitmap(video_status_fail_bitmap[3:0]),
+									       // Inputs
+									       .clk		(clk),
+									       .rst_n		(rst_n),
+									       .auto_mask_en	(local_auto_mask_en), // Templated
+									       .pipe_normal_bitmap(pipe_normal_bitmap[3:0]),
+									       .timestamp_align_pass_bitmap(timestamp_align_pass_bitmap[3:0]),
+									       .data_vld_0	(data_vld_0),
+									       .data_0		(data_0[101:0]),
+									       .data_vld_1	(data_vld_1),
+									       .data_1		(data_1[101:0]),
+									       .data_vld_2	(data_vld_2),
+									       .data_2		(data_2[101:0]),
+									       .data_vld_3	(data_vld_3),
+									       .data_3		(data_3[101:0]),
+									       .check_video_pkt_datatype(check_pkt_datatype), // Templated
+									       .check_video_pkt_count(check_pkt_count), // Templated
+									       .local_pkt_datatype(local_pkt_datatype[5:0]),
+									       .local_pkt_count	(local_pkt_count[15:0]),
+									       .start_video_status_determing(start_video_status_determing));
+
+    // pipe_mask_ctrl_restart Module
+    /*as6d_app_pipe_mask_ctrl_restart  AUTO_TEMPLATE (
+        .clear(1'd0),
+        .frame_active(pipe_frame_active[]),
+        .reg_sync_aggr_clear_release_threshold(4'd15),
+        .reg_sync_aggr_restart_hold_threshold(20'd1000),
+        .pipe_wr_mode(pipe_wr_mode_restart[]),
+        .pipe_mem_clear(pipe_mem_clear_restart[]),
+    );*/
+    as6d_app_pipe_mask_ctrl_restart u_as6d_app_pipe_mask_ctrl_restart(/*AUTOINST*/
+								      // Outputs
+								      .pipe_mem_clear	(pipe_mem_clear_restart[3:0]), // Templated
+								      .pipe_restart_window(pipe_restart_window[3:0]),
+								      .pipe_wr_mode	(pipe_wr_mode_restart[7:0]), // Templated
+								      // Inputs
+								      .clear		(1'd0),		 // Templated
+								      .clk		(clk),
+								      .frame_active	(pipe_frame_active[3:0]), // Templated
+								      .pipe_concat_en	(pipe_concat_en[3:0]),
+								      .pipe_mask_bitmap	(pipe_mask_bitmap[3:0]),
+								      .reg_sync_aggr_clear_release_threshold(4'd15), // Templated
+								      .reg_sync_aggr_restart_hold_threshold(20'd1000), // Templated
+								      .rst_n		(rst_n),
+								      .update_mask	(update_mask),
+								      .video_mask_restart(video_mask_restart[3:0]));
 
 endmodule
 

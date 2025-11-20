@@ -66,7 +66,7 @@ typedef struct packed {
     logic  [16-1:0]     hvalid;
     logic  [16-1:0]     vvalid;			
     logic  [32-1:0]     data_crc;			
-} app_idi_host;
+} app_idi_host_as6d;
 
 typedef struct packed {
     logic  [64-1:0]    	csi_data;

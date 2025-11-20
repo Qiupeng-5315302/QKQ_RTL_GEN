@@ -30,9 +30,11 @@ module as6d_app_pipe_route	#(
    reg_rd_vprbs_rx_check_app_route_lane0, pipe7_pkt_crc_en,
    pipe7_pkt_crc, pipe6_pkt_crc_en, pipe6_pkt_crc, pipe5_pkt_crc_en,
    pipe5_pkt_crc, pipe4_pkt_crc_en, pipe4_pkt_crc, pipe3_pkt_crc_en,
-   pipe3_pkt_crc, pipe2_pkt_crc_en, pipe2_pkt_crc, pipe1_pkt_crc_en,
-   pipe1_pkt_crc, pipe0_pkt_crc_en, pipe0_pkt_crc, pipe0_csi_data,
-   pipe0_bytes_en, pipe0_header_en, pipe0_data_en, pipe0_data_type,
+   pipe3_pkt_crc, pipe3_frame_active, pipe2_pkt_crc_en, pipe2_pkt_crc,
+   pipe2_frame_active, pipe1_pkt_crc_en, pipe1_pkt_crc,
+   pipe1_frame_active, pipe0_pkt_crc_en, pipe0_pkt_crc,
+   pipe0_frame_active, pipe0_csi_data, pipe0_bytes_en,
+   pipe0_header_en, pipe0_data_en, pipe0_data_type,
    pipe0_virtual_channel, pipe0_virtual_channel_x, pipe0_word_count,
    pipe0_aggr_id, pipe1_csi_data, pipe1_bytes_en, pipe1_header_en,
    pipe1_data_en, pipe1_data_type, pipe1_virtual_channel,
@@ -1484,12 +1486,16 @@ input  [15:0]										            mep3_word_count;
 
 /*AUTOOUTPUT*/
 // Beginning of automatic outputs (from unused autoinst outputs)
+output			pipe0_frame_active;	// From u0_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
 output [31:0]		pipe0_pkt_crc;		// From u0_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
 output			pipe0_pkt_crc_en;	// From u0_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
+output			pipe1_frame_active;	// From u1_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
 output [31:0]		pipe1_pkt_crc;		// From u1_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
 output			pipe1_pkt_crc_en;	// From u1_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
+output			pipe2_frame_active;	// From u2_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
 output [31:0]		pipe2_pkt_crc;		// From u2_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
 output			pipe2_pkt_crc_en;	// From u2_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
+output			pipe3_frame_active;	// From u3_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
 output [31:0]		pipe3_pkt_crc;		// From u3_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
 output			pipe3_pkt_crc_en;	// From u3_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
 output [31:0]		pipe4_pkt_crc;		// From u4_as6d_app_pipe_route_lane of as6d_app_pipe_route_lane.v
@@ -1622,6 +1628,7 @@ as6d_app_pipe_route_lane    u0_as6d_app_pipe_route_lane(/*AUTOINST*/
 							.pipe_aggr_id	(pipe0_aggr_id[3:0]), // Templated
 							.pipe_pkt_crc_en(pipe0_pkt_crc_en), // Templated
 							.pipe_pkt_crc	(pipe0_pkt_crc[31:0]), // Templated
+							.pipe_frame_active(pipe0_frame_active), // Templated
 							// Inputs
 							.reg_vprbs_loopback(reg_vprbs_loopback_app_route_lane0), // Templated
 							.reg_vprbs_rx_err_clear(reg_vprbs_rx_err_clear_app_route_lane0), // Templated
@@ -1792,6 +1799,7 @@ as6d_app_pipe_route_lane    u1_as6d_app_pipe_route_lane(/*AUTOINST*/
 							.pipe_aggr_id	(pipe1_aggr_id[3:0]), // Templated
 							.pipe_pkt_crc_en(pipe1_pkt_crc_en), // Templated
 							.pipe_pkt_crc	(pipe1_pkt_crc[31:0]), // Templated
+							.pipe_frame_active(pipe1_frame_active), // Templated
 							// Inputs
 							.reg_vprbs_loopback(reg_vprbs_loopback_app_route_lane1), // Templated
 							.reg_vprbs_rx_err_clear(reg_vprbs_rx_err_clear_app_route_lane1), // Templated
@@ -1962,6 +1970,7 @@ as6d_app_pipe_route_lane    u2_as6d_app_pipe_route_lane(/*AUTOINST*/
 							.pipe_aggr_id	(pipe2_aggr_id[3:0]), // Templated
 							.pipe_pkt_crc_en(pipe2_pkt_crc_en), // Templated
 							.pipe_pkt_crc	(pipe2_pkt_crc[31:0]), // Templated
+							.pipe_frame_active(pipe2_frame_active), // Templated
 							// Inputs
 							.reg_vprbs_loopback(reg_vprbs_loopback_app_route_lane2), // Templated
 							.reg_vprbs_rx_err_clear(reg_vprbs_rx_err_clear_app_route_lane2), // Templated
@@ -2132,6 +2141,7 @@ as6d_app_pipe_route_lane    u3_as6d_app_pipe_route_lane(/*AUTOINST*/
 							.pipe_aggr_id	(pipe3_aggr_id[3:0]), // Templated
 							.pipe_pkt_crc_en(pipe3_pkt_crc_en), // Templated
 							.pipe_pkt_crc	(pipe3_pkt_crc[31:0]), // Templated
+							.pipe_frame_active(pipe3_frame_active), // Templated
 							// Inputs
 							.reg_vprbs_loopback(reg_vprbs_loopback_app_route_lane3), // Templated
 							.reg_vprbs_rx_err_clear(reg_vprbs_rx_err_clear_app_route_lane3), // Templated
@@ -2286,6 +2296,15 @@ as6d_app_pipe_route_lane    u3_as6d_app_pipe_route_lane(/*AUTOINST*/
 							.reg_vprbs_rx_chk_en(reg_vprbs_rx_chk_en_app_route_lane3), // Templated
 							.reg_vprbs_tx_gen_en(reg_vprbs_tx_gen_en_app_route_lane3)); // Templated
 
+/*  as6d_app_pipe_route_lane  AUTO_TEMPLATE (
+    .fifo_wrclk(fifo_wrclk@),
+    .fifo_wrclk_rst_n(fifo_wrclk_rst_n@),
+    .pipe_frame_active(),
+    .\(.*\)pipe\(.*\)(\1pipe@\2[]),
+    .reg_drop_mapping_fault_pkt(reg_drop_mapping_fault_pkt[@]),
+    .reg\(.*\)vprbs_\(.*\)	(reg\1vprbs_\2_app_route_lane@[]),
+    .reg_drop_short_pkt(reg_pipe@_drop_ls_le_pkt),
+)*/
 as6d_app_pipe_route_lane    u4_as6d_app_pipe_route_lane(/*AUTOINST*/
 							// Outputs
 							.reg_rd_vprbs_rx_check(reg_rd_vprbs_rx_check_app_route_lane4), // Templated
@@ -2302,6 +2321,7 @@ as6d_app_pipe_route_lane    u4_as6d_app_pipe_route_lane(/*AUTOINST*/
 							.pipe_aggr_id	(pipe4_aggr_id[3:0]), // Templated
 							.pipe_pkt_crc_en(pipe4_pkt_crc_en), // Templated
 							.pipe_pkt_crc	(pipe4_pkt_crc[31:0]), // Templated
+							.pipe_frame_active(),		 // Templated
 							// Inputs
 							.reg_vprbs_loopback(reg_vprbs_loopback_app_route_lane4), // Templated
 							.reg_vprbs_rx_err_clear(reg_vprbs_rx_err_clear_app_route_lane4), // Templated
@@ -2472,6 +2492,7 @@ as6d_app_pipe_route_lane    u5_as6d_app_pipe_route_lane(/*AUTOINST*/
 							.pipe_aggr_id	(pipe5_aggr_id[3:0]), // Templated
 							.pipe_pkt_crc_en(pipe5_pkt_crc_en), // Templated
 							.pipe_pkt_crc	(pipe5_pkt_crc[31:0]), // Templated
+							.pipe_frame_active(),		 // Templated
 							// Inputs
 							.reg_vprbs_loopback(reg_vprbs_loopback_app_route_lane5), // Templated
 							.reg_vprbs_rx_err_clear(reg_vprbs_rx_err_clear_app_route_lane5), // Templated
@@ -2642,6 +2663,7 @@ as6d_app_pipe_route_lane    u6_as6d_app_pipe_route_lane(/*AUTOINST*/
 							.pipe_aggr_id	(pipe6_aggr_id[3:0]), // Templated
 							.pipe_pkt_crc_en(pipe6_pkt_crc_en), // Templated
 							.pipe_pkt_crc	(pipe6_pkt_crc[31:0]), // Templated
+							.pipe_frame_active(),		 // Templated
 							// Inputs
 							.reg_vprbs_loopback(reg_vprbs_loopback_app_route_lane6), // Templated
 							.reg_vprbs_rx_err_clear(reg_vprbs_rx_err_clear_app_route_lane6), // Templated
@@ -2812,6 +2834,7 @@ as6d_app_pipe_route_lane    u7_as6d_app_pipe_route_lane(/*AUTOINST*/
 							.pipe_aggr_id	(pipe7_aggr_id[3:0]), // Templated
 							.pipe_pkt_crc_en(pipe7_pkt_crc_en), // Templated
 							.pipe_pkt_crc	(pipe7_pkt_crc[31:0]), // Templated
+							.pipe_frame_active(),		 // Templated
 							// Inputs
 							.reg_vprbs_loopback(reg_vprbs_loopback_app_route_lane7), // Templated
 							.reg_vprbs_rx_err_clear(reg_vprbs_rx_err_clear_app_route_lane7), // Templated

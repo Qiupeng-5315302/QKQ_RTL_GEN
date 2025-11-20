@@ -1,0 +1,19 @@
+
+./run_all_as6s.csh
+
+source ../../../proj_env.csh
+
+setenv  AS6T28_PROJ_DIR   /data/proj/as6t28d/wa/${USER}/current/
+
+vcs -R -full64 -sverilog -l vcs.log -f as6d_app_tb.f -timescale=1ns/1fs -call_tasks_functions_from_cli +vcs+lic+wait +v2k +lint=TFIPC-L \
+     +define+INCLUDE_POWER  +define+_SERDES   +define+RTL_SIM  +define+_clk_12p5g  +ntb_random_seed_automatic  +define+EXT_LOOPBACK +define+_DUMP_ON  +define+_DFE_FAST_TIMER   +define+_TRX_TRAIN_SPEED_UP    +define+ADD_WAM\
+-sverilog +plusarg_save +CHIP_ID=11 -P /tools/synopsys/verdi/O-2018.09-SP2-9/share/PLI/VCS/LINUX64/novas.tab   /tools/synopsys/verdi/O-2018.09-SP2-9/share/PLI/VCS/LINUX64/pli.a  -lca -kdb -debug_access+all
+
+
+
+
+#  +define+_NO_DATA_CHK  +define+_NO_FREQ_CHK +define+_DFE_FAST_TIMER  +define+_CAL_EN  +define+_TRX_TRAIN_SPEED_UP 
+#+define+DWC_CDPHYTX_TOP_PG_PINS  +define+dwc_mipi_cdphy_tx_4l3t_ns_CR_PARITY_BIT
+
+#simv -a vcs.log  +vcs+lic+wait   +CHIP_ID=11 -lca
+

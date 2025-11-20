@@ -11,7 +11,7 @@ module as6d_app_fifo_rd_ctrl #(
    fifo_rdclk, fifo_rdclk_rst_n, up_state, video_data_fifo_empty,
    video_data_fifo_rdata, reg_video_fifo_empty_depend_cnt_mux,
    pkt_aggr_id, pkt_aggr_id_vld, reg_app_pkt_crc_gen_dis,
-   reg_sram_lcrc_err_oen
+   reg_sram_lcrc_err_oen, pipe_mem_clear
    );
 
 input                                   fifo_rdclk                          ;
@@ -24,6 +24,7 @@ input      [3:0]                        pkt_aggr_id                         ;
 input                                   pkt_aggr_id_vld                     ;
 input                                   reg_app_pkt_crc_gen_dis             ;
 input                                   reg_sram_lcrc_err_oen               ;
+input                                   pipe_mem_clear                      ;
 
 output                                  ack                                 ;
 output                                  line_end                            ;
@@ -191,7 +192,9 @@ end
 
 //junk data read
 always@(*)begin
-    if(current_state == APP_RX_IDLE)begin
+    if(pipe_mem_clear)
+        fifo_rd_junk = 1'd1; 
+    else if(current_state == APP_RX_IDLE)begin
         if(~empty)
             if(sp_pkt)
                 fifo_rd_junk = 1'd0;

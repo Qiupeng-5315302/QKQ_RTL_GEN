@@ -39,7 +39,7 @@ module as6d_app_video_pipe_lane    #(
    in_csi_data, in_bytes_en, in_header_en, in_data_en, in_data_type,
    in_virtual_channel, in_virtual_channel_x, in_word_count,
    in_aggr_id, in_pkt_crc, in_pkt_crc_en, up_state, line_delay_en,
-   video_loss_en, time_window, reg_dft_tpram_config,
+   video_loss_en, time_window, reg_dft_tpram_config,pipe_mem_clear,
    reg_dft_sync_tpram_config, app_aggregation_bypass,
    reg_video_pipe_en, reg_last_byte_header_down_mux,
    reg_clear_resv_pkt_cnt_lp_pf, reg_clear_resv_pkt_cnt_lp_ph,
@@ -66,6 +66,7 @@ input                                                fifo_wrclk;
 input                                                fifo_wrclk_rst_n;
 input                                                fifo_rdclk;
 input                                                fifo_rdclk_rst_n;
+input                                                pipe_mem_clear;
 input  [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]     in_csi_data;
 input  [(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]in_bytes_en;
 input                                                in_header_en;
@@ -622,6 +623,7 @@ as6d_app_fifo_rd_ctrl    u_as6d_app_fifo_rd_ctrl(
 						 .ack_vld_aggregator	(ack_vld_aggregator[3:0]),
                          .line_end              (line_end_pre),
 						 .video_data_fifo_rd	(video_data_fwft_fifo_rd_en),
+                         .pipe_mem_clear        (pipe_mem_clear),
                         /*AUTOINST*/
 						 // Outputs
 						 .ack			(ack),		 // Templated
@@ -722,6 +724,8 @@ assign sum_pulse_pkt_rd_side = pulse_pkt_rd_side[3] + pulse_pkt_rd_side[2] + pul
 //***cnt_line in rd_clk for pulse_sync 
 always@(posedge fifo_rdclk or negedge fifo_rdclk_rst_n)begin
     if(~fifo_rdclk_rst_n)
+        cnt_pkt_rd_side <= 32'd0;
+    else if(pipe_mem_clear)
         cnt_pkt_rd_side <= 32'd0;
     else 
         cnt_pkt_rd_side <= cnt_pkt_rd_side + sum_pulse_pkt_rd_side - line_end_pre;

@@ -176,90 +176,29 @@ end
 
 ### 3.6 完整时序图
 
-```
-时间  状态                           window  fifo_clear  说明
-──────────────────────────────────────────────────────────────────
-t0    INIT                           0000    1111       初始化
-t1    IDLE                           0000    1111       等待
-      pipe_mask_bitmap[0]=1
-      Video_Mask_Restart_En[0]=1
-      video_loss[0]=1
-      
-t2~   IDLE                           0000    1111       定时器计数1s
-t1000 restart_timer_cnt[0]++
-      
-t1000 IDLE                           0001    1110       ✅ 开窗！
-      restart_timer_en[0]=1
-      pipe_frame_active[0]=1
-      
-t1001 IDLE                           0001    1110       等待 data_vld
-      
-t1002 DURING_TIMESTAMP_ALIGN         0001    1110       开始检测
-      data_vld_0=1, delay_cnt=1
-      
-t1003 DURING_TIMESTAMP_ALIGN         0001    1110       检测中
-      delay_cnt=2
-      
-t1004 DURING_TIMESTAMP_ALIGN         0001    1110       检测中
-      delay_cnt=3
-
-───────────────────── 场景1：timestamp_align_fail（延迟过大，需重试）─────────
-t1005 IDLE                           0001    1110       ⚠️ 窗口保持开启！
-      timestamp_align_fail=1                            回到IDLE等待us_cnt增长
-      next_state=IDLE                                   并重新检测
-      
-t1006 IDLE                           0001    1110       等待 data_vld
-      (us_cnt 继续增长)
-      
-t1007 DURING_TIMESTAMP_ALIGN         0001    1110       再次进入检测
-      data_vld_0=1 (新数据)
-      
-... 重复检测流程，直到 timestamp_align_pass 或达到其他退出条件 ...
-
-───────────────────── 场景2：timestamp_align_pass + video_status_pass ─────────
-t1005 DURING_VIDEO_STATUS_DETERMING  0001    1110       时间戳通过
-      timestamp_align_pass=1
-      delay_cnt=1
-      
-t1006 DURING_VIDEO_STATUS_DETERMING  0001    1110       检测中
-      delay_cnt=2
-      
-t1007 DURING_VIDEO_STATUS_DETERMING  0001    1110       检测中
-      delay_cnt=3
-      video_status_pass_bitmap[0]=1
-      
-t1008 MASK_BITMAP_SUB_RECOVER        0001    1110       检测成功
-      pipe_mask_bitmap[0] ← 0
-      
-t1009 MASK_BITMAP_ADD_TIME_OUT       0001    0000       确认pass
-      
-t1010 CLEAR_MASK_PIPE                0000    0000       ✅ 统一关窗！
-      
-t1011 DURING_SCHEDULING_PIPE         0000    0000       开始调度
-      start_sch_pulse=1
-      
-t1012 IDLE                           0000    0000       完成！撤离成功
-
-───────────────────── 场景3：timestamp_align_pass + video_status_fail ─────────
-t1005 DURING_VIDEO_STATUS_DETERMING  0001    1110       时间戳通过
-      timestamp_align_pass=1
-      
-t1006 DURING_VIDEO_STATUS_DETERMING  0001    1110       检测中
-      delay_cnt=2
-      
-t1007 DURING_VIDEO_STATUS_DETERMING  0001    1110       检测中
-      delay_cnt=3
-      video_status_fail_bitmap[0]=1  (数据错误)
-      
-t1008 MASK_BITMAP_SUB_RECOVER        0001    1110       无pass
-      
-t1009 MASK_BITMAP_ADD_TIME_OUT       0001    1110       检测失败
-      pipe_mask_bitmap[0] 保持1
-      
-t1010 CLEAR_MASK_PIPE                0000    1111       ✅ 统一关窗！
-      
-t1011 IDLE                           0000    1111       回到IDLE
-                                                        等待下一次1s定时器触发
+```wavedrom
+{signal: [
+  {name: 'clk', wave: 'p....................................................................'},
+  {name: 'video_mask_restart', wave: '0.1..................................................................', data: ['head', 'body', 'tail', 'data'], "node": "..a...."},
+  {name: 'video_mask_restart_hold_cnt', wave: '2..2|2...........2.........2.|2..................0...................', data: ['1', '...', '1000','1', '...', '1000'], "node": ".....c...........h"},
+  {name: 'video_mask_restart_hold_window', wave: '0...|1...........0...........|1..................0...................', data: ['1', '...', '1000']},
+  {name: 'evacuate_mem_clear', wave: '2...|.22222.......2..........|.22222..............2..................', data: ['1', '2', '3', '4', '5', '6','1', '2', '3', '4', '5', '6','1'],"node": "..........d"},
+  {name: 'mem_clear', wave: '1...|.0....................1.|.0.....................................', data: ['1', '2', '3', '4', '5']},
+  {name: 'wr_mode', wave: '2...|......2...............2.|......2................................', data: ['00', '10', '00', '10'] ,"node": "...........e"},
+  {name: 'idi', wave: '0...|........20....2..02..0..|.......20......20....2..02..02..0....20', data: ['FS','LONG_PKT','LONG_PKT','FE','FS','LONG_PKT','LONG_PKT','LONG_PKT','FE'],"node": ".............f"},
+  {name: 'frame_active', wave: '0...|........1.............0.|...............1......................0'},
+  {name: 'pipe_mask_bitmap', wave: '1...|...........0.........1..|..................0....................', "node": "..b.............g"},
+],
+  "edge": [
+    "a~>c ",  
+    "b~>c ", 
+  	"c~>d ",
+  	"d~>e ",
+  	"e~>f ",
+  	"f~>g ",
+  	"g~>h ",
+  ]
+}
 ```
 
 ### 3.7 边界条件与防护

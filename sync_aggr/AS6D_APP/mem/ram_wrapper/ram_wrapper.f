@@ -1,6 +1,7 @@
 
 ${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/mem/ram_wrapper/as6d_app_video_pipe_1r1w_32x140_ram_wrapper.v
 ${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/mem/ram_wrapper/as6d_app_video_pipe_1r1w_2048x140_ram_wrapper.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/mem/ram_wrapper/as6d_app_video_status_buffer_1r1w_16x102_ram_wrapper.v
 
 
 

@@ -308,40 +308,43 @@ module   as6d_app_video_pipe #(
    reg_app_ecc_fault_detc_en, reg_app_ecc_bypass,
    reg_app_ecc_addr_protect_en, pipe7_word_count,
    pipe7_virtual_channel_x, pipe7_virtual_channel, pipe7_pkt_crc_en,
-   pipe7_pkt_crc, pipe7_header_en, pipe7_data_type, pipe7_data_en,
-   pipe7_csi_data, pipe7_bytes_en, pipe7_aggr_id, pipe6_word_count,
-   pipe6_virtual_channel_x, pipe6_virtual_channel, pipe6_pkt_crc_en,
-   pipe6_pkt_crc, pipe6_header_en, pipe6_data_type, pipe6_data_en,
-   pipe6_csi_data, pipe6_bytes_en, pipe6_aggr_id, pipe5_word_count,
-   pipe5_virtual_channel_x, pipe5_virtual_channel, pipe5_pkt_crc_en,
-   pipe5_pkt_crc, pipe5_header_en, pipe5_data_type, pipe5_data_en,
+   pipe7_pkt_crc, pipe7_mem_clear, pipe7_header_en, pipe7_data_type,
+   pipe7_data_en, pipe7_csi_data, pipe7_bytes_en, pipe7_aggr_id,
+   pipe6_word_count, pipe6_virtual_channel_x, pipe6_virtual_channel,
+   pipe6_pkt_crc_en, pipe6_pkt_crc, pipe6_mem_clear, pipe6_header_en,
+   pipe6_data_type, pipe6_data_en, pipe6_csi_data, pipe6_bytes_en,
+   pipe6_aggr_id, pipe5_word_count, pipe5_virtual_channel_x,
+   pipe5_virtual_channel, pipe5_pkt_crc_en, pipe5_pkt_crc,
+   pipe5_mem_clear, pipe5_header_en, pipe5_data_type, pipe5_data_en,
    pipe5_csi_data, pipe5_bytes_en, pipe5_aggr_id, pipe4_word_count,
    pipe4_virtual_channel_x, pipe4_virtual_channel, pipe4_pkt_crc_en,
-   pipe4_pkt_crc, pipe4_header_en, pipe4_data_type, pipe4_data_en,
-   pipe4_csi_data, pipe4_bytes_en, pipe4_aggr_id, pipe3_word_count,
-   pipe3_virtual_channel_x, pipe3_virtual_channel, pipe3_pkt_crc_en,
-   pipe3_pkt_crc, pipe3_header_en, pipe3_data_type, pipe3_data_en,
-   pipe3_csi_data, pipe3_bytes_en, pipe3_aggr_id, pipe2_word_count,
-   pipe2_virtual_channel_x, pipe2_virtual_channel, pipe2_pkt_crc_en,
-   pipe2_pkt_crc, pipe2_header_en, pipe2_data_type, pipe2_data_en,
+   pipe4_pkt_crc, pipe4_mem_clear, pipe4_header_en, pipe4_data_type,
+   pipe4_data_en, pipe4_csi_data, pipe4_bytes_en, pipe4_aggr_id,
+   pipe3_word_count, pipe3_virtual_channel_x, pipe3_virtual_channel,
+   pipe3_pkt_crc_en, pipe3_pkt_crc, pipe3_mem_clear, pipe3_header_en,
+   pipe3_data_type, pipe3_data_en, pipe3_csi_data, pipe3_bytes_en,
+   pipe3_aggr_id, pipe2_word_count, pipe2_virtual_channel_x,
+   pipe2_virtual_channel, pipe2_pkt_crc_en, pipe2_pkt_crc,
+   pipe2_mem_clear, pipe2_header_en, pipe2_data_type, pipe2_data_en,
    pipe2_csi_data, pipe2_bytes_en, pipe2_aggr_id, pipe1_word_count,
    pipe1_virtual_channel_x, pipe1_virtual_channel, pipe1_pkt_crc_en,
-   pipe1_pkt_crc, pipe1_header_en, pipe1_data_type, pipe1_data_en,
-   pipe1_csi_data, pipe1_bytes_en, pipe1_aggr_id, pipe0_word_count,
-   pipe0_virtual_channel_x, pipe0_virtual_channel, pipe0_pkt_crc_en,
-   pipe0_pkt_crc, pipe0_header_en, pipe0_data_type, pipe0_data_en,
-   pipe0_csi_data, pipe0_bytes_en, pipe0_aggr_id, line_delay_en7,
-   line_delay_en6, line_delay_en5, line_delay_en4, line_delay_en3,
-   line_delay_en2, line_delay_en1, line_delay_en0, fifo_wrclk_rst_n7,
-   fifo_wrclk_rst_n6, fifo_wrclk_rst_n5, fifo_wrclk_rst_n4,
-   fifo_wrclk_rst_n3, fifo_wrclk_rst_n2, fifo_wrclk_rst_n1,
-   fifo_wrclk_rst_n0, fifo_wrclk7, fifo_wrclk6, fifo_wrclk5,
-   fifo_wrclk4, fifo_wrclk3, fifo_wrclk2, fifo_wrclk1, fifo_wrclk0,
-   fifo_rdclk_rst_n7, fifo_rdclk_rst_n6, fifo_rdclk_rst_n5,
-   fifo_rdclk_rst_n4, fifo_rdclk_rst_n3, fifo_rdclk_rst_n2,
-   fifo_rdclk_rst_n1, fifo_rdclk_rst_n0, fifo_rdclk7, fifo_rdclk6,
-   fifo_rdclk5, fifo_rdclk4, fifo_rdclk3, fifo_rdclk2, fifo_rdclk1,
-   fifo_rdclk0, clk_1M, app_aggregation_bypass, pipe_fifo_full_clear
+   pipe1_pkt_crc, pipe1_mem_clear, pipe1_header_en, pipe1_data_type,
+   pipe1_data_en, pipe1_csi_data, pipe1_bytes_en, pipe1_aggr_id,
+   pipe0_word_count, pipe0_virtual_channel_x, pipe0_virtual_channel,
+   pipe0_pkt_crc_en, pipe0_pkt_crc, pipe0_mem_clear, pipe0_header_en,
+   pipe0_data_type, pipe0_data_en, pipe0_csi_data, pipe0_bytes_en,
+   pipe0_aggr_id, line_delay_en7, line_delay_en6, line_delay_en5,
+   line_delay_en4, line_delay_en3, line_delay_en2, line_delay_en1,
+   line_delay_en0, fifo_wrclk_rst_n7, fifo_wrclk_rst_n6,
+   fifo_wrclk_rst_n5, fifo_wrclk_rst_n4, fifo_wrclk_rst_n3,
+   fifo_wrclk_rst_n2, fifo_wrclk_rst_n1, fifo_wrclk_rst_n0,
+   fifo_wrclk7, fifo_wrclk6, fifo_wrclk5, fifo_wrclk4, fifo_wrclk3,
+   fifo_wrclk2, fifo_wrclk1, fifo_wrclk0, fifo_rdclk_rst_n7,
+   fifo_rdclk_rst_n6, fifo_rdclk_rst_n5, fifo_rdclk_rst_n4,
+   fifo_rdclk_rst_n3, fifo_rdclk_rst_n2, fifo_rdclk_rst_n1,
+   fifo_rdclk_rst_n0, fifo_rdclk7, fifo_rdclk6, fifo_rdclk5,
+   fifo_rdclk4, fifo_rdclk3, fifo_rdclk2, fifo_rdclk1, fifo_rdclk0,
+   clk_1M, app_aggregation_bypass, pipe_fifo_full_clear
    );
 
 
@@ -395,6 +398,7 @@ input [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0] pipe0_csi_data;// To u0_as6d_app
 input			pipe0_data_en;		// To u0_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [5:0]		pipe0_data_type;	// To u0_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe0_header_en;	// To u0_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
+input			pipe0_mem_clear;	// To u0_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [31:0]		pipe0_pkt_crc;		// To u0_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe0_pkt_crc_en;	// To u0_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [1:0]		pipe0_virtual_channel;	// To u0_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
@@ -406,6 +410,7 @@ input [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0] pipe1_csi_data;// To u1_as6d_app
 input			pipe1_data_en;		// To u1_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [5:0]		pipe1_data_type;	// To u1_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe1_header_en;	// To u1_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
+input			pipe1_mem_clear;	// To u1_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [31:0]		pipe1_pkt_crc;		// To u1_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe1_pkt_crc_en;	// To u1_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [1:0]		pipe1_virtual_channel;	// To u1_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
@@ -417,6 +422,7 @@ input [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0] pipe2_csi_data;// To u2_as6d_app
 input			pipe2_data_en;		// To u2_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [5:0]		pipe2_data_type;	// To u2_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe2_header_en;	// To u2_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
+input			pipe2_mem_clear;	// To u2_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [31:0]		pipe2_pkt_crc;		// To u2_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe2_pkt_crc_en;	// To u2_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [1:0]		pipe2_virtual_channel;	// To u2_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
@@ -428,6 +434,7 @@ input [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0] pipe3_csi_data;// To u3_as6d_app
 input			pipe3_data_en;		// To u3_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [5:0]		pipe3_data_type;	// To u3_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe3_header_en;	// To u3_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
+input			pipe3_mem_clear;	// To u3_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [31:0]		pipe3_pkt_crc;		// To u3_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe3_pkt_crc_en;	// To u3_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [1:0]		pipe3_virtual_channel;	// To u3_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
@@ -439,6 +446,7 @@ input [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0] pipe4_csi_data;// To u4_as6d_app
 input			pipe4_data_en;		// To u4_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [5:0]		pipe4_data_type;	// To u4_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe4_header_en;	// To u4_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
+input			pipe4_mem_clear;	// To u4_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [31:0]		pipe4_pkt_crc;		// To u4_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe4_pkt_crc_en;	// To u4_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [1:0]		pipe4_virtual_channel;	// To u4_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
@@ -450,6 +458,7 @@ input [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0] pipe5_csi_data;// To u5_as6d_app
 input			pipe5_data_en;		// To u5_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [5:0]		pipe5_data_type;	// To u5_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe5_header_en;	// To u5_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
+input			pipe5_mem_clear;	// To u5_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [31:0]		pipe5_pkt_crc;		// To u5_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe5_pkt_crc_en;	// To u5_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [1:0]		pipe5_virtual_channel;	// To u5_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
@@ -461,6 +470,7 @@ input [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0] pipe6_csi_data;// To u6_as6d_app
 input			pipe6_data_en;		// To u6_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [5:0]		pipe6_data_type;	// To u6_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe6_header_en;	// To u6_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
+input			pipe6_mem_clear;	// To u6_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [31:0]		pipe6_pkt_crc;		// To u6_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe6_pkt_crc_en;	// To u6_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [1:0]		pipe6_virtual_channel;	// To u6_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
@@ -472,6 +482,7 @@ input [(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0] pipe7_csi_data;// To u7_as6d_app
 input			pipe7_data_en;		// To u7_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [5:0]		pipe7_data_type;	// To u7_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe7_header_en;	// To u7_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
+input			pipe7_mem_clear;	// To u7_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [31:0]		pipe7_pkt_crc;		// To u7_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input			pipe7_pkt_crc_en;	// To u7_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
 input [1:0]		pipe7_virtual_channel;	// To u7_as6d_app_video_pipe_lane of as6d_app_video_pipe_lane.v
@@ -1097,6 +1108,7 @@ wire [7:0]      fifo_rdclk_rst_n        ;
             .reg_rd_dbg_pkt_num_nonzero_and_fifo_empty_threshold_err(reg_rd_dbg_pkt_num_nonzero_and_fifo_empty_threshold_err[@]),
             .reg_dbg_pkt_num_nonzero_threshold(reg_dbg_pkt_num_nonzero_threshold[]),
             .reg_dbg_pkt_num_nonzero_and_fifo_empty_threshold(reg_dbg_pkt_num_nonzero_and_fifo_empty_threshold[]),
+            .pipe_mem_clear(pipe@_mem_clear),
             .\(.*\)   (\1@[]),
 
  ) */
@@ -1171,6 +1183,7 @@ as6d_app_video_pipe_lane    u0_as6d_app_video_pipe_lane(/*AUTOINST*/
 							.fifo_wrclk_rst_n(fifo_wrclk_rst_n0), // Templated
 							.fifo_rdclk	(fifo_rdclk0),	 // Templated
 							.fifo_rdclk_rst_n(fifo_rdclk_rst_n0), // Templated
+							.pipe_mem_clear	(pipe0_mem_clear), // Templated
 							.in_csi_data	(pipe0_csi_data[(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]), // Templated
 							.in_bytes_en	(pipe0_bytes_en[(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]), // Templated
 							.in_header_en	(pipe0_header_en), // Templated
@@ -1275,6 +1288,7 @@ as6d_app_video_pipe_lane    u1_as6d_app_video_pipe_lane(/*AUTOINST*/
 							.fifo_wrclk_rst_n(fifo_wrclk_rst_n1), // Templated
 							.fifo_rdclk	(fifo_rdclk1),	 // Templated
 							.fifo_rdclk_rst_n(fifo_rdclk_rst_n1), // Templated
+							.pipe_mem_clear	(pipe1_mem_clear), // Templated
 							.in_csi_data	(pipe1_csi_data[(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]), // Templated
 							.in_bytes_en	(pipe1_bytes_en[(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]), // Templated
 							.in_header_en	(pipe1_header_en), // Templated
@@ -1377,6 +1391,7 @@ as6d_app_video_pipe_lane    u2_as6d_app_video_pipe_lane(/*AUTOINST*/
 							.fifo_wrclk_rst_n(fifo_wrclk_rst_n2), // Templated
 							.fifo_rdclk	(fifo_rdclk2),	 // Templated
 							.fifo_rdclk_rst_n(fifo_rdclk_rst_n2), // Templated
+							.pipe_mem_clear	(pipe2_mem_clear), // Templated
 							.in_csi_data	(pipe2_csi_data[(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]), // Templated
 							.in_bytes_en	(pipe2_bytes_en[(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]), // Templated
 							.in_header_en	(pipe2_header_en), // Templated
@@ -1479,6 +1494,7 @@ as6d_app_video_pipe_lane    u3_as6d_app_video_pipe_lane(/*AUTOINST*/
 							.fifo_wrclk_rst_n(fifo_wrclk_rst_n3), // Templated
 							.fifo_rdclk	(fifo_rdclk3),	 // Templated
 							.fifo_rdclk_rst_n(fifo_rdclk_rst_n3), // Templated
+							.pipe_mem_clear	(pipe3_mem_clear), // Templated
 							.in_csi_data	(pipe3_csi_data[(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]), // Templated
 							.in_bytes_en	(pipe3_bytes_en[(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]), // Templated
 							.in_header_en	(pipe3_header_en), // Templated
@@ -1582,6 +1598,7 @@ as6d_app_video_pipe_lane    u4_as6d_app_video_pipe_lane(/*AUTOINST*/
 							.fifo_wrclk_rst_n(fifo_wrclk_rst_n4), // Templated
 							.fifo_rdclk	(fifo_rdclk4),	 // Templated
 							.fifo_rdclk_rst_n(fifo_rdclk_rst_n4), // Templated
+							.pipe_mem_clear	(pipe4_mem_clear), // Templated
 							.in_csi_data	(pipe4_csi_data[(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]), // Templated
 							.in_bytes_en	(pipe4_bytes_en[(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]), // Templated
 							.in_header_en	(pipe4_header_en), // Templated
@@ -1684,6 +1701,7 @@ as6d_app_video_pipe_lane    u5_as6d_app_video_pipe_lane(/*AUTOINST*/
 							.fifo_wrclk_rst_n(fifo_wrclk_rst_n5), // Templated
 							.fifo_rdclk	(fifo_rdclk5),	 // Templated
 							.fifo_rdclk_rst_n(fifo_rdclk_rst_n5), // Templated
+							.pipe_mem_clear	(pipe5_mem_clear), // Templated
 							.in_csi_data	(pipe5_csi_data[(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]), // Templated
 							.in_bytes_en	(pipe5_bytes_en[(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]), // Templated
 							.in_header_en	(pipe5_header_en), // Templated
@@ -1786,6 +1804,7 @@ as6d_app_video_pipe_lane    u6_as6d_app_video_pipe_lane(/*AUTOINST*/
 							.fifo_wrclk_rst_n(fifo_wrclk_rst_n6), // Templated
 							.fifo_rdclk	(fifo_rdclk6),	 // Templated
 							.fifo_rdclk_rst_n(fifo_rdclk_rst_n6), // Templated
+							.pipe_mem_clear	(pipe6_mem_clear), // Templated
 							.in_csi_data	(pipe6_csi_data[(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]), // Templated
 							.in_bytes_en	(pipe6_bytes_en[(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]), // Templated
 							.in_header_en	(pipe6_header_en), // Templated
@@ -1888,6 +1907,7 @@ as6d_app_video_pipe_lane    u7_as6d_app_video_pipe_lane(/*AUTOINST*/
 							.fifo_wrclk_rst_n(fifo_wrclk_rst_n7), // Templated
 							.fifo_rdclk	(fifo_rdclk7),	 // Templated
 							.fifo_rdclk_rst_n(fifo_rdclk_rst_n7), // Templated
+							.pipe_mem_clear	(pipe7_mem_clear), // Templated
 							.in_csi_data	(pipe7_csi_data[(`MEP_CSI2_DEVICE_IDI_CSIDATA_SIZE-1):0]), // Templated
 							.in_bytes_en	(pipe7_bytes_en[(`MEP_CSI2_DEVICE_IDI_DATA_BYTEEN_WIDTH-1):0]), // Templated
 							.in_header_en	(pipe7_header_en), // Templated

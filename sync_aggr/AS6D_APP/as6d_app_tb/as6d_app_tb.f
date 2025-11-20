@@ -1,0 +1,40 @@
+
++incdir+${AS6T28_PROJ_DIR}/AS6T28D//AS6D_APP/as6d_app_tb/idi_bus_vip/
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/idi_bus_vip/idi_define.sv
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/idi_bus_vip/idi_interface.sv
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/idi_bus_vip/idi_config.sv
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/idi_bus_vip/idi_driver.sv
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/idi_bus_vip/idi_monitor.sv
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/idi_bus_vip/idi_env.sv
+
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/dvp_driver.v
+
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/as6d_app_tb.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/clk_generator.v
+-f ${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/vpg_idi.f
+-f ${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app.f
+
++incdir+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_MEP/
++incdir+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/
++incdir+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_APP/as6d_app_tb/
+
+
+-f ${AS6T28_PROJ_DIR}/AS6T28S/AS6S_APP/as6s_app.f
+${AS6T28_PROJ_DIR}/AS6T28D/uvm_ver/R1P0/wam/wam.v
+
+${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/dig_cell.v
+${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/StdCell_Wrap.v
+
+-f ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/FIFO/ecc_module/ecc_test/ecc_test.f
+-f ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/FIFO/ecc_module/ecc_module.f
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/memory_wrap/TPUHDSRAM2048X149SVTBW0M8B4R0P0_I0O0.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/memory_wrap/TPSRAM16X110SVTBW0M8B4R0P0_I0O0.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/memory_wrap/TPSRAM32X76SVTBW0M8B4R0P0_I0O0.v
+
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/FIFO/sram_wrapper/memory_instance.v
+-v ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/FIFO/sram_wrapper/sram_wrapper.v
+
+-f ${AS6T28_PROJ_DIR}/AS6T28_DIGCOM/AS6T28_COMRTL/BUS_DELAY/bus_delay.f
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_MEP/common/crc32_128bit_with_crc_en.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_MEP/common/crc32_64bit_with_crc_en.v
+${AS6T28_PROJ_DIR}/AS6T28D/AS6D_MEP/common/crc32_core_8bit.v

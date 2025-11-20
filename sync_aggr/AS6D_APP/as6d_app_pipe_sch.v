@@ -8,22 +8,22 @@ module as6d_app_pipe_sch#(
    up_state0, up_state1, up_state2, up_state3, up_state4, up_state5,
    up_state6, up_state7, sch_current_state, out_video_data_vld,
    out_video_data, up_state_aggre, up_state_concat, line_end_aggre,
-   line_end_concat, ack_aggre, ack_concat, aggre_busy,
-   pipe_clear_bit_map, pipe0_wr_mode, pipe1_wr_mode, pipe2_wr_mode,
-   pipe3_wr_mode, pipe0_wr_mode_strobe, pipe1_wr_mode_strobe,
-   pipe2_wr_mode_strobe, pipe3_wr_mode_strobe,
+   line_end_concat, ack_aggre, ack_concat, aggre_busy, pipe0_wr_mode,
+   pipe1_wr_mode, pipe2_wr_mode, pipe3_wr_mode, pipe0_mem_clear,
+   pipe1_mem_clear, pipe2_mem_clear, pipe3_mem_clear,
    sch_data_type_align_fail_int,
    // Inputs
-   aggre_clk, aggre_clk_rst_n, frame_sync_lock, aggre_mode, clk_1M,
-   fifo_wr_clk_0, fifo_wr_clk_1, fifo_wr_clk_2, fifo_wr_clk_3,
-   fifo_wr_clk_rst_n_0, fifo_wr_clk_rst_n_1, fifo_wr_clk_rst_n_2,
-   fifo_wr_clk_rst_n_3, idi_header_en_0, idi_header_en_1,
-   idi_header_en_2, idi_header_en_3, idi_datatype_0, idi_datatype_1,
-   idi_datatype_2, idi_datatype_3, idi_wordcount_0, idi_wordcount_1,
-   idi_wordcount_2, idi_wordcount_3, idi_linecount_0, idi_linecount_1,
-   idi_linecount_2, idi_linecount_3, pipe_frame_active,
-   reg_sync_aggr_auto_mask_en, reg_sync_aggr_force_video_mask,
-   reg_sync_aggr_video_mask_restart,
+   clk_1M_rst_n, aggre_clk, aggre_clk_rst_n, frame_sync_lock,
+   aggre_mode, clk_1M, fifo_wrclk0, fifo_wrclk1, fifo_wrclk2,
+   fifo_wrclk3, fifo_wrclk_rst_n0, fifo_wrclk_rst_n1,
+   fifo_wrclk_rst_n2, fifo_wrclk_rst_n3, idi_header_en_0,
+   idi_header_en_1, idi_header_en_2, idi_header_en_3, idi_datatype_0,
+   idi_datatype_1, idi_datatype_2, idi_datatype_3, idi_wordcount_0,
+   idi_wordcount_1, idi_wordcount_2, idi_wordcount_3, idi_linecount_0,
+   idi_linecount_1, idi_linecount_2, idi_linecount_3,
+   pipe0_frame_active, pipe1_frame_active, pipe2_frame_active,
+   pipe3_frame_active, reg_sync_aggr_auto_mask_en,
+   reg_sync_aggr_force_video_mask, reg_sync_aggr_video_mask_restart,
    reg_sync_aggr_video_mask_latch_reset,
    reg_sync_aggr_video_timeout_threshold,
    reg_sync_aggr_check_framecount_en,
@@ -60,19 +60,20 @@ module as6d_app_pipe_sch#(
    video_pipe_date_type_for_concat_align0
    );
 
+    input		            clk_1M_rst_n;
     input                   aggre_clk;
     input                   aggre_clk_rst_n;
     input                   frame_sync_lock;
     input [1:0]             aggre_mode;
     input                   clk_1M;
-    input                   fifo_wr_clk_0;
-    input                   fifo_wr_clk_1;
-    input                   fifo_wr_clk_2;
-    input                   fifo_wr_clk_3;
-    input                   fifo_wr_clk_rst_n_0;
-    input                   fifo_wr_clk_rst_n_1;
-    input                   fifo_wr_clk_rst_n_2;
-    input                   fifo_wr_clk_rst_n_3;
+    input                   fifo_wrclk0;
+    input                   fifo_wrclk1;
+    input                   fifo_wrclk2;
+    input                   fifo_wrclk3;
+    input                   fifo_wrclk_rst_n0;
+    input                   fifo_wrclk_rst_n1;
+    input                   fifo_wrclk_rst_n2;
+    input                   fifo_wrclk_rst_n3;
     input                   idi_header_en_0;
     input                   idi_header_en_1;
     input                   idi_header_en_2;
@@ -89,7 +90,10 @@ module as6d_app_pipe_sch#(
     input   [2:0]           idi_linecount_1;
     input   [2:0]           idi_linecount_2;
     input   [2:0]           idi_linecount_3;
-    input   [3:0]           pipe_frame_active;
+    input                   pipe0_frame_active;
+    input                   pipe1_frame_active;
+    input                   pipe2_frame_active;
+    input                   pipe3_frame_active;
     input   [3:0]		    reg_sync_aggr_auto_mask_en;
     input   [3:0]		    reg_sync_aggr_force_video_mask;
     input   [3:0]		    reg_sync_aggr_video_mask_restart;
@@ -100,7 +104,7 @@ module as6d_app_pipe_sch#(
     input   [5:0]           reg_sync_aggr_video_status_info_datatype;
     input   [15:0]          reg_sync_aggr_video_status_info_linecount;
     input   [15:0]          reg_sync_aggr_video_status_info_wordcount;
-    input   [2:0]           reg_sync_aggr_video_status_info_vc;
+    input   [4:0]           reg_sync_aggr_video_status_info_vc;
     input   [1:0]           master_pipe;
     input                   pipe0_concat_en;
     input                   pipe0_aggre_en;
@@ -217,15 +221,14 @@ module as6d_app_pipe_sch#(
     output   [7:0]          ack_aggre;
     output   [3:0]          ack_concat;
     output                  aggre_busy;
-    output   [3:0]          pipe_clear_bit_map;
     output   [1:0]          pipe0_wr_mode;
     output   [1:0]          pipe1_wr_mode;
     output   [1:0]          pipe2_wr_mode;
     output   [1:0]          pipe3_wr_mode;
-    output                  pipe0_wr_mode_strobe;
-    output                  pipe1_wr_mode_strobe;
-    output                  pipe2_wr_mode_strobe;
-    output                  pipe3_wr_mode_strobe;
+    output   		        pipe0_mem_clear;
+    output   		        pipe1_mem_clear;
+    output   		        pipe2_mem_clear;
+    output   		        pipe3_mem_clear;
     output                  sch_data_type_align_fail_int;
     
     //debug state
@@ -261,6 +264,8 @@ module as6d_app_pipe_sch#(
     wire [139:0]            black_pixel_data                ;
     wire                    black_pixel_vld_en              ;
 
+    /*AUTOWIRE*/
+    
     //***logic body***///
     //***debug state_machine begin
     always @ (posedge aggre_clk or negedge aggre_clk_rst_n) begin
@@ -557,23 +562,23 @@ module as6d_app_pipe_sch#(
 							// Outputs
 							.black_pixel_data(black_pixel_data[139:0]),
 							.black_pixel_data_vld(black_pixel_data_vld),
-							.local_linecount_out(local_linecount_out[15:0]),
-							.local_pkt_datatype_out(local_pkt_datatype_out[5:0]),
+							.pipe0_mem_clear(pipe0_mem_clear),
+							.pipe1_mem_clear(pipe1_mem_clear),
+							.pipe2_mem_clear(pipe2_mem_clear),
+							.pipe3_mem_clear(pipe3_mem_clear),
+							.sch_data_type_align_fail_int(sch_data_type_align_fail_int),
+							.up_state_concat(up_state_concat[3:0]),
+							.ack_concat	(ack_concat[3:0]),
+							.line_end_concat(line_end_concat[3:0]),
 							.pipe0_wr_mode	(pipe0_wr_mode[1:0]),
 							.pipe1_wr_mode	(pipe1_wr_mode[1:0]),
 							.pipe2_wr_mode	(pipe2_wr_mode[1:0]),
 							.pipe3_wr_mode	(pipe3_wr_mode[1:0]),
-							.sch_data_type_align_fail_int(sch_data_type_align_fail_int),
-							.up_state_concat(up_state_concat/*.[0:3]*/),
-							.ack_concat	(ack_concat[3:0]),
-							.line_end_concat(line_end_concat[3:0]),
 							// Inputs
 							.ack0		(ack0),
 							.ack1		(ack1),
 							.ack2		(ack2),
 							.ack3		(ack3),
-							.aggr_clk	(aggr_clk),
-							.aggr_clk_rst_n	(aggr_clk_rst_n),
 							.aggre_clk	(aggre_clk),
 							.aggre_clk_rst_n(aggre_clk_rst_n),
 							.aggre_mode	(aggre_mode[1:0]),
@@ -583,16 +588,14 @@ module as6d_app_pipe_sch#(
 							.empty1		(empty1),
 							.empty2		(empty2),
 							.empty3		(empty3),
-							.fifo_wr_clk	(fifo_wr_clk),
-							.fifo_wr_clk_0	(fifo_wr_clk_0),
-							.fifo_wr_clk_1	(fifo_wr_clk_1),
-							.fifo_wr_clk_2	(fifo_wr_clk_2),
-							.fifo_wr_clk_3	(fifo_wr_clk_3),
-							.fifo_wr_clk_rst_n(fifo_wr_clk_rst_n),
-							.fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
-							.fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
-							.fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
-							.fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
+							.fifo_wrclk0	(fifo_wrclk0),
+							.fifo_wrclk1	(fifo_wrclk1),
+							.fifo_wrclk2	(fifo_wrclk2),
+							.fifo_wrclk3	(fifo_wrclk3),
+							.fifo_wrclk_rst_n0(fifo_wrclk_rst_n0),
+							.fifo_wrclk_rst_n1(fifo_wrclk_rst_n1),
+							.fifo_wrclk_rst_n2(fifo_wrclk_rst_n2),
+							.fifo_wrclk_rst_n3(fifo_wrclk_rst_n3),
 							.frame_sync_lock(frame_sync_lock),
 							.idi_datatype_0	(idi_datatype_0[5:0]),
 							.idi_datatype_1	(idi_datatype_1[5:0]),
@@ -615,7 +618,6 @@ module as6d_app_pipe_sch#(
 							.line_end2	(line_end2),
 							.line_end3	(line_end3),
 							.master_pipe	(master_pipe[1:0]),
-							.pipe_frame_active(pipe_frame_active[3:0]),
 							.video_pipe_date_type_for_concat_align0(video_pipe_date_type_for_concat_align0[5:0]),
 							.video_pipe_date_type_for_concat_align1(video_pipe_date_type_for_concat_align1[5:0]),
 							.video_pipe_date_type_for_concat_align2(video_pipe_date_type_for_concat_align2[5:0]),
@@ -626,7 +628,7 @@ module as6d_app_pipe_sch#(
 							.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
 							.reg_sync_aggr_auto_mask_en(reg_sync_aggr_auto_mask_en[3:0]),
 							.reg_sync_aggr_force_video_mask(reg_sync_aggr_force_video_mask[3:0]),
-							.reg_sync_aggr_video_mask_restart_en(reg_sync_aggr_video_mask_restart_en[3:0]),
+							.reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
 							.reg_sync_aggr_video_mask_latch_reset(reg_sync_aggr_video_mask_latch_reset),
 							.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 							.reg_sync_aggr_check_framecount_en(reg_sync_aggr_check_framecount_en),
@@ -634,11 +636,19 @@ module as6d_app_pipe_sch#(
 							.reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
 							.reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
 							.reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
-							.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+							.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[4:0]),
 							.video_loss0	(video_loss0),
 							.video_loss1	(video_loss1),
 							.video_loss2	(video_loss2),
-							.video_loss3	(video_loss3));
+							.video_loss3	(video_loss3),
+							.pipe0_concat_en(pipe0_concat_en),
+							.pipe1_concat_en(pipe1_concat_en),
+							.pipe2_concat_en(pipe2_concat_en),
+							.pipe3_concat_en(pipe3_concat_en),
+							.pipe0_frame_active(pipe0_frame_active),
+							.pipe1_frame_active(pipe1_frame_active),
+							.pipe2_frame_active(pipe2_frame_active),
+							.pipe3_frame_active(pipe3_frame_active));
     
     
     
@@ -742,7 +752,7 @@ module as6d_app_pipe_sch#(
     assign black_pixel_vld_en = black_pixel_data_vld;
 
     always@(*)begin
-        out_video_data_vld_fix    = black_pixel_vld_en |video_data_vld_en;
+        out_video_data_vld_fix    = black_pixel_vld_en || (|video_data_vld_en);
     end
     
     always@(*)begin

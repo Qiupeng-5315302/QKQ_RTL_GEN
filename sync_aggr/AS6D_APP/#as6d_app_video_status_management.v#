@@ -1,0 +1,218 @@
+
+module as6d_app_video_status_management(/*AUTOARG*/);
+/*AUTOINPUT*/
+/*AUTOOUTPUT*/
+
+
+input  [3:0]    reg_sync_aggr_force_video_mask;
+input  [3:0]    reg_sync_aggr_auto_mask_en;
+input  [3:0]    reg_sync_aggr_video_mask_restart;
+input           reg_sync_aggr_video_mask_latch_reset;
+
+
+
+
+
+
+
+// =========================================================================
+// Internal Signals
+// =========================================================================
+
+/*AUTOWIRE*/
+
+
+// =========================================================================
+// Submodule: video_status_buffer_wr_ctrl (4 instances)
+// Note: us_counter is now provided by pipe_mask_ctrl's local_us_cnt output
+// =========================================================================
+ /*  as6d_video_status_buffer_wr_ctrl  AUTO_TEMPLATE (
+    .fifo_wrclk(fifo_wrclk_@),
+    .fifo_wrclk_rst_n(fifo_wrclkrst_n_@),
+    .wr_en(video_status_buffer_wr_en_@),
+    .wr_data(video_status_buffer_wr_data_@[]),
+    .afifo_full(video_status_buffer_full_@),
+    .idi_header_en(idi_header_en_@),
+    .idi_datatype(idi_datatype_@[]),
+    .idi_wordcount(idi_wordcount_@[]),
+    .idi_linecount(idi_linecount_@[]),
+)*/
+// Instance 0
+as6d_app_video_status_buffer_wr_ctrl u_as6d_app_video_status_buffer_wr_ctrl_0(/*AUTOINST*/
+									      // Outputs
+									      .wr_en		(wr_en),
+									      .wr_data		(wr_data[101:0]),
+									      // Inputs
+									      .fifo_wrclk	(fifo_wrclk),
+									      .fifo_wrclk_rst_n	(fifo_wrclk_rst_n),
+									      .idi_header_en	(idi_header_en),
+									      .idi_datatype	(idi_datatype[5:0]),
+									      .idi_wordcount	(idi_wordcount[15:0]),
+									      .idi_linecount	(idi_linecount[2:0]),
+									      .aggre_clk	(aggre_clk),
+									      .aggre_clk_rst_n	(aggre_clk_rst_n),
+									      .local_us_cnt	(local_us_cnt[79:0]),
+									      .afifo_full	(afifo_full));
+
+// Instance 1
+as6d_app_video_status_buffer_wr_ctrl u_as6d_app_video_status_buffer_wr_ctrl_1(/*AUTOINST*/
+									      // Outputs
+									      .wr_en		(wr_en),
+									      .wr_data		(wr_data[101:0]),
+									      // Inputs
+									      .fifo_wrclk	(fifo_wrclk),
+									      .fifo_wrclk_rst_n	(fifo_wrclk_rst_n),
+									      .idi_header_en	(idi_header_en),
+									      .idi_datatype	(idi_datatype[5:0]),
+									      .idi_wordcount	(idi_wordcount[15:0]),
+									      .idi_linecount	(idi_linecount[2:0]),
+									      .aggre_clk	(aggre_clk),
+									      .aggre_clk_rst_n	(aggre_clk_rst_n),
+									      .local_us_cnt	(local_us_cnt[79:0]),
+									      .afifo_full	(afifo_full));
+
+// Instance 2
+as6d_app_video_status_buffer_wr_ctrl u_as6d_app_video_status_buffer_wr_ctrl_2(/*AUTOINST*/
+									      // Outputs
+									      .wr_en		(wr_en),
+									      .wr_data		(wr_data[101:0]),
+									      // Inputs
+									      .fifo_wrclk	(fifo_wrclk),
+									      .fifo_wrclk_rst_n	(fifo_wrclk_rst_n),
+									      .idi_header_en	(idi_header_en),
+									      .idi_datatype	(idi_datatype[5:0]),
+									      .idi_wordcount	(idi_wordcount[15:0]),
+									      .idi_linecount	(idi_linecount[2:0]),
+									      .aggre_clk	(aggre_clk),
+									      .aggre_clk_rst_n	(aggre_clk_rst_n),
+									      .local_us_cnt	(local_us_cnt[79:0]),
+									      .afifo_full	(afifo_full));
+
+// Instance 3
+as6d_video_status_buffer_wr_ctrl u_video_as6d_app_status_buffer_wr_ctrl_3(/*AUTOINST*/);
+
+// =========================================================================
+// Submodule: 4 AFIFO Instances
+// =========================================================================
+ /*  as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper  AUTO_TEMPLATE (
+    .FLIPFLOP(0),
+    .ADDR_WIDTH(4),
+    .DATA_WIDTH(102),
+    .PROG_EMPTY_ASSERT(5'd8),
+    .PROG_EMPTY_NEGATE(5'd8),
+    .FIFO_DEEP(16),
+    .RAM_PIPE_STAGE	(2),
+    .wr_clk(fifo_wrclk_@),
+    .wr_rst_n(fifo_wrclk_rst_n_@),
+    .rd_clk(aggre_clk),
+    .rd_rst_n(aggre_clk_rst_n),
+    .wr_en(video_status_buffer_wr_en_@),
+    .wr_data(video_status_buffer_wr_data_@[]),
+    .rd_en(video_status_buffer_rd_en_@),
+    .rd_data(video_status_buffer_data_@[]),
+    .rd_data_val(video_status_buffer_data_vld_@),
+    .ecc_fault(),
+    .single_err(),
+    .double_err(),
+    .ovf_int(),
+    .udf_int(),
+    .prog_full(),
+    .empty(),
+    .full(video_status_buffer_full_@[]),
+    .data_count(),
+    .wr_domain_clear(pipe_clear_pulse[@]),
+    .rd_domain_clear(pipe_clear_pulse[@]),
+    .ram_bypass(1'd1),
+    .reg_dft_tpram_config(9'd0),
+    .prog_full_assert_cfg(5'd8),
+    .prog_full_negate_cfg(5'd8),
+    .ecc_addr_protect_en(1'd1),
+    .ecc_fault_detc_en	(1'd1),
+    .ecc_bypass	(1'd0),
+)*/
+
+// AFIFO Instance 0
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper#(/*AUTOINSTPARAM*/
+							     // Parameters
+							     .FLIPFLOP		(0),		 // Templated
+							     .ADDR_WIDTH	(4),		 // Templated
+							     .DATA_WIDTH	(102),		 // Templated
+							     .PROG_EMPTY_ASSERT	(5'd8),		 // Templated
+							     .PROG_EMPTY_NEGATE	(5'd8),		 // Templated
+							     .FIFO_DEEP		(16),		 // Templated
+							     .RAM_PIPE_STAGE	(2))		 // Templated
+u_video_status_buffer_0 (/*AUTOINST*/);
+
+// AFIFO Instance 1
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper#(/*AUTOINSTPARAM*/
+							     // Parameters
+							     .FLIPFLOP		(0),		 // Templated
+							     .ADDR_WIDTH	(4),		 // Templated
+							     .DATA_WIDTH	(102),		 // Templated
+							     .PROG_EMPTY_ASSERT	(5'd8),		 // Templated
+							     .PROG_EMPTY_NEGATE	(5'd8),		 // Templated
+							     .FIFO_DEEP		(16),		 // Templated
+							     .RAM_PIPE_STAGE	(2))		 // Templated
+u_video_status_buffer_1 (/*AUTOINST*/);
+
+// AFIFO Instance 2
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper#(/*AUTOINSTPARAM*/
+							     // Parameters
+							     .FLIPFLOP		(0),		 // Templated
+							     .ADDR_WIDTH	(4),		 // Templated
+							     .DATA_WIDTH	(102),		 // Templated
+							     .PROG_EMPTY_ASSERT	(5'd8),		 // Templated
+							     .PROG_EMPTY_NEGATE	(5'd8),		 // Templated
+							     .FIFO_DEEP		(16),		 // Templated
+							     .RAM_PIPE_STAGE	(2))		 // Templated
+u_video_status_buffer_2 (/*AUTOINST*/);
+
+// AFIFO Instance 3
+as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper#(/*AUTOINSTPARAM*/
+							     // Parameters
+							     .FLIPFLOP		(0),		 // Templated
+							     .ADDR_WIDTH	(4),		 // Templated
+							     .DATA_WIDTH	(102),		 // Templated
+							     .PROG_EMPTY_ASSERT	(5'd8),		 // Templated
+							     .PROG_EMPTY_NEGATE	(5'd8),		 // Templated
+							     .FIFO_DEEP		(16),		 // Templated
+							     .RAM_PIPE_STAGE	(2))		 // Templated
+u_video_status_buffer_3 (/*AUTOINST*/);
+
+wire [3:0]  force_video_mask;
+wire [3:0]  auto_mask_en;
+wire [3:0]  video_mask_restart;
+wire        video_mask_latch_reset;
+
+assign  force_video_mask        = pipe_concat_en & reg_sync_aggr_force_video_mask;
+assign  auto_mask_en            = pipe_concat_en & reg_sync_aggr_auto_mask_en;
+assign  video_mask_restart      = pipe_concat_en & reg_sync_aggr_video_mask_restart;
+assign  video_mask_latch_reset  = reg_sync_aggr_video_mask_latch_reset;
+
+// =========================================================================
+// Submodule: pipe_mask_ctrl
+// =========================================================================
+ /*  as6d_app_pipe_mask_ctrl  AUTO_TEMPLATE (
+    .clk(aggre_clk),
+    .rst_n(aggre_clk_rst_n),
+    .force_video_mask(force_video_mask[]),
+    .auto_mask_en(auto_mask_en[]),
+    .video_mask_restart(video_mask_restart[]),
+    .video_mask_latch_reset(video_mask_latch_reset[]),
+    .data_vld_\([0-3]\)(video_status_buffer_data_vld_\1),
+    .data_\([0-3]\)(video_status_buffer_data_\1[]),
+    .pipe_mask_bitmap(start_sch_pipe_mask_bitmap[]),
+    .video_status_pass_bitmap(start_sch_video_status_pass_bitmap[]),
+    .start_sch_pulse(start_sch_pulse),
+    .pipe_normal_bitmap(),
+    .pipe_restart_bitmap(),
+)*/
+
+as6d_app_pipe_mask_ctrl u_as6d_app_pipe_mask_ctrl(/*AUTOINST*/);
+
+endmodule
+//Local Variables:
+//verilog-auto-inst-param-value : t
+//verilog-library-files:("./mem/fifo_wrapper/as6d_app_video_status_buffer_1r1w_16x102_fwft_afifo_wrapper.v")
+//verilog-library-extensions:(".v"".vh"".sv"".svh")
+//End:

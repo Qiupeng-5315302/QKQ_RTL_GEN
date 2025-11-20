@@ -1,3 +1,4 @@
+
 module as6d_app_pipe_sch_concat_line_interleaved(
     // Clock and Reset
     input                   aggre_clk,
@@ -6,10 +7,15 @@ module as6d_app_pipe_sch_concat_line_interleaved(
     // Configuration Inputs
     input   [1:0]           aggre_mode,                         // 汇聚模式
     input   [3:0]           pipe_concat_en,
-    input   [3:0]           pipe_mask_bitmap,
     input   [1:0]           master_pipe,                        // 主pipe选择
+
+    input   [3:0]           pipe_mask_bitmap,
     input   [3:0]           pipe_rdy_bitmap,                    // pipe就绪位图
     
+    input  [15:0]           pipe_framecount,
+    input  [15:0]           pipe_linecount,
+    input  [ 5:0]           pipe_pkt_datatype,
+
     // Scheduling Control
     input                   start_sch_pulse,
     output  reg             end_sch_pulse,
@@ -42,14 +48,17 @@ module as6d_app_pipe_sch_concat_line_interleaved(
     input                   bpg_empty,                          // BPG empty signal
     input                   bpg_ack,                            // BPG ack signal
     input                   bpg_line_end,                       // BPG line_end signal
+    output  reg [15:0]      bpg_framecount,                     // bpg framecount signal
+    output  reg [15:0]      bpg_linecount,                      // bpg linecount signal
+    output  reg [ 5:0]      bpg_pkt_datatype,                   // bpg pkt_datatype
     
     // BPG Interface - Outputs to BPG
-    output  reg             bpg_up_state,                       // BPG up_state (4-bit, one per pipe)
+    output  wire            bpg_up_state,                       // BPG up_state (4-bit, one per pipe)
     
     // Video Pipe Up State Concat Outputs
-    output  reg             up_state_concat[0:3],
-    output  wire            ack_concat[0:3],
-    output  wire            line_end_concat[0:3],
+    output  wire [3:0]      up_state_concat,
+    output  wire [3:0]      ack_concat,
+    output  wire [3:0]      line_end_concat,
     
     // Status Outputs
     output  reg             sch_data_type_align_fail_int
@@ -70,7 +79,7 @@ module as6d_app_pipe_sch_concat_line_interleaved(
     reg                     master_flag;
     reg     [1:0]           group_index;
     reg                     flag;
-    reg                     up_state_internal[0:3];         // Internal up_state before splitting
+    reg     [3:0]           up_state_internal;         // Internal up_state before splitting
     
     wire                    start_sch_pulse_datatype_align;
     wire    [3:0]           multiple_value_comparator_vld;
@@ -80,13 +89,31 @@ module as6d_app_pipe_sch_concat_line_interleaved(
     wire    [1:0]           group_index_mux;
     
     // BPG MUX signals - combine video_pipe and BPG based on pipe_mask_bitmap
-    wire    [0:3]           ack_combined;
-    wire    [0:3]           line_end_combined;
-    wire    [0:3]           bpg_up_state_bitmap;
+    wire    [3:0]           ack_combined;
+    wire    [3:0]           line_end_combined;
+    wire    [3:0]           bpg_up_state_bitmap;
     
     integer                 j;
     genvar                  i;
     
+    // =========================================================================
+    // BPG pkt message lock - bpg_framecount / bpg_linecount / bpg_pkt_datatype
+    // =========================================================================
+
+    always@(posedge aggre_clk or negedge aggre_clk_rst_n)begin
+        if(~aggre_clk_rst_n)begin
+            bpg_framecount   <= 16'd0;
+            bpg_linecount    <= 16'd0;
+            bpg_pkt_datatype <=  6'd0;
+        end
+        else if(start_sch_pulse)begin
+            bpg_framecount   <= pipe_framecount;
+            bpg_linecount    <= pipe_linecount;
+            bpg_pkt_datatype <= pipe_pkt_datatype;
+        end
+    end
+
+
     // =========================================================================
     // BPG MUX Logic - Combine video_pipe and BPG signals based on pipe_mask_bitmap
     // =========================================================================

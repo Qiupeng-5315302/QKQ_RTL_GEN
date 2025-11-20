@@ -1,0 +1,109 @@
+
+Magic 271485
+Revision Verdi_O-2018.09-SP2-9
+
+; Window Layout <x> <y> <width> <height> <signalwidth> <valuewidth>
+viewPort 0 27 3440 876 474 116
+
+; File list:
+; openDirFile [-d delimiter] [-s time_offset] [-rf auto_bus_rule_file] path_name file_name
+openDirFile -d / "" "/data/proj/as6t28d/wa/xuhaiqiang/current_debug/AS6T28D/AS6D_APP/as6d_app_tb/idi_bus_vip/sim/dump.fsdb"
+
+; file time scale:
+; fileTimeScale ### s|ms|us|ns|ps
+
+; signal spacing:
+signalSpacing 5
+
+; windowTimeUnit is used for zoom, cursor & marker
+; waveform viewport range
+zoom 0.000000 1515000000000.000000
+cursor 0.000000
+marker 0.000000
+
+; user define markers
+; userMarker time_pos marker_name color linestyle
+; visible top row signal index
+top 0
+; marker line index
+markerPos 35
+
+; event list
+; addEvent event_name event_expression
+; curEvent event_name
+
+
+
+COMPLEX_EVENT_BEGIN
+
+
+COMPLEX_EVENT_END
+
+
+
+; toolbar current search type
+; curSTATUS search_type
+curSTATUS ByChange
+
+
+addGroup "G1"
+activeDirFile "" "/data/proj/as6t28d/wa/xuhaiqiang/current_debug/AS6T28D/AS6D_APP/as6d_app_tb/idi_bus_vip/sim/dump.fsdb"
+addSignal -h 15 /tb_top/idi_if_in[0]/byte_en[2:0]
+addSignal -h 15 -holdScope clk_data
+addSignal -h 15 -holdScope csi_data[63:0]
+addSignal -h 15 -holdScope data_en
+addSignal -h 15 -holdScope data_type[5:0]
+addSignal -h 15 -holdScope header_en
+addSignal -h 15 -holdScope virtual_channel[3:0]
+addSignal -h 15 -holdScope world_count[15:0]
+addGroup "G2"
+addSignal -h 15 /tb_top/idi_if_in[1]/byte_en[2:0]
+addSignal -h 15 -holdScope clk_data
+addSignal -h 15 -holdScope csi_data[63:0]
+addSignal -h 15 -holdScope data_en
+addSignal -h 15 -holdScope data_type[5:0]
+addSignal -h 15 -holdScope header_en
+addSignal -h 15 -holdScope virtual_channel[3:0]
+addSignal -h 15 -holdScope world_count[15:0]
+addGroup "G3"
+addSignal -h 15 /tb_top/idi_if_in[2]/byte_en[2:0]
+addSignal -h 15 -holdScope clk_data
+addSignal -h 15 -holdScope csi_data[63:0]
+addSignal -h 15 -holdScope data_en
+addSignal -h 15 -holdScope data_type[5:0]
+addSignal -h 15 -holdScope header_en
+addSignal -h 15 -holdScope virtual_channel[3:0]
+addSignal -h 15 -holdScope world_count[15:0]
+addGroup "G4"
+addSignal -h 15 /tb_top/idi_if_in[3]/byte_en[2:0]
+addSignal -h 15 -holdScope clk_data
+addSignal -h 15 -holdScope csi_data[63:0]
+addSignal -h 15 -holdScope data_en
+addSignal -h 15 -holdScope data_type[5:0]
+addSignal -h 15 -holdScope header_en
+addSignal -h 15 -holdScope virtual_channel[3:0]
+addSignal -h 15 -holdScope world_count[15:0]
+addGroup "G5"
+
+; getSignalForm Scope Hierarchy Status
+; active file of getSignalForm
+activeDirFile "" "/data/proj/as6t28d/wa/xuhaiqiang/current_debug/AS6T28D/AS6D_APP/as6d_app_tb/idi_bus_vip/sim/dump.fsdb"
+
+GETSIGNALFORM_SCOPE_HIERARCHY_BEGIN
+getSignalForm close
+
+"/tb_top"
+"/tb_top/idi_if_in[0]"
+"/tb_top/idi_if_in[2]"
+
+SCOPE_LIST_BEGIN
+"/tb_top"
+"/tb_top/idi_if_in[0]"
+"/tb_top/idi_if_in[1]"
+"/tb_top/idi_if_in[2]"
+"/tb_top/idi_if_in[3]"
+SCOPE_LIST_END
+
+GETSIGNALFORM_SCOPE_HIERARCHY_END
+
+

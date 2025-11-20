@@ -53,7 +53,9 @@ module as6d_app_aggr #(
    app_aggr_idi_crc_err_int0, up_state_video_pipe0,
    up_state_video_pipe1, up_state_video_pipe2, up_state_video_pipe3,
    up_state_video_pipe4, up_state_video_pipe5, up_state_video_pipe6,
-   up_state_video_pipe7,
+   up_state_video_pipe7, pipe0_wr_mode, pipe1_wr_mode, pipe2_wr_mode,
+   pipe3_wr_mode, pipe0_mem_clear, pipe1_mem_clear, pipe2_mem_clear,
+   pipe3_mem_clear,
    // Inputs
    video_pipe_date_type_for_concat_align_vld3,
    video_pipe_date_type_for_concat_align_vld2,
@@ -142,7 +144,8 @@ module as6d_app_aggr #(
    reg_app_aggr1_vc_bit_override_value,
    reg_app_aggr1_vc_bit_override_en,
    reg_app_aggr0_vc_bit_override_value,
-   reg_app_aggr0_vc_bit_override_en, pipe_frame_active,
+   reg_app_aggr0_vc_bit_override_en, pipe3_frame_active,
+   pipe2_frame_active, pipe1_frame_active, pipe0_frame_active,
    line_end_vld_pipe7_aggregator3, line_end_vld_pipe7_aggregator2,
    line_end_vld_pipe7_aggregator1, line_end_vld_pipe7_aggregator0,
    line_end_vld_pipe6_aggregator3, line_end_vld_pipe6_aggregator2,
@@ -169,9 +172,9 @@ module as6d_app_aggr #(
    idi_linecount_3, idi_linecount_2, idi_linecount_1, idi_linecount_0,
    idi_header_en_3, idi_header_en_2, idi_header_en_1, idi_header_en_0,
    idi_datatype_3, idi_datatype_2, idi_datatype_1, idi_datatype_0,
-   fifo_wr_clk_rst_n_3, fifo_wr_clk_rst_n_2, fifo_wr_clk_rst_n_1,
-   fifo_wr_clk_rst_n_0, fifo_wr_clk_3, fifo_wr_clk_2, fifo_wr_clk_1,
-   fifo_wr_clk_0, empty_vld_pipe7_aggregator3,
+   fifo_wrclk_rst_n3, fifo_wrclk_rst_n2, fifo_wrclk_rst_n1,
+   fifo_wrclk_rst_n0, fifo_wrclk3, fifo_wrclk2, fifo_wrclk1,
+   fifo_wrclk0, empty_vld_pipe7_aggregator3,
    empty_vld_pipe7_aggregator2, empty_vld_pipe7_aggregator1,
    empty_vld_pipe7_aggregator0, empty_vld_pipe6_aggregator3,
    empty_vld_pipe6_aggregator2, empty_vld_pipe6_aggregator1,
@@ -191,27 +194,28 @@ module as6d_app_aggr #(
    csi2device3_idi_anti_halt, csi2device2_idi_halt,
    csi2device2_idi_anti_halt, csi2device1_idi_halt,
    csi2device1_idi_anti_halt, csi2device0_idi_halt,
-   csi2device0_idi_anti_halt, clk_1M, app_aggregation_bypass,
-   aggre_clk_rst_n3, aggre_clk_rst_n2, aggre_clk_rst_n1,
-   aggre_clk_rst_n0, aggre_clk3, aggre_clk2, aggre_clk1, aggre_clk0,
-   ack_vld_pipe7_aggregator3, ack_vld_pipe7_aggregator2,
-   ack_vld_pipe7_aggregator1, ack_vld_pipe7_aggregator0,
-   ack_vld_pipe6_aggregator3, ack_vld_pipe6_aggregator2,
-   ack_vld_pipe6_aggregator1, ack_vld_pipe6_aggregator0,
-   ack_vld_pipe5_aggregator3, ack_vld_pipe5_aggregator2,
-   ack_vld_pipe5_aggregator1, ack_vld_pipe5_aggregator0,
-   ack_vld_pipe4_aggregator3, ack_vld_pipe4_aggregator2,
-   ack_vld_pipe4_aggregator1, ack_vld_pipe4_aggregator0,
-   ack_vld_pipe3_aggregator3, ack_vld_pipe3_aggregator2,
-   ack_vld_pipe3_aggregator1, ack_vld_pipe3_aggregator0,
-   ack_vld_pipe2_aggregator3, ack_vld_pipe2_aggregator2,
-   ack_vld_pipe2_aggregator1, ack_vld_pipe2_aggregator0,
-   ack_vld_pipe1_aggregator3, ack_vld_pipe1_aggregator2,
-   ack_vld_pipe1_aggregator1, ack_vld_pipe1_aggregator0,
-   ack_vld_pipe0_aggregator3, ack_vld_pipe0_aggregator2,
-   ack_vld_pipe0_aggregator1, ack_vld_pipe0_aggregator0, ack_pre7,
-   ack_pre6, ack_pre5, ack_pre4, ack_pre3, ack_pre2, ack_pre1,
-   ack_pre0, ack7, ack6, ack5, ack4, ack3, ack2, ack1, ack0
+   csi2device0_idi_anti_halt, clk_1M_rst_n, clk_1M,
+   app_aggregation_bypass, aggre_clk_rst_n3, aggre_clk_rst_n2,
+   aggre_clk_rst_n1, aggre_clk_rst_n0, aggre_clk3, aggre_clk2,
+   aggre_clk1, aggre_clk0, ack_vld_pipe7_aggregator3,
+   ack_vld_pipe7_aggregator2, ack_vld_pipe7_aggregator1,
+   ack_vld_pipe7_aggregator0, ack_vld_pipe6_aggregator3,
+   ack_vld_pipe6_aggregator2, ack_vld_pipe6_aggregator1,
+   ack_vld_pipe6_aggregator0, ack_vld_pipe5_aggregator3,
+   ack_vld_pipe5_aggregator2, ack_vld_pipe5_aggregator1,
+   ack_vld_pipe5_aggregator0, ack_vld_pipe4_aggregator3,
+   ack_vld_pipe4_aggregator2, ack_vld_pipe4_aggregator1,
+   ack_vld_pipe4_aggregator0, ack_vld_pipe3_aggregator3,
+   ack_vld_pipe3_aggregator2, ack_vld_pipe3_aggregator1,
+   ack_vld_pipe3_aggregator0, ack_vld_pipe2_aggregator3,
+   ack_vld_pipe2_aggregator2, ack_vld_pipe2_aggregator1,
+   ack_vld_pipe2_aggregator0, ack_vld_pipe1_aggregator3,
+   ack_vld_pipe1_aggregator2, ack_vld_pipe1_aggregator1,
+   ack_vld_pipe1_aggregator0, ack_vld_pipe0_aggregator3,
+   ack_vld_pipe0_aggregator2, ack_vld_pipe0_aggregator1,
+   ack_vld_pipe0_aggregator0, ack_pre7, ack_pre6, ack_pre5, ack_pre4,
+   ack_pre3, ack_pre2, ack_pre1, ack_pre0, ack7, ack6, ack5, ack4,
+   ack3, ack2, ack1, ack0
    );
 
 /*AUTOINPUT*/
@@ -274,6 +278,7 @@ input			aggre_clk_rst_n2;	// To u2_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			aggre_clk_rst_n3;	// To u3_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			app_aggregation_bypass;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input			clk_1M;			// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			clk_1M_rst_n;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input			csi2device0_idi_anti_halt;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			csi2device0_idi_halt;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			csi2device1_idi_anti_halt;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
@@ -314,14 +319,14 @@ input			empty_vld_pipe7_aggregator0;// To u0_as6d_app_aggr_lane of as6d_app_aggr
 input			empty_vld_pipe7_aggregator1;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			empty_vld_pipe7_aggregator2;// To u2_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			empty_vld_pipe7_aggregator3;// To u3_as6d_app_aggr_lane of as6d_app_aggr_lane.v
-input			fifo_wr_clk_0;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
-input			fifo_wr_clk_1;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
-input			fifo_wr_clk_2;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
-input			fifo_wr_clk_3;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
-input			fifo_wr_clk_rst_n_0;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
-input			fifo_wr_clk_rst_n_1;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
-input			fifo_wr_clk_rst_n_2;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
-input			fifo_wr_clk_rst_n_3;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wrclk0;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wrclk1;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wrclk2;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wrclk3;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wrclk_rst_n0;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wrclk_rst_n1;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wrclk_rst_n2;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			fifo_wrclk_rst_n3;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [5:0]		idi_datatype_0;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [5:0]		idi_datatype_1;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [5:0]		idi_datatype_2;		// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
@@ -394,7 +399,10 @@ input			line_end_vld_pipe7_aggregator0;// To u0_as6d_app_aggr_lane of as6d_app_a
 input			line_end_vld_pipe7_aggregator1;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			line_end_vld_pipe7_aggregator2;// To u2_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input			line_end_vld_pipe7_aggregator3;// To u3_as6d_app_aggr_lane of as6d_app_aggr_lane.v
-input [3:0]		pipe_frame_active;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			pipe0_frame_active;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			pipe1_frame_active;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			pipe2_frame_active;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input			pipe3_frame_active;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [2:0]		reg_app_aggr0_vc_bit_override_en;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input [2:0]		reg_app_aggr0_vc_bit_override_value;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
 input [2:0]		reg_app_aggr1_vc_bit_override_en;// To u1_as6d_app_aggr_lane of as6d_app_aggr_lane.v
@@ -448,7 +456,7 @@ input [3:0]		reg_sync_aggr_force_video_mask;// To u0_as6d_app_aggr_lane of as6d_
 input [3:0]		reg_sync_aggr_video_mask_restart;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [5:0]		reg_sync_aggr_video_status_info_datatype;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [15:0]		reg_sync_aggr_video_status_info_linecount;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
-input [2:0]		reg_sync_aggr_video_status_info_vc;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
+input [4:0]		reg_sync_aggr_video_status_info_vc;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [15:0]		reg_sync_aggr_video_status_info_wordcount;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [19:0]		reg_sync_aggr_video_timeout_threshold;// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v, ...
 input [1:0]		sch0_aggre_mode;	// To u0_as6d_app_aggr_lane of as6d_app_aggr_lane.v
@@ -664,6 +672,14 @@ output			up_state_video_pipe4	;
 output			up_state_video_pipe5	;				
 output			up_state_video_pipe6	;				
 output			up_state_video_pipe7	;				
+output [1:0]    pipe0_wr_mode;
+output [1:0]    pipe1_wr_mode;
+output [1:0]    pipe2_wr_mode;
+output [1:0]    pipe3_wr_mode;
+output          pipe0_mem_clear;
+output          pipe1_mem_clear;
+output          pipe2_mem_clear;
+output          pipe3_mem_clear;
 
 wire			sch0_up_state0	;				
 wire			sch1_up_state0	;				
@@ -697,6 +713,14 @@ wire			sch0_up_state7	;
 wire			sch1_up_state7	;				
 wire			sch2_up_state7	;				
 wire			sch3_up_state7	;				
+wire   [1:0]    sch0_pipe0_wr_mode,sch1_pipe0_wr_mode,sch2_pipe0_wr_mode,sch3_pipe0_wr_mode;
+wire   [1:0]    sch0_pipe1_wr_mode,sch1_pipe1_wr_mode,sch2_pipe1_wr_mode,sch3_pipe1_wr_mode;
+wire   [1:0]    sch0_pipe2_wr_mode,sch1_pipe2_wr_mode,sch2_pipe2_wr_mode,sch3_pipe2_wr_mode;
+wire   [1:0]    sch0_pipe3_wr_mode,sch1_pipe3_wr_mode,sch2_pipe3_wr_mode,sch3_pipe3_wr_mode;
+wire            sch0_pipe0_mem_clear,sch1_pipe0_mem_clear,sch2_pipe0_mem_clear,sch3_pipe0_mem_clear;
+wire            sch0_pipe1_mem_clear,sch1_pipe1_mem_clear,sch2_pipe1_mem_clear,sch3_pipe1_mem_clear;
+wire            sch0_pipe2_mem_clear,sch1_pipe2_mem_clear,sch2_pipe2_mem_clear,sch3_pipe2_mem_clear;
+wire            sch0_pipe3_mem_clear,sch1_pipe3_mem_clear,sch2_pipe3_mem_clear,sch3_pipe3_mem_clear;
 
 assign	up_state_video_pipe0	=	sch0_up_state0|sch1_up_state0|sch2_up_state0|sch3_up_state0		;	
 assign	up_state_video_pipe1	=	sch0_up_state1|sch1_up_state1|sch2_up_state1|sch3_up_state1		;	
@@ -707,6 +731,15 @@ assign	up_state_video_pipe5	=	sch0_up_state5|sch1_up_state5|sch2_up_state5|sch3_
 assign	up_state_video_pipe6	=	sch0_up_state6|sch1_up_state6|sch2_up_state6|sch3_up_state6		;	
 assign	up_state_video_pipe7	=	sch0_up_state7|sch1_up_state7|sch2_up_state7|sch3_up_state7		;	
 
+assign  pipe0_wr_mode = sch0_pipe0_wr_mode & sch1_pipe0_wr_mode & sch2_pipe0_wr_mode & sch3_pipe0_wr_mode;
+assign  pipe1_wr_mode = sch0_pipe1_wr_mode & sch1_pipe1_wr_mode & sch2_pipe1_wr_mode & sch3_pipe1_wr_mode;
+assign  pipe2_wr_mode = sch0_pipe2_wr_mode & sch1_pipe2_wr_mode & sch2_pipe2_wr_mode & sch3_pipe2_wr_mode;
+assign  pipe3_wr_mode = sch0_pipe3_wr_mode & sch1_pipe3_wr_mode & sch2_pipe3_wr_mode & sch3_pipe3_wr_mode;
+
+assign  pipe0_mem_clear = sch0_pipe0_mem_clear & sch1_pipe0_mem_clear & sch2_pipe0_mem_clear & sch3_pipe0_mem_clear;
+assign  pipe1_mem_clear = sch0_pipe1_mem_clear & sch1_pipe1_mem_clear & sch2_pipe1_mem_clear & sch3_pipe1_mem_clear;
+assign  pipe2_mem_clear = sch0_pipe2_mem_clear & sch1_pipe2_mem_clear & sch2_pipe2_mem_clear & sch3_pipe2_mem_clear;
+assign  pipe3_mem_clear = sch0_pipe3_mem_clear & sch1_pipe3_mem_clear & sch2_pipe3_mem_clear & sch3_pipe3_mem_clear;
 /*  as6d_app_aggr_lane  AUTO_TEMPLATE (
 		.VIDEO_DATA_SIZE			 (140),
 		.DATA_PARITY_WIDTH			 (21),
@@ -746,15 +779,6 @@ assign	up_state_video_pipe7	=	sch0_up_state7|sch1_up_state7|sch2_up_state7|sch3_
 		.auto_mask_en(4'h0),
 		.force_video_mask(4'h0),
 		.sch_data_type_align_fail_int(sch_data_type_align_fail_int@),
-		.pipe_clear_bit_map(),
-		.pipe0_wr_mode(),
-		.pipe1_wr_mode(),
-		.pipe2_wr_mode(),
-		.pipe3_wr_mode(),
-		.pipe0_wr_mode_strobe(),
-		.pipe1_wr_mode_strobe(),
-		.pipe2_wr_mode_strobe(),
-		.pipe3_wr_mode_strobe(),
         .reg_sync_aggr_video_mask_latch_reset(reg_sync_aggr_@_video_mask_latch_reset),
  );
 */
@@ -765,14 +789,22 @@ as6d_app_aggr_lane #(/*AUTOINSTPARAM*/
 		     .DATA_PARITY_WIDTH	(21),			 // Templated
 		     .AGGR_ID		(2'd0))			 // Templated
 u0_as6d_app_aggr_lane  (
-					     .up_state0		(sch0_up_state0),
-					     .up_state1		(sch0_up_state1), 
-					     .up_state2		(sch0_up_state2),
-					     .up_state3		(sch0_up_state3),
-			             .up_state4	    (sch0_up_state4),
-			             .up_state5	    (sch0_up_state5),
-			             .up_state6	    (sch0_up_state6),
-			             .up_state7	    (sch0_up_state7),
+            .up_state0		(sch0_up_state0),
+            .up_state1		(sch0_up_state1), 
+            .up_state2		(sch0_up_state2),
+            .up_state3		(sch0_up_state3),
+            .up_state4	    (sch0_up_state4),
+            .up_state5	    (sch0_up_state5),
+            .up_state6	    (sch0_up_state6),
+            .up_state7	    (sch0_up_state7),
+			.pipe0_wr_mode	(sch0_pipe0_wr_mode[1:0]),
+			.pipe1_wr_mode	(sch0_pipe1_wr_mode[1:0]),
+			.pipe2_wr_mode	(sch0_pipe2_wr_mode[1:0]),
+			.pipe3_wr_mode	(sch0_pipe3_wr_mode[1:0]),
+			.pipe0_mem_clear(sch0_pipe0_mem_clear),
+			.pipe1_mem_clear(sch0_pipe1_mem_clear),
+			.pipe2_mem_clear(sch0_pipe2_mem_clear),
+			.pipe3_mem_clear(sch0_pipe3_mem_clear),
 						 /*AUTOINST*/
 			// Outputs
 			.ack_aggre	(sch0_ack_aggre[7:0]),	 // Templated
@@ -792,15 +824,6 @@ u0_as6d_app_aggr_lane  (
 			.current_state	(sch0_cs[3:0]),		 // Templated
 			.line_end_aggre	(sch0_line_end_aggre[7:0]), // Templated
 			.line_end_concat(sch0_line_end_concat[3:0]), // Templated
-			.pipe0_wr_mode	(),			 // Templated
-			.pipe0_wr_mode_strobe(),		 // Templated
-			.pipe1_wr_mode	(),			 // Templated
-			.pipe1_wr_mode_strobe(),		 // Templated
-			.pipe2_wr_mode	(),			 // Templated
-			.pipe2_wr_mode_strobe(),		 // Templated
-			.pipe3_wr_mode	(),			 // Templated
-			.pipe3_wr_mode_strobe(),		 // Templated
-			.pipe_clear_bit_map(),			 // Templated
 			.reg_rd_send_pkt_cnt_lp_pf(reg_rd_send_pkt_cnt_lp_pf_aggr0[31:0]), // Templated
 			.reg_rd_send_pkt_cnt_lp_ph(reg_rd_send_pkt_cnt_lp_ph_aggr0[31:0]), // Templated
 			.reg_rd_send_pkt_cnt_sp_fe(reg_rd_send_pkt_cnt_sp_fe_aggr0[31:0]), // Templated
@@ -841,6 +864,7 @@ u0_as6d_app_aggr_lane  (
 			.aggre_mode	(sch0_aggre_mode[1:0]),	 // Templated
 			.app_aggregation_bypass(app_aggregation_bypass), // Templated
 			.clk_1M		(clk_1M),
+			.clk_1M_rst_n	(clk_1M_rst_n),
 			.csi2device_idi_anti_halt(csi2device0_idi_anti_halt), // Templated
 			.csi2device_idi_halt(csi2device0_idi_halt), // Templated
 			.empty0		(video_data_fifo_empty0), // Templated
@@ -859,14 +883,14 @@ u0_as6d_app_aggr_lane  (
 			.empty_vld5	(empty_vld_pipe5_aggregator0), // Templated
 			.empty_vld6	(empty_vld_pipe6_aggregator0), // Templated
 			.empty_vld7	(empty_vld_pipe7_aggregator0), // Templated
-			.fifo_wr_clk_0	(fifo_wr_clk_0),
-			.fifo_wr_clk_1	(fifo_wr_clk_1),
-			.fifo_wr_clk_2	(fifo_wr_clk_2),
-			.fifo_wr_clk_3	(fifo_wr_clk_3),
-			.fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
-			.fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
-			.fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
-			.fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
+			.fifo_wrclk0	(fifo_wrclk0),
+			.fifo_wrclk1	(fifo_wrclk1),
+			.fifo_wrclk2	(fifo_wrclk2),
+			.fifo_wrclk3	(fifo_wrclk3),
+			.fifo_wrclk_rst_n0(fifo_wrclk_rst_n0),
+			.fifo_wrclk_rst_n1(fifo_wrclk_rst_n1),
+			.fifo_wrclk_rst_n2(fifo_wrclk_rst_n2),
+			.fifo_wrclk_rst_n3(fifo_wrclk_rst_n3),
 			.frame_sync_lock(sch0_frame_sync_lock),	 // Templated
 			.fse_filter	(sch0_fse_filter),	 // Templated
 			.idi_datatype_0	(idi_datatype_0[5:0]),
@@ -920,17 +944,20 @@ u0_as6d_app_aggr_lane  (
 			.master_pipe	(sch0_master_pipe[1:0]), // Templated
 			.pipe0_aggre_en	(sch0_pipe0_aggre_en),	 // Templated
 			.pipe0_concat_en(sch0_pipe0_concat_en),	 // Templated
+			.pipe0_frame_active(pipe0_frame_active),
 			.pipe1_aggre_en	(sch0_pipe1_aggre_en),	 // Templated
 			.pipe1_concat_en(sch0_pipe1_concat_en),	 // Templated
+			.pipe1_frame_active(pipe1_frame_active),
 			.pipe2_aggre_en	(sch0_pipe2_aggre_en),	 // Templated
 			.pipe2_concat_en(sch0_pipe2_concat_en),	 // Templated
+			.pipe2_frame_active(pipe2_frame_active),
 			.pipe3_aggre_en	(sch0_pipe3_aggre_en),	 // Templated
 			.pipe3_concat_en(sch0_pipe3_concat_en),	 // Templated
+			.pipe3_frame_active(pipe3_frame_active),
 			.pipe4_aggre_en	(sch0_pipe4_aggre_en),	 // Templated
 			.pipe5_aggre_en	(sch0_pipe5_aggre_en),	 // Templated
 			.pipe6_aggre_en	(sch0_pipe6_aggre_en),	 // Templated
 			.pipe7_aggre_en	(sch0_pipe7_aggre_en),	 // Templated
-			.pipe_frame_active(pipe_frame_active[3:0]),
 			.reg_app_aggr_idi_crc_chk_en(reg_app_aggr_idi_crc_chk_en[0]), // Templated
 			.reg_app_aggr_vc_bit_override_en(reg_app_aggr0_vc_bit_override_en[2:0]), // Templated
 			.reg_app_aggr_vc_bit_override_value(reg_app_aggr0_vc_bit_override_value[2:0]), // Templated
@@ -951,7 +978,7 @@ u0_as6d_app_aggr_lane  (
 			.reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
 			.reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
 			.reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
-			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[4:0]),
 			.reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
 			.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 			.video_loss0	(video_loss0),
@@ -975,14 +1002,22 @@ as6d_app_aggr_lane#(/*AUTOINSTPARAM*/
 		    .DATA_PARITY_WIDTH	(21),			 // Templated
 		    .AGGR_ID		(2'd1))			 // Templated
 u1_as6d_app_aggr_lane  (
-					     .up_state0		(sch1_up_state0),
-					     .up_state1		(sch1_up_state1),
-					     .up_state2		(sch1_up_state2),
-					     .up_state3		(sch1_up_state3),
-			             .up_state4	    (sch1_up_state4),
-			             .up_state5	    (sch1_up_state5),
-			             .up_state6	    (sch1_up_state6),
-			             .up_state7	    (sch1_up_state7),
+            .up_state0		(sch1_up_state0),
+            .up_state1		(sch1_up_state1),
+            .up_state2		(sch1_up_state2),
+            .up_state3		(sch1_up_state3),
+            .up_state4	    (sch1_up_state4),
+            .up_state5	    (sch1_up_state5),
+            .up_state6	    (sch1_up_state6),
+            .up_state7	    (sch1_up_state7),
+			.pipe0_wr_mode	(sch1_pipe0_wr_mode[1:0]),
+			.pipe1_wr_mode	(sch1_pipe1_wr_mode[1:0]),
+			.pipe2_wr_mode	(sch1_pipe2_wr_mode[1:0]),
+			.pipe3_wr_mode	(sch1_pipe3_wr_mode[1:0]),
+			.pipe0_mem_clear(sch1_pipe0_mem_clear),
+			.pipe1_mem_clear(sch1_pipe1_mem_clear),
+			.pipe2_mem_clear(sch1_pipe2_mem_clear),
+			.pipe3_mem_clear(sch1_pipe3_mem_clear),
 						 /*AUTOINST*/
 			// Outputs
 			.ack_aggre	(sch1_ack_aggre[7:0]),	 // Templated
@@ -1002,15 +1037,6 @@ u1_as6d_app_aggr_lane  (
 			.current_state	(sch1_cs[3:0]),		 // Templated
 			.line_end_aggre	(sch1_line_end_aggre[7:0]), // Templated
 			.line_end_concat(sch1_line_end_concat[3:0]), // Templated
-			.pipe0_wr_mode	(),			 // Templated
-			.pipe0_wr_mode_strobe(),		 // Templated
-			.pipe1_wr_mode	(),			 // Templated
-			.pipe1_wr_mode_strobe(),		 // Templated
-			.pipe2_wr_mode	(),			 // Templated
-			.pipe2_wr_mode_strobe(),		 // Templated
-			.pipe3_wr_mode	(),			 // Templated
-			.pipe3_wr_mode_strobe(),		 // Templated
-			.pipe_clear_bit_map(),			 // Templated
 			.reg_rd_send_pkt_cnt_lp_pf(reg_rd_send_pkt_cnt_lp_pf_aggr1[31:0]), // Templated
 			.reg_rd_send_pkt_cnt_lp_ph(reg_rd_send_pkt_cnt_lp_ph_aggr1[31:0]), // Templated
 			.reg_rd_send_pkt_cnt_sp_fe(reg_rd_send_pkt_cnt_sp_fe_aggr1[31:0]), // Templated
@@ -1051,6 +1077,7 @@ u1_as6d_app_aggr_lane  (
 			.aggre_mode	(sch1_aggre_mode[1:0]),	 // Templated
 			.app_aggregation_bypass(app_aggregation_bypass), // Templated
 			.clk_1M		(clk_1M),
+			.clk_1M_rst_n	(clk_1M_rst_n),
 			.csi2device_idi_anti_halt(csi2device1_idi_anti_halt), // Templated
 			.csi2device_idi_halt(csi2device1_idi_halt), // Templated
 			.empty0		(video_data_fifo_empty0), // Templated
@@ -1069,14 +1096,14 @@ u1_as6d_app_aggr_lane  (
 			.empty_vld5	(empty_vld_pipe5_aggregator1), // Templated
 			.empty_vld6	(empty_vld_pipe6_aggregator1), // Templated
 			.empty_vld7	(empty_vld_pipe7_aggregator1), // Templated
-			.fifo_wr_clk_0	(fifo_wr_clk_0),
-			.fifo_wr_clk_1	(fifo_wr_clk_1),
-			.fifo_wr_clk_2	(fifo_wr_clk_2),
-			.fifo_wr_clk_3	(fifo_wr_clk_3),
-			.fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
-			.fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
-			.fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
-			.fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
+			.fifo_wrclk0	(fifo_wrclk0),
+			.fifo_wrclk1	(fifo_wrclk1),
+			.fifo_wrclk2	(fifo_wrclk2),
+			.fifo_wrclk3	(fifo_wrclk3),
+			.fifo_wrclk_rst_n0(fifo_wrclk_rst_n0),
+			.fifo_wrclk_rst_n1(fifo_wrclk_rst_n1),
+			.fifo_wrclk_rst_n2(fifo_wrclk_rst_n2),
+			.fifo_wrclk_rst_n3(fifo_wrclk_rst_n3),
 			.frame_sync_lock(sch1_frame_sync_lock),	 // Templated
 			.fse_filter	(sch1_fse_filter),	 // Templated
 			.idi_datatype_0	(idi_datatype_0[5:0]),
@@ -1130,17 +1157,20 @@ u1_as6d_app_aggr_lane  (
 			.master_pipe	(sch1_master_pipe[1:0]), // Templated
 			.pipe0_aggre_en	(sch1_pipe0_aggre_en),	 // Templated
 			.pipe0_concat_en(sch1_pipe0_concat_en),	 // Templated
+			.pipe0_frame_active(pipe0_frame_active),
 			.pipe1_aggre_en	(sch1_pipe1_aggre_en),	 // Templated
 			.pipe1_concat_en(sch1_pipe1_concat_en),	 // Templated
+			.pipe1_frame_active(pipe1_frame_active),
 			.pipe2_aggre_en	(sch1_pipe2_aggre_en),	 // Templated
 			.pipe2_concat_en(sch1_pipe2_concat_en),	 // Templated
+			.pipe2_frame_active(pipe2_frame_active),
 			.pipe3_aggre_en	(sch1_pipe3_aggre_en),	 // Templated
 			.pipe3_concat_en(sch1_pipe3_concat_en),	 // Templated
+			.pipe3_frame_active(pipe3_frame_active),
 			.pipe4_aggre_en	(sch1_pipe4_aggre_en),	 // Templated
 			.pipe5_aggre_en	(sch1_pipe5_aggre_en),	 // Templated
 			.pipe6_aggre_en	(sch1_pipe6_aggre_en),	 // Templated
 			.pipe7_aggre_en	(sch1_pipe7_aggre_en),	 // Templated
-			.pipe_frame_active(pipe_frame_active[3:0]),
 			.reg_app_aggr_idi_crc_chk_en(reg_app_aggr_idi_crc_chk_en[1]), // Templated
 			.reg_app_aggr_vc_bit_override_en(reg_app_aggr1_vc_bit_override_en[2:0]), // Templated
 			.reg_app_aggr_vc_bit_override_value(reg_app_aggr1_vc_bit_override_value[2:0]), // Templated
@@ -1161,7 +1191,7 @@ u1_as6d_app_aggr_lane  (
 			.reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
 			.reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
 			.reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
-			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[4:0]),
 			.reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
 			.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 			.video_loss0	(video_loss0),
@@ -1185,14 +1215,22 @@ as6d_app_aggr_lane#(/*AUTOINSTPARAM*/
 		    .DATA_PARITY_WIDTH	(21),			 // Templated
 		    .AGGR_ID		(2'd2))			 // Templated
 u2_as6d_app_aggr_lane  (
-					     .up_state0		(sch2_up_state0),
-					     .up_state1		(sch2_up_state1),
-					     .up_state2		(sch2_up_state2),
-					     .up_state3		(sch2_up_state3),
-			             .up_state4	    (sch2_up_state4),
-			             .up_state5	    (sch2_up_state5),
-			             .up_state6	    (sch2_up_state6),
-			             .up_state7	    (sch2_up_state7),
+            .up_state0		(sch2_up_state0),
+            .up_state1		(sch2_up_state1),
+            .up_state2		(sch2_up_state2),
+            .up_state3		(sch2_up_state3),
+            .up_state4	    (sch2_up_state4),
+            .up_state5	    (sch2_up_state5),
+            .up_state6	    (sch2_up_state6),
+            .up_state7	    (sch2_up_state7),
+			.pipe0_wr_mode	(sch2_pipe0_wr_mode[1:0]),
+			.pipe1_wr_mode	(sch2_pipe1_wr_mode[1:0]),
+			.pipe2_wr_mode	(sch2_pipe2_wr_mode[1:0]),
+			.pipe3_wr_mode	(sch2_pipe3_wr_mode[1:0]),
+			.pipe0_mem_clear(sch2_pipe0_mem_clear),
+			.pipe1_mem_clear(sch2_pipe1_mem_clear),
+			.pipe2_mem_clear(sch2_pipe2_mem_clear),
+			.pipe3_mem_clear(sch2_pipe3_mem_clear),
 						 /*AUTOINST*/
 			// Outputs
 			.ack_aggre	(sch2_ack_aggre[7:0]),	 // Templated
@@ -1212,15 +1250,6 @@ u2_as6d_app_aggr_lane  (
 			.current_state	(sch2_cs[3:0]),		 // Templated
 			.line_end_aggre	(sch2_line_end_aggre[7:0]), // Templated
 			.line_end_concat(sch2_line_end_concat[3:0]), // Templated
-			.pipe0_wr_mode	(),			 // Templated
-			.pipe0_wr_mode_strobe(),		 // Templated
-			.pipe1_wr_mode	(),			 // Templated
-			.pipe1_wr_mode_strobe(),		 // Templated
-			.pipe2_wr_mode	(),			 // Templated
-			.pipe2_wr_mode_strobe(),		 // Templated
-			.pipe3_wr_mode	(),			 // Templated
-			.pipe3_wr_mode_strobe(),		 // Templated
-			.pipe_clear_bit_map(),			 // Templated
 			.reg_rd_send_pkt_cnt_lp_pf(reg_rd_send_pkt_cnt_lp_pf_aggr2[31:0]), // Templated
 			.reg_rd_send_pkt_cnt_lp_ph(reg_rd_send_pkt_cnt_lp_ph_aggr2[31:0]), // Templated
 			.reg_rd_send_pkt_cnt_sp_fe(reg_rd_send_pkt_cnt_sp_fe_aggr2[31:0]), // Templated
@@ -1261,6 +1290,7 @@ u2_as6d_app_aggr_lane  (
 			.aggre_mode	(sch2_aggre_mode[1:0]),	 // Templated
 			.app_aggregation_bypass(app_aggregation_bypass), // Templated
 			.clk_1M		(clk_1M),
+			.clk_1M_rst_n	(clk_1M_rst_n),
 			.csi2device_idi_anti_halt(csi2device2_idi_anti_halt), // Templated
 			.csi2device_idi_halt(csi2device2_idi_halt), // Templated
 			.empty0		(video_data_fifo_empty0), // Templated
@@ -1279,14 +1309,14 @@ u2_as6d_app_aggr_lane  (
 			.empty_vld5	(empty_vld_pipe5_aggregator2), // Templated
 			.empty_vld6	(empty_vld_pipe6_aggregator2), // Templated
 			.empty_vld7	(empty_vld_pipe7_aggregator2), // Templated
-			.fifo_wr_clk_0	(fifo_wr_clk_0),
-			.fifo_wr_clk_1	(fifo_wr_clk_1),
-			.fifo_wr_clk_2	(fifo_wr_clk_2),
-			.fifo_wr_clk_3	(fifo_wr_clk_3),
-			.fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
-			.fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
-			.fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
-			.fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
+			.fifo_wrclk0	(fifo_wrclk0),
+			.fifo_wrclk1	(fifo_wrclk1),
+			.fifo_wrclk2	(fifo_wrclk2),
+			.fifo_wrclk3	(fifo_wrclk3),
+			.fifo_wrclk_rst_n0(fifo_wrclk_rst_n0),
+			.fifo_wrclk_rst_n1(fifo_wrclk_rst_n1),
+			.fifo_wrclk_rst_n2(fifo_wrclk_rst_n2),
+			.fifo_wrclk_rst_n3(fifo_wrclk_rst_n3),
 			.frame_sync_lock(sch2_frame_sync_lock),	 // Templated
 			.fse_filter	(sch2_fse_filter),	 // Templated
 			.idi_datatype_0	(idi_datatype_0[5:0]),
@@ -1340,17 +1370,20 @@ u2_as6d_app_aggr_lane  (
 			.master_pipe	(sch2_master_pipe[1:0]), // Templated
 			.pipe0_aggre_en	(sch2_pipe0_aggre_en),	 // Templated
 			.pipe0_concat_en(sch2_pipe0_concat_en),	 // Templated
+			.pipe0_frame_active(pipe0_frame_active),
 			.pipe1_aggre_en	(sch2_pipe1_aggre_en),	 // Templated
 			.pipe1_concat_en(sch2_pipe1_concat_en),	 // Templated
+			.pipe1_frame_active(pipe1_frame_active),
 			.pipe2_aggre_en	(sch2_pipe2_aggre_en),	 // Templated
 			.pipe2_concat_en(sch2_pipe2_concat_en),	 // Templated
+			.pipe2_frame_active(pipe2_frame_active),
 			.pipe3_aggre_en	(sch2_pipe3_aggre_en),	 // Templated
 			.pipe3_concat_en(sch2_pipe3_concat_en),	 // Templated
+			.pipe3_frame_active(pipe3_frame_active),
 			.pipe4_aggre_en	(sch2_pipe4_aggre_en),	 // Templated
 			.pipe5_aggre_en	(sch2_pipe5_aggre_en),	 // Templated
 			.pipe6_aggre_en	(sch2_pipe6_aggre_en),	 // Templated
 			.pipe7_aggre_en	(sch2_pipe7_aggre_en),	 // Templated
-			.pipe_frame_active(pipe_frame_active[3:0]),
 			.reg_app_aggr_idi_crc_chk_en(reg_app_aggr_idi_crc_chk_en[2]), // Templated
 			.reg_app_aggr_vc_bit_override_en(reg_app_aggr2_vc_bit_override_en[2:0]), // Templated
 			.reg_app_aggr_vc_bit_override_value(reg_app_aggr2_vc_bit_override_value[2:0]), // Templated
@@ -1371,7 +1404,7 @@ u2_as6d_app_aggr_lane  (
 			.reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
 			.reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
 			.reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
-			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[4:0]),
 			.reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
 			.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 			.video_loss0	(video_loss0),
@@ -1395,14 +1428,22 @@ as6d_app_aggr_lane#(/*AUTOINSTPARAM*/
 		    .DATA_PARITY_WIDTH	(21),			 // Templated
 		    .AGGR_ID		(2'd3))			 // Templated
 u3_as6d_app_aggr_lane  (
-					     .up_state0		(sch3_up_state0),
-					     .up_state1		(sch3_up_state1),
-					     .up_state2		(sch3_up_state2),
-					     .up_state3		(sch3_up_state3),
-			             .up_state4	    (sch3_up_state4),
-			             .up_state5	    (sch3_up_state5),
-			             .up_state6	    (sch3_up_state6),
-			             .up_state7	    (sch3_up_state7),
+            .up_state0		(sch3_up_state0),
+            .up_state1		(sch3_up_state1),
+            .up_state2		(sch3_up_state2),
+            .up_state3		(sch3_up_state3),
+            .up_state4	    (sch3_up_state4),
+            .up_state5	    (sch3_up_state5),
+            .up_state6	    (sch3_up_state6),
+            .up_state7	    (sch3_up_state7),
+			.pipe0_wr_mode	(sch3_pipe0_wr_mode[1:0]),
+			.pipe1_wr_mode	(sch3_pipe1_wr_mode[1:0]),
+			.pipe2_wr_mode	(sch3_pipe2_wr_mode[1:0]),
+			.pipe3_wr_mode	(sch3_pipe3_wr_mode[1:0]),
+			.pipe0_mem_clear(sch3_pipe0_mem_clear),
+			.pipe1_mem_clear(sch3_pipe1_mem_clear),
+			.pipe2_mem_clear(sch3_pipe2_mem_clear),
+			.pipe3_mem_clear(sch3_pipe3_mem_clear),
 						 /*AUTOINST*/
 			// Outputs
 			.ack_aggre	(sch3_ack_aggre[7:0]),	 // Templated
@@ -1422,15 +1463,6 @@ u3_as6d_app_aggr_lane  (
 			.current_state	(sch3_cs[3:0]),		 // Templated
 			.line_end_aggre	(sch3_line_end_aggre[7:0]), // Templated
 			.line_end_concat(sch3_line_end_concat[3:0]), // Templated
-			.pipe0_wr_mode	(),			 // Templated
-			.pipe0_wr_mode_strobe(),		 // Templated
-			.pipe1_wr_mode	(),			 // Templated
-			.pipe1_wr_mode_strobe(),		 // Templated
-			.pipe2_wr_mode	(),			 // Templated
-			.pipe2_wr_mode_strobe(),		 // Templated
-			.pipe3_wr_mode	(),			 // Templated
-			.pipe3_wr_mode_strobe(),		 // Templated
-			.pipe_clear_bit_map(),			 // Templated
 			.reg_rd_send_pkt_cnt_lp_pf(reg_rd_send_pkt_cnt_lp_pf_aggr3[31:0]), // Templated
 			.reg_rd_send_pkt_cnt_lp_ph(reg_rd_send_pkt_cnt_lp_ph_aggr3[31:0]), // Templated
 			.reg_rd_send_pkt_cnt_sp_fe(reg_rd_send_pkt_cnt_sp_fe_aggr3[31:0]), // Templated
@@ -1471,6 +1503,7 @@ u3_as6d_app_aggr_lane  (
 			.aggre_mode	(sch3_aggre_mode[1:0]),	 // Templated
 			.app_aggregation_bypass(app_aggregation_bypass), // Templated
 			.clk_1M		(clk_1M),
+			.clk_1M_rst_n	(clk_1M_rst_n),
 			.csi2device_idi_anti_halt(csi2device3_idi_anti_halt), // Templated
 			.csi2device_idi_halt(csi2device3_idi_halt), // Templated
 			.empty0		(video_data_fifo_empty0), // Templated
@@ -1489,14 +1522,14 @@ u3_as6d_app_aggr_lane  (
 			.empty_vld5	(empty_vld_pipe5_aggregator3), // Templated
 			.empty_vld6	(empty_vld_pipe6_aggregator3), // Templated
 			.empty_vld7	(empty_vld_pipe7_aggregator3), // Templated
-			.fifo_wr_clk_0	(fifo_wr_clk_0),
-			.fifo_wr_clk_1	(fifo_wr_clk_1),
-			.fifo_wr_clk_2	(fifo_wr_clk_2),
-			.fifo_wr_clk_3	(fifo_wr_clk_3),
-			.fifo_wr_clk_rst_n_0(fifo_wr_clk_rst_n_0),
-			.fifo_wr_clk_rst_n_1(fifo_wr_clk_rst_n_1),
-			.fifo_wr_clk_rst_n_2(fifo_wr_clk_rst_n_2),
-			.fifo_wr_clk_rst_n_3(fifo_wr_clk_rst_n_3),
+			.fifo_wrclk0	(fifo_wrclk0),
+			.fifo_wrclk1	(fifo_wrclk1),
+			.fifo_wrclk2	(fifo_wrclk2),
+			.fifo_wrclk3	(fifo_wrclk3),
+			.fifo_wrclk_rst_n0(fifo_wrclk_rst_n0),
+			.fifo_wrclk_rst_n1(fifo_wrclk_rst_n1),
+			.fifo_wrclk_rst_n2(fifo_wrclk_rst_n2),
+			.fifo_wrclk_rst_n3(fifo_wrclk_rst_n3),
 			.frame_sync_lock(sch3_frame_sync_lock),	 // Templated
 			.fse_filter	(sch3_fse_filter),	 // Templated
 			.idi_datatype_0	(idi_datatype_0[5:0]),
@@ -1550,17 +1583,20 @@ u3_as6d_app_aggr_lane  (
 			.master_pipe	(sch3_master_pipe[1:0]), // Templated
 			.pipe0_aggre_en	(sch3_pipe0_aggre_en),	 // Templated
 			.pipe0_concat_en(sch3_pipe0_concat_en),	 // Templated
+			.pipe0_frame_active(pipe0_frame_active),
 			.pipe1_aggre_en	(sch3_pipe1_aggre_en),	 // Templated
 			.pipe1_concat_en(sch3_pipe1_concat_en),	 // Templated
+			.pipe1_frame_active(pipe1_frame_active),
 			.pipe2_aggre_en	(sch3_pipe2_aggre_en),	 // Templated
 			.pipe2_concat_en(sch3_pipe2_concat_en),	 // Templated
+			.pipe2_frame_active(pipe2_frame_active),
 			.pipe3_aggre_en	(sch3_pipe3_aggre_en),	 // Templated
 			.pipe3_concat_en(sch3_pipe3_concat_en),	 // Templated
+			.pipe3_frame_active(pipe3_frame_active),
 			.pipe4_aggre_en	(sch3_pipe4_aggre_en),	 // Templated
 			.pipe5_aggre_en	(sch3_pipe5_aggre_en),	 // Templated
 			.pipe6_aggre_en	(sch3_pipe6_aggre_en),	 // Templated
 			.pipe7_aggre_en	(sch3_pipe7_aggre_en),	 // Templated
-			.pipe_frame_active(pipe_frame_active[3:0]),
 			.reg_app_aggr_idi_crc_chk_en(reg_app_aggr_idi_crc_chk_en[3]), // Templated
 			.reg_app_aggr_vc_bit_override_en(reg_app_aggr3_vc_bit_override_en[2:0]), // Templated
 			.reg_app_aggr_vc_bit_override_value(reg_app_aggr3_vc_bit_override_value[2:0]), // Templated
@@ -1581,7 +1617,7 @@ u3_as6d_app_aggr_lane  (
 			.reg_sync_aggr_video_mask_restart(reg_sync_aggr_video_mask_restart[3:0]),
 			.reg_sync_aggr_video_status_info_datatype(reg_sync_aggr_video_status_info_datatype[5:0]),
 			.reg_sync_aggr_video_status_info_linecount(reg_sync_aggr_video_status_info_linecount[15:0]),
-			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[2:0]),
+			.reg_sync_aggr_video_status_info_vc(reg_sync_aggr_video_status_info_vc[4:0]),
 			.reg_sync_aggr_video_status_info_wordcount(reg_sync_aggr_video_status_info_wordcount[15:0]),
 			.reg_sync_aggr_video_timeout_threshold(reg_sync_aggr_video_timeout_threshold[19:0]),
 			.video_loss0	(video_loss0),
@@ -1598,5 +1634,6 @@ u3_as6d_app_aggr_lane  (
 			.video_pipe_date_type_for_concat_align_vld2(video_pipe_date_type_for_concat_align_vld2),
 			.video_pipe_date_type_for_concat_align_vld3(video_pipe_date_type_for_concat_align_vld3),
 			.video_pipe_vld_aggre_bypass(video_pipe3_vld_aggre_bypass)); // Templated
+
 
 endmodule

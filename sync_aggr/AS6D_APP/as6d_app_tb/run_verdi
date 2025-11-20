@@ -1,0 +1,6 @@
+
+source /data/proj/as6t28d/wa/qiupeng/current/proj_env.csh
+
+
+setenv  AS6T28_PROJ_DIR    /data/proj/as6t28d/wa/${USER}/current
+verdi -sv -2001 -autoalias -background -f as6d_app_tb.f -ssf app.fsdb &
